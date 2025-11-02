@@ -1,55 +1,268 @@
 # H2 Database 学习环境 .gitignore
 
+# ============================================
 # 编译产物
+# ============================================
 h2/bin/
 h2/target/
 h2/temp/
 h2/ext/
 h2/h2.iml
 
+# IntelliJ IDEA 输出目录
+out/
+out/
+
+# 编译生成的类文件
+*.class
+**/target/
+**/bin/
+**/temp/
+**/build/
+
+# ============================================
 # 数据文件
+# ============================================
 data/
 *.db
 *.mv.db
 *.h2.db
 *.lock.db
 *.trace.db
+*.log.db
+*.lobs.db
 
+# ============================================
 # IDE 文件
+# ============================================
+# IntelliJ IDEA
 .idea/
 *.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Eclipse
+.project
+.classpath
+.settings/
+.metadata/
+bin/
+tmp/
+*.tmp
+.cache/
+.buildpath
+.target/
+
+# VS Code
 .vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/
+nbdist/
+.nb-gradle/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# 编辑器备份文件
 *.swp
 *.swo
+*~
+.#*
+\#*#
 
+# ============================================
 # 系统文件
+# ============================================
+# macOS
 .DS_Store
-Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
 
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
 # 日志文件
+# ============================================
 *.log
 logs/
+*.log.*
+*.log.*.gz
+*.log.*.zip
 
+# ============================================
 # 临时文件
+# ============================================
 *.tmp
 *.temp
 *.bak
 *.backup
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+.#*
 
+# ============================================
 # 测试输出
+# ============================================
 test-output/
 test-results/
+**/test-results/
+**/test-output/
+coverage/
+.nyc_output/
 
+# ============================================
 # Maven 相关（如果使用）
+# ============================================
 .mvn/wrapper/maven-wrapper.jar
 .mvn/wrapper/maven-wrapper.properties
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+**/pom.xml.next
+**/release.properties
+**/dependency-reduced-pom.xml
+**/buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
 
-# 其他编译产物
-*.class
+# ============================================
+# Gradle 相关（如果使用）
+# ============================================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+**/build/
+!src/**/build/
+.gradletasknamecache
+
+# ============================================
+# 打包文件
+# ============================================
 *.jar
 *.war
 *.ear
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.gz
+*.bz2
 
+# 排除源代码中的 jar（如果有）
+!h2/src/**/*.jar
+!**/lib/**/*.jar
+
+# ============================================
+# 文档生成
+# ============================================
+h2/docs/
+**/javadoc/
+**/javadoc-api/
+**/javadoc-impl/
+**/javadocImpl/
+**/javadocImpl2/
+**/docs/javadoc/
+**/docs/javadocImpl/
+
+# ============================================
 # 学习笔记备份
+# ============================================
 *.backup
 *.old
+*.save
+*.save.*
+
+# ============================================
+# 调试和性能分析文件
+# ============================================
+*.hprof
+*.prof
+*.dump
+*.gc
+*.jfr
+hs_err_pid*
+replay_pid*
+
+# ============================================
+# 数据库相关
+# ============================================
+*.lck
+*.lock
+*.pid
+*.wal
+*.shm
+*.journal
+
+# ============================================
+# 用户特定配置
+# ============================================
+local.properties
+local.properties.*
+.env
+.env.local
+.env.*.local
+
+# ============================================
+# 缓存目录
+# ============================================
+.cache/
+**/.cache/
+**/cache/
+**/__pycache__/
+
+# ============================================
+# 其他
+# ============================================
+# 压缩包
+*.zip
+*.tar.gz
+*.rar
+
+# 证书和密钥（如果本地有）
+*.pem
+*.key
+*.crt
+*.cert
+*.jks
+*.keystore
+*.truststore
+
+# 配置文件（本地覆盖）
+application-local.properties
+application-local.yml
+config-local.properties

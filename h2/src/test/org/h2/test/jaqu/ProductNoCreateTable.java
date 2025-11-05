@@ -6,10 +6,11 @@
  */
 package org.h2.test.jaqu;
 
-import java.util.Arrays;
-import java.util.List;
 import org.h2.jaqu.Table.JQColumn;
 import org.h2.jaqu.Table.JQTable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A table containing product data.
@@ -37,7 +38,7 @@ public class ProductNoCreateTable {
     }
 
     public static List<ProductNoCreateTable> getList() {
-        ProductNoCreateTable[] list = { create(1, "Chai"), create(2, "Chang") };
+        ProductNoCreateTable[] list = {create(1, "Chai"), create(2, "Chang")};
         return Arrays.asList(list);
     }
 

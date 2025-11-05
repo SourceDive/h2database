@@ -57,7 +57,7 @@ public class SoftHashMap<K, V> extends AbstractMap<K, V> {
      * Store the object. The return value of this method is null or a
      * SoftReference.
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      * @return null or the old object.
      */

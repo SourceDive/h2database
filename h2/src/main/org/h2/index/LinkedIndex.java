@@ -6,9 +6,6 @@
  */
 package org.h2.index;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import org.h2.engine.Constants;
 import org.h2.engine.Session;
 import org.h2.message.DbException;
@@ -24,6 +21,10 @@ import org.h2.util.StatementBuilder;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
 /**
  * A linked index is a index for a linked (remote) table.
  * It is backed by an index on the remote table which is accessed over JDBC.
@@ -35,7 +36,7 @@ public class LinkedIndex extends BaseIndex {
     private long rowCount;
 
     public LinkedIndex(TableLink table, int id, IndexColumn[] columns,
-            IndexType indexType) {
+                       IndexType indexType) {
         initBaseIndex(table, id, null, columns, indexType);
         link = table;
         targetTableName = link.getQualifiedTable();
@@ -143,7 +144,7 @@ public class LinkedIndex extends BaseIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return 100 + getCostRangeIndex(masks, rowCount +
                 Constants.COST_ROW_OFFSET, filter, sortOrder);
     }

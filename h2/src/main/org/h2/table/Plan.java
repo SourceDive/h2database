@@ -6,13 +6,14 @@
  */
 package org.h2.table;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
 import org.h2.expression.ExpressionVisitor;
 import org.h2.table.TableFilter.TableFilterVisitor;
 import org.h2.util.New;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A possible query execution plan. The time required to execute a query depends
@@ -28,8 +29,8 @@ public class Plan {
     /**
      * Create a query plan with the given order.
      *
-     * @param filters the tables of the query
-     * @param count the number of table items
+     * @param filters   the tables of the query
+     * @param count     the number of table items
      * @param condition the condition in the WHERE clause
      */
     public Plan(TableFilter[] filters, int count, Expression condition) {

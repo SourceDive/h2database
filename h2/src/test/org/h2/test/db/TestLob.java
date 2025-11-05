@@ -6,37 +6,18 @@
  */
 package org.h2.test.db;
 
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.SysProperties;
 import org.h2.jdbc.JdbcConnection;
 import org.h2.message.DbException;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
-import org.h2.util.IOUtils;
-import org.h2.util.JdbcUtils;
-import org.h2.util.StringUtils;
-import org.h2.util.Task;
-import org.h2.util.Utils;
+import org.h2.util.*;
+
+import java.io.*;
+import java.sql.*;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Tests LOB and CLOB data types.
@@ -45,8 +26,8 @@ public class TestLob extends TestBase {
 
     private static final String MORE_THAN_128_CHARS =
             "12345678901234567890123456789012345678901234567890" +
-            "12345678901234567890123456789012345678901234567890" +
-            "12345678901234567890123456789";
+                    "12345678901234567890123456789012345678901234567890" +
+                    "12345678901234567890123456789";
 
     /**
      * Run just this test.
@@ -794,67 +775,67 @@ public class TestLob extends TestBase {
         // config.traceTest = true;
         for (int i = 0; i < len; i++) {
             switch (random.nextInt(10)) {
-            case 0:
-                trace("insert " + i);
-                conn.createStatement().execute(
-                        "INSERT INTO TEST(DATA, DATA2) VALUES('" + i +
-                        "' || SPACE(" + spaceLen + "), '" + i + "')");
-                rows++;
-                break;
-            case 1:
-                if (rows > 0) {
-                    int x = random.nextInt(rows);
-                    trace("delete " + x);
+                case 0:
+                    trace("insert " + i);
                     conn.createStatement().execute(
-                            "DELETE FROM TEST WHERE ID=" + x);
-                }
-                break;
-            case 2:
-                if (rows > 0) {
-                    int x = random.nextInt(rows);
-                    trace("update " + x);
-                    conn.createStatement().execute(
-                            "UPDATE TEST SET DATA='x' || DATA, " +
-                            "DATA2='x' || DATA2 WHERE ID=" + x);
-                }
-                break;
-            case 3:
-                if (rows > 0) {
-                    trace("commit");
-                    conn.commit();
-                    sp = null;
-                }
-                break;
-            case 4:
-                if (rows > 0) {
-                    trace("rollback");
-                    conn.rollback();
-                    sp = null;
-                }
-                break;
-            case 5:
-                trace("savepoint");
-                sp = conn.setSavepoint();
-                break;
-            case 6:
-                if (sp != null) {
-                    trace("rollback to savepoint");
-                    conn.rollback(sp);
-                }
-                break;
-            case 7:
-                if (rows > 0) {
-                    trace("checkpoint");
-                    conn.createStatement().execute("CHECKPOINT");
-                    trace("shutdown immediately");
-                    conn.createStatement().execute("SHUTDOWN IMMEDIATELY");
-                    trace("shutdown done");
-                    conn = reconnect(conn);
-                    conn.setAutoCommit(false);
-                    sp = null;
-                }
-                break;
-            default:
+                            "INSERT INTO TEST(DATA, DATA2) VALUES('" + i +
+                                    "' || SPACE(" + spaceLen + "), '" + i + "')");
+                    rows++;
+                    break;
+                case 1:
+                    if (rows > 0) {
+                        int x = random.nextInt(rows);
+                        trace("delete " + x);
+                        conn.createStatement().execute(
+                                "DELETE FROM TEST WHERE ID=" + x);
+                    }
+                    break;
+                case 2:
+                    if (rows > 0) {
+                        int x = random.nextInt(rows);
+                        trace("update " + x);
+                        conn.createStatement().execute(
+                                "UPDATE TEST SET DATA='x' || DATA, " +
+                                        "DATA2='x' || DATA2 WHERE ID=" + x);
+                    }
+                    break;
+                case 3:
+                    if (rows > 0) {
+                        trace("commit");
+                        conn.commit();
+                        sp = null;
+                    }
+                    break;
+                case 4:
+                    if (rows > 0) {
+                        trace("rollback");
+                        conn.rollback();
+                        sp = null;
+                    }
+                    break;
+                case 5:
+                    trace("savepoint");
+                    sp = conn.setSavepoint();
+                    break;
+                case 6:
+                    if (sp != null) {
+                        trace("rollback to savepoint");
+                        conn.rollback(sp);
+                    }
+                    break;
+                case 7:
+                    if (rows > 0) {
+                        trace("checkpoint");
+                        conn.createStatement().execute("CHECKPOINT");
+                        trace("shutdown immediately");
+                        conn.createStatement().execute("SHUTDOWN IMMEDIATELY");
+                        trace("shutdown done");
+                        conn = reconnect(conn);
+                        conn.setAutoCommit(false);
+                        sp = null;
+                    }
+                    break;
+                default:
             }
             ResultSet rs = conn.createStatement().executeQuery(
                     "SELECT * FROM TEST");
@@ -1399,7 +1380,7 @@ public class TestLob extends TestBase {
         Statement stat = conn.createStatement();
         stat.execute("CREATE TABLE TEST(ID INT PRIMARY KEY, DATA OTHER)");
         PreparedStatement prep = conn.prepareStatement(
-                    "INSERT INTO TEST VALUES(1, ?)");
+                "INSERT INTO TEST VALUES(1, ?)");
         prep.setObject(1, new TestLobObject("abc"));
         prep.execute();
         ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM TEST");

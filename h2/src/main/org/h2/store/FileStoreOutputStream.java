@@ -6,9 +6,10 @@
  */
 package org.h2.store;
 
-import java.io.OutputStream;
 import org.h2.engine.Constants;
 import org.h2.tools.CompressTool;
+
+import java.io.OutputStream;
 
 /**
  * An output stream that is backed by a file store.
@@ -18,10 +19,10 @@ public class FileStoreOutputStream extends OutputStream {
     private final Data page;
     private final String compressionAlgorithm;
     private final CompressTool compress;
-    private final byte[] buffer = { 0 };
+    private final byte[] buffer = {0};
 
     public FileStoreOutputStream(FileStore store, DataHandler handler,
-            String compressionAlgorithm) {
+                                 String compressionAlgorithm) {
         this.store = store;
         if (compressionAlgorithm != null) {
             this.compress = CompressTool.getInstance();

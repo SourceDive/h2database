@@ -6,13 +6,6 @@
  */
 package org.h2.engine;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import org.h2.Driver;
 import org.h2.api.ErrorCode;
 import org.h2.command.Parser;
@@ -22,15 +15,19 @@ import org.h2.message.Trace;
 import org.h2.schema.Schema;
 import org.h2.schema.SchemaObjectBase;
 import org.h2.table.Table;
-import org.h2.util.New;
-import org.h2.util.SourceCompiler;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
-import org.h2.util.Utils;
+import org.h2.util.*;
 import org.h2.value.DataType;
 import org.h2.value.Value;
 import org.h2.value.ValueArray;
 import org.h2.value.ValueNull;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * <p>函数</p>
@@ -55,11 +52,11 @@ public class FunctionAlias extends SchemaObjectBase {
     /**
      * Create a new alias based on a method name.
      *
-     * @param schema the schema
-     * @param id the id
-     * @param name the name
-     * @param javaClassMethod the class and method name
-     * @param force create the object even if the class or method does not exist
+     * @param schema                     the schema
+     * @param id                         the id
+     * @param name                       the name
+     * @param javaClassMethod            the class and method name
+     * @param force                      create the object even if the class or method does not exist
      * @param bufferResultSetToLocalTemp whether the result should be buffered
      * @return the database object
      */
@@ -83,11 +80,11 @@ public class FunctionAlias extends SchemaObjectBase {
     /**
      * Create a new alias based on source code.
      *
-     * @param schema the schema
-     * @param id the id
-     * @param name the name
-     * @param source the source code
-     * @param force create the object even if the class or method does not exist
+     * @param schema                     the schema
+     * @param id                         the id
+     * @param name                       the name
+     * @param source                     the source code
+     * @param force                      create the object even if the class or method does not exist
      * @param bufferResultSetToLocalTemp whether the result should be buffered
      * @return the database object
      */
@@ -132,7 +129,7 @@ public class FunctionAlias extends SchemaObjectBase {
             try {
                 Method m = compiler.getMethod(fullClassName);
                 JavaMethod method = new JavaMethod(m, 0);
-                javaMethods = new JavaMethod[] {
+                javaMethods = new JavaMethod[]{
                         method
                 };
             } catch (DbException e) {
@@ -158,7 +155,7 @@ public class FunctionAlias extends SchemaObjectBase {
                 for (JavaMethod old : list) {
                     if (old.getParameterCount() == javaMethod.getParameterCount()) {
                         throw DbException.get(ErrorCode.
-                                METHODS_MUST_HAVE_DIFFERENT_PARAMETER_COUNTS_2,
+                                        METHODS_MUST_HAVE_DIFFERENT_PARAMETER_COUNTS_2,
                                 old.toString(), javaMethod.toString());
                     }
                 }
@@ -390,14 +387,14 @@ public class FunctionAlias extends SchemaObjectBase {
         /**
          * Call the user-defined function and return the value.
          *
-         * @param session the session
-         * @param args the argument list
+         * @param session    the session
+         * @param args       the argument list
          * @param columnList true if the function should only return the column
-         *            list
+         *                   list
          * @return the value
          */
         public Value getValue(Session session, Expression[] args,
-                boolean columnList) {
+                              boolean columnList) {
             Class<?>[] paramClasses = method.getParameterTypes();
             Object[] params = new Object[paramClasses.length];
             int p = 0;

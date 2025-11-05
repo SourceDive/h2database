@@ -6,16 +6,10 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
+
+import java.sql.*;
 
 /**
  * Tests the compatibility with other databases.
@@ -70,9 +64,9 @@ public class TestCompatibility extends TestBase {
         stat.execute("create table test(id int primary key, name varchar) " +
                 "as select 1, 'hello'");
         assertThrows(ErrorCode.TABLE_OR_VIEW_ALREADY_EXISTS_1, stat).
-            execute("create table test(id int primary key, name varchar)");
+                execute("create table test(id int primary key, name varchar)");
         assertThrows(ErrorCode.DUPLICATE_COLUMN_NAME_1, stat).
-            execute("alter table test add column Name varchar");
+                execute("alter table test add column Name varchar");
         ResultSet rs;
 
         DatabaseMetaData meta = c.getMetaData();
@@ -124,8 +118,8 @@ public class TestCompatibility extends TestBase {
 
     private void testColumnAlias() throws SQLException {
         Statement stat = conn.createStatement();
-        String[] modes = { "PostgreSQL", "MySQL", "HSQLDB", "MSSQLServer",
-                "Derby", "Oracle", "Regular" };
+        String[] modes = {"PostgreSQL", "MySQL", "HSQLDB", "MSSQLServer",
+                "Derby", "Oracle", "Regular"};
         String columnAlias;
         columnAlias = "MySQL,Regular";
         stat.execute("CREATE TABLE TEST(ID INT)");
@@ -150,8 +144,8 @@ public class TestCompatibility extends TestBase {
 
     private void testUniqueIndexSingleNull() throws SQLException {
         Statement stat = conn.createStatement();
-        String[] modes = { "PostgreSQL", "MySQL", "HSQLDB", "MSSQLServer",
-                "Derby", "Oracle", "Regular" };
+        String[] modes = {"PostgreSQL", "MySQL", "HSQLDB", "MSSQLServer",
+                "Derby", "Oracle", "Regular"};
         String multiNull = "PostgreSQL,MySQL,Oracle,Regular";
         for (String mode : modes) {
             stat.execute("SET MODE " + mode);
@@ -337,7 +331,7 @@ public class TestCompatibility extends TestBase {
 
         assertResult("Doe, John", stat,
                 "SELECT surname + ', ' + name FROM test " +
-                "WHERE SUBSTRING(NAME,1,1)+SUBSTRING(SURNAME,1,1) = 'JD'");
+                        "WHERE SUBSTRING(NAME,1,1)+SUBSTRING(SURNAME,1,1) = 'JD'");
 
         stat.execute("ALTER TABLE TEST ADD COLUMN full_name VARCHAR(100)");
         stat.execute("UPDATE TEST SET full_name = name + ', ' + surname");

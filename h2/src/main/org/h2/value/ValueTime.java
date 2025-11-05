@@ -6,15 +6,15 @@
  */
 package org.h2.value;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Time;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.util.DateTimeUtils;
 import org.h2.util.MathUtils;
 import org.h2.util.StringUtils;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Time;
 
 /**
  * Implementation of the TIME data type.
@@ -174,12 +174,12 @@ public class ValueTime extends Value {
     /**
      * Append a time to the string builder.
      *
-     * @param buff the target string builder
-     * @param nanos the time in nanoseconds
+     * @param buff            the target string builder
+     * @param nanos           the time in nanoseconds
      * @param alwaysAddMillis whether to always add at least ".0"
      */
     static void appendTime(StringBuilder buff, long nanos,
-            boolean alwaysAddMillis) {
+                           boolean alwaysAddMillis) {
         if (nanos < 0) {
             buff.append('-');
             nanos = -nanos;

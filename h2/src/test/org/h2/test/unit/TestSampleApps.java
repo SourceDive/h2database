@@ -6,19 +6,15 @@
  */
 package org.h2.test.unit;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.util.IOUtils;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Tests the sample apps.
@@ -53,29 +49,29 @@ public class TestSampleApps extends TestBase {
         deleteDb("optimizations");
         testApp("Compacting...\nDone.", org.h2.samples.Compact.class);
         testApp("NAME: Bob Meier\n" +
-                "EMAIL: bob.meier@abcde.abc\n" +
-                "PHONE: +41123456789\n\n" +
-                "NAME: John Jones\n" +
-                "EMAIL: john.jones@abcde.abc\n" +
-                "PHONE: +41976543210\n",
+                        "EMAIL: bob.meier@abcde.abc\n" +
+                        "PHONE: +41123456789\n\n" +
+                        "NAME: John Jones\n" +
+                        "EMAIL: john.jones@abcde.abc\n" +
+                        "PHONE: +41976543210\n",
                 org.h2.samples.CsvSample.class);
         testApp("",
                 org.h2.samples.CachedPreparedStatements.class);
         testApp("2 is prime\n" +
-                "3 is prime\n" +
-                "5 is prime\n" +
-                "7 is prime\n" +
-                "11 is prime\n" +
-                "13 is prime\n" +
-                "17 is prime\n" +
-                "19 is prime\n" +
-                "30\n" +
-                "20\n" +
-                "0/0\n" +
-                "0/1\n" +
-                "1/0\n" +
-                "1/1\n" +
-                "10",
+                        "3 is prime\n" +
+                        "5 is prime\n" +
+                        "7 is prime\n" +
+                        "11 is prime\n" +
+                        "13 is prime\n" +
+                        "17 is prime\n" +
+                        "19 is prime\n" +
+                        "30\n" +
+                        "20\n" +
+                        "0/0\n" +
+                        "0/1\n" +
+                        "1/0\n" +
+                        "1/1\n" +
+                        "10",
                 org.h2.samples.Function.class);
         // Not compatible with PostgreSQL JDBC driver (throws a
         // NullPointerException):
@@ -86,21 +82,21 @@ public class TestSampleApps extends TestBase {
         testApp("The sum is 20.00", org.h2.samples.TriggerSample.class);
         testApp("Hello: 1\nWorld: 2", org.h2.samples.TriggerPassData.class);
         testApp("table test:\n" +
-                "1 Hallo\n\n" +
-                "test_view:\n" +
-                "1 Hallo",
+                        "1 Hallo\n\n" +
+                        "test_view:\n" +
+                        "1 Hallo",
                 org.h2.samples.UpdatableView.class);
         testApp(
                 "adding test data...\n" +
-                "defrag to reduce random access...\n" +
-                "create the zip file...\n" +
-                "open the database from the zip file...",
+                        "defrag to reduce random access...\n" +
+                        "create the zip file...\n" +
+                        "open the database from the zip file...",
                 org.h2.samples.ReadOnlyDatabaseInZip.class);
         testApp(
                 "a: 1/Hello!\n" +
-                "b: 1/Hallo!\n" +
-                "1/A/Hello!\n" +
-                "1/B/Hallo!",
+                        "b: 1/Hallo!\n" +
+                        "1/A/Hello!\n" +
+                        "1/B/Hallo!",
                 org.h2.samples.RowAccessRights.class);
 
         // tools
@@ -123,7 +119,7 @@ public class TestSampleApps extends TestBase {
         System.setOut(out);
         System.setErr(out);
         try {
-            m.invoke(null, new Object[] { args });
+            m.invoke(null, new Object[]{args});
         } catch (InvocationTargetException e) {
             TestBase.logError("error", e.getTargetException());
         } catch (Throwable e) {

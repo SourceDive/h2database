@@ -6,6 +6,13 @@
  */
 package org.h2.upgrade;
 
+import org.h2.engine.ConnectionInfo;
+import org.h2.jdbc.JdbcConnection;
+import org.h2.message.DbException;
+import org.h2.store.fs.FileUtils;
+import org.h2.util.StringUtils;
+import org.h2.util.Utils;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,12 +20,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.UUID;
-import org.h2.engine.ConnectionInfo;
-import org.h2.jdbc.JdbcConnection;
-import org.h2.message.DbException;
-import org.h2.store.fs.FileUtils;
-import org.h2.util.StringUtils;
-import org.h2.util.Utils;
 
 /**
  * This class starts the conversion from older database versions to the current
@@ -41,7 +42,7 @@ public class DbUpgrade {
      * the database is upgraded, or if no upgrade is possible or needed, this
      * methods returns null.
      *
-     * @param url the database URL
+     * @param url  the database URL
      * @param info the properties
      * @return the connection if connected with the old version (NO_UPGRADE)
      */
@@ -84,7 +85,7 @@ public class DbUpgrade {
      * directory.
      *
      * @param scriptInTempDir true if the conversion script should be
-     *        located in the temp directory.
+     *                        located in the temp directory.
      */
     public static void setScriptInTempDir(boolean scriptInTempDir) {
         DbUpgrade.scriptInTempDir = scriptInTempDir;
@@ -165,7 +166,7 @@ public class DbUpgrade {
                 FileUtils.delete(backupIndex);
                 FileUtils.deleteRecursive(backupLobs, false);
             }
-        } catch (Exception e)  {
+        } catch (Exception e) {
             if (FileUtils.exists(backupData)) {
                 FileUtils.moveTo(backupData, data);
             }

@@ -42,18 +42,18 @@ public interface Trigger {
      * appropriate flags set. As an example, if the trigger is of type INSERT
      * and UPDATE, then the parameter type is set to (INSERT | UPDATE).
      *
-     * @param conn a connection to the database (a system connection)
-     * @param schemaName the name of the schema
+     * @param conn        a connection to the database (a system connection)
+     * @param schemaName  the name of the schema
      * @param triggerName the name of the trigger used in the CREATE TRIGGER
-     *            statement
-     * @param tableName the name of the table
-     * @param before whether the fire method is called before or after the
-     *            operation is performed
-     * @param type the operation type: INSERT, UPDATE, DELETE, SELECT, or a
-     *            combination (this parameter is a bit field)
+     *                    statement
+     * @param tableName   the name of the table
+     * @param before      whether the fire method is called before or after the
+     *                    operation is performed
+     * @param type        the operation type: INSERT, UPDATE, DELETE, SELECT, or a
+     *                    combination (this parameter is a bit field)
      */
     void init(Connection conn, String schemaName, String triggerName,
-            String tableName, boolean before, int type) throws SQLException;
+              String tableName, boolean before, int type) throws SQLException;
 
     /**
      * This method is called for each triggered action. The method is called
@@ -67,11 +67,11 @@ public interface Trigger {
      * as defined in the table.
      * </p>
      *
-     * @param conn a connection to the database
+     * @param conn   a connection to the database
      * @param oldRow the old row, or null if no old row is available (for
-     *            INSERT)
+     *               INSERT)
      * @param newRow the new row, or null if no new row is available (for
-     *            DELETE)
+     *               DELETE)
      * @throws SQLException if the operation must be undone
      */
     void fire(Connection conn, Object[] oldRow, Object[] newRow)

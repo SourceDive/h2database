@@ -6,10 +6,10 @@
  */
 package org.h2.test.synth.thread;
 
+import org.h2.test.TestBase;
+
 import java.sql.SQLException;
 import java.util.Random;
-
-import org.h2.test.TestBase;
 
 /**
  * The is an abstract operation for {@link TestMulti}.

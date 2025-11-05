@@ -6,11 +6,6 @@
  */
 package org.h2.table;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
@@ -29,6 +24,11 @@ import org.h2.value.Value;
 import org.h2.value.ValueNull;
 import org.h2.value.ValueResultSet;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 /**
  * A table backed by a system or user-defined function that returns a result
  * set.
@@ -42,7 +42,7 @@ public class FunctionTable extends Table {
     private Value cachedValue;
 
     public FunctionTable(Schema schema, Session session,
-            Expression functionExpr, FunctionCall function) {
+                         Expression functionExpr, FunctionCall function) {
         super(schema, 0, function.getName(), false, true);
         this.functionExpr = functionExpr;
         this.function = function;
@@ -109,8 +109,8 @@ public class FunctionTable extends Table {
 
     @Override
     public Index addIndex(Session session, String indexName, int indexId,
-            IndexColumn[] cols, IndexType indexType, boolean create,
-            String indexComment) {
+                          IndexColumn[] cols, IndexType indexType, boolean create,
+                          String indexComment) {
         throw DbException.getUnsupportedException("ALIAS");
     }
 
@@ -195,7 +195,7 @@ public class FunctionTable extends Table {
             cachedResult.reset();
             return cachedResult;
         }
-        LocalResult result = LocalResult.read(session,  v.getResultSet(), 0);
+        LocalResult result = LocalResult.read(session, v.getResultSet(), 0);
         if (function.isDeterministic()) {
             cachedResult = result;
             cachedValue = v;

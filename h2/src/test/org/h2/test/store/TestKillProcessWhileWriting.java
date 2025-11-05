@@ -6,13 +6,13 @@
  */
 package org.h2.test.store;
 
-import java.util.Random;
-
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.test.utils.FilePathUnstable;
+
+import java.util.Random;
 
 /**
  * Tests the MVStore.
@@ -96,34 +96,34 @@ public class TestKillProcessWhileWriting extends TestBase {
                 byte[] v = new byte[r.nextInt(100) * 100];
                 int type = r.nextInt(10);
                 switch (type) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                    m.put(k, v);
-                    break;
-                case 4:
-                case 5:
-                    m.remove(k);
-                    break;
-                case 6:
-                    s.commit();
-                    break;
-                case 7:
-                    s.compact(80, 1024);
-                    break;
-                case 8:
-                    m.clear();
-                    break;
-                case 9:
-                    s.close();
-                    s = new MVStore.Builder().
-                            fileName(fileName).
-                            pageSplitSize(50).
-                            autoCommitDisabled().
-                            open();
-                    m = s.openMap("data");
-                    break;
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        m.put(k, v);
+                        break;
+                    case 4:
+                    case 5:
+                        m.remove(k);
+                        break;
+                    case 6:
+                        s.commit();
+                        break;
+                    case 7:
+                        s.compact(80, 1024);
+                        break;
+                    case 8:
+                        m.clear();
+                        break;
+                    case 9:
+                        s.close();
+                        s = new MVStore.Builder().
+                                fileName(fileName).
+                                pageSplitSize(50).
+                                autoCommitDisabled().
+                                open();
+                        m = s.openMap("data");
+                        break;
                 }
             }
             s.close();

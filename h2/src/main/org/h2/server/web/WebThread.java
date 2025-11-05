@@ -6,20 +6,6 @@
  */
 package org.h2.server.web;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.StringTokenizer;
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
 import org.h2.message.TraceSystem;
@@ -27,6 +13,14 @@ import org.h2.mvstore.DataUtils;
 import org.h2.util.IOUtils;
 import org.h2.util.NetUtils;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * For each connection to a session, an object of this class is created.
@@ -323,7 +317,7 @@ class WebThread extends WebApp implements Runnable {
             uploadMultipart(input, len);
         } else if (session != null && len > 0) {
             byte[] bytes = DataUtils.newBytes(len);
-            for (int pos = 0; pos < len;) {
+            for (int pos = 0; pos < len; ) {
                 pos += input.read(bytes, pos, len - pos);
             }
             String s = new String(bytes);

@@ -6,9 +6,6 @@
  */
 package org.h2.table;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.Prepared;
 import org.h2.command.dml.Query;
@@ -16,11 +13,7 @@ import org.h2.engine.Constants;
 import org.h2.engine.DbObject;
 import org.h2.engine.Session;
 import org.h2.engine.User;
-import org.h2.expression.Alias;
-import org.h2.expression.Expression;
-import org.h2.expression.ExpressionColumn;
-import org.h2.expression.ExpressionVisitor;
-import org.h2.expression.Parameter;
+import org.h2.expression.*;
 import org.h2.index.Index;
 import org.h2.index.IndexType;
 import org.h2.index.ViewIndex;
@@ -30,18 +23,16 @@ import org.h2.result.ResultInterface;
 import org.h2.result.Row;
 import org.h2.result.SortOrder;
 import org.h2.schema.Schema;
-import org.h2.util.IntArray;
-import org.h2.util.New;
-import org.h2.util.SmallLRUCache;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
-import org.h2.util.SynchronizedVerifier;
-import org.h2.util.Utils;
+import org.h2.util.*;
 import org.h2.value.Value;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * <p>视图</p>
  * A view is a virtual table that is defined by a query.
+ *
  * @author Thomas Mueller
  * @author Nicolas Fortin, Atelier SIG, IRSTV FR CNRS 24888
  */
@@ -66,8 +57,8 @@ public class TableView extends Table {
     private boolean tableExpression;
 
     public TableView(Schema schema, int id, String name, String querySQL,
-            ArrayList<Parameter> params, String[] columnNames, Session session,
-            boolean recursive) {
+                     ArrayList<Parameter> params, String[] columnNames, Session session,
+                     boolean recursive) {
         super(schema, id, name, false, true);
         init(querySQL, params, columnNames, session, recursive);
     }
@@ -76,14 +67,14 @@ public class TableView extends Table {
      * Try to replace the SQL statement of the view and re-compile this and all
      * dependent views.
      *
-     * @param querySQL the SQL statement
+     * @param querySQL    the SQL statement
      * @param columnNames the column names
-     * @param session the session
-     * @param recursive whether this is a recursive view
-     * @param force if errors should be ignored
+     * @param session     the session
+     * @param recursive   whether this is a recursive view
+     * @param force       if errors should be ignored
      */
     public void replace(String querySQL, String[] columnNames, Session session,
-            boolean recursive, boolean force) {
+                        boolean recursive, boolean force) {
         String oldQuerySQL = this.querySQL;
         String[] oldColumnNames = this.columnNames;
         boolean oldRecursive = this.recursive;
@@ -97,7 +88,7 @@ public class TableView extends Table {
     }
 
     private synchronized void init(String querySQL, ArrayList<Parameter> params,
-            String[] columnNames, Session session, boolean recursive) {
+                                   String[] columnNames, Session session, boolean recursive) {
         this.querySQL = querySQL;
         this.columnNames = columnNames;
         this.recursive = recursive;
@@ -119,9 +110,9 @@ public class TableView extends Table {
      * Re-compile the view query and all views that depend on this object.
      *
      * @param session the session
-     * @param force if exceptions should be ignored
+     * @param force   if exceptions should be ignored
      * @return the exception if re-compiling this or any dependent view failed
-     *         (only when force is disabled)
+     * (only when force is disabled)
      */
     public synchronized DbException recompile(Session session, boolean force) {
         try {
@@ -230,7 +221,7 @@ public class TableView extends Table {
 
     @Override
     public synchronized PlanItem getBestPlanItem(Session session, int[] masks,
-            TableFilter filter, SortOrder sortOrder) {
+                                                 TableFilter filter, SortOrder sortOrder) {
         PlanItem item = new PlanItem();
         item.cost = index.getCost(session, masks, filter, sortOrder);
         IntArray masksArray = new IntArray(masks == null ?
@@ -265,7 +256,7 @@ public class TableView extends Table {
      * Generate "CREATE" SQL statement for the view.
      *
      * @param orReplace if true, then include the OR REPLACE clause
-     * @param force if true, then include the FORCE clause
+     * @param force     if true, then include the FORCE clause
      * @return the SQL statement
      */
     public String getCreateSQL(boolean orReplace, boolean force) {
@@ -273,7 +264,7 @@ public class TableView extends Table {
     }
 
     private String getCreateSQL(boolean orReplace, boolean force,
-            String quotedName) {
+                                String quotedName) {
         StatementBuilder buff = new StatementBuilder("CREATE ");
         if (orReplace) {
             buff.append("OR REPLACE ");
@@ -331,8 +322,8 @@ public class TableView extends Table {
 
     @Override
     public Index addIndex(Session session, String indexName, int indexId,
-            IndexColumn[] cols, IndexType indexType, boolean create,
-            String indexComment) {
+                          IndexColumn[] cols, IndexType indexType, boolean create,
+                          String indexComment) {
         throw DbException.getUnsupportedException("VIEW");
     }
 
@@ -470,15 +461,15 @@ public class TableView extends Table {
     /**
      * Create a temporary view out of the given query.
      *
-     * @param session the session
-     * @param owner the owner of the query
-     * @param name the view name
-     * @param query the query
+     * @param session  the session
+     * @param owner    the owner of the query
+     * @param name     the view name
+     * @param query    the query
      * @param topQuery the top level query
      * @return the view table
      */
     public static TableView createTempView(Session session, User owner,
-            String name, Query query, Query topQuery) {
+                                           String name, Query query, Query topQuery) {
         Schema mainSchema = session.getDatabase().getSchema(Constants.SCHEMA_MAIN);
         String querySQL = query.getPlanSQL();
         TableView v = new TableView(mainSchema, 0, name,

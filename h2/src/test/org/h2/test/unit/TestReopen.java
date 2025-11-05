@@ -6,10 +6,6 @@
  */
 package org.h2.test.unit;
 
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Properties;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Constants;
@@ -25,6 +21,10 @@ import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.util.Profiler;
 import org.h2.util.Utils;
+
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Properties;
 
 /**
  * A test that calls another test, and after each write operation to the
@@ -111,7 +111,7 @@ public class TestReopen extends TestBase implements Recorder {
             verifyCount++;
             // avoid using the Engine class to avoid deadlocks
             Properties p = new Properties();
-            String userName =  getUser();
+            String userName = getUser();
             p.setProperty("user", userName);
             p.setProperty("password", getPassword());
             String url = "jdbc:h2:" + testDatabase +

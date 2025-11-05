@@ -6,15 +6,12 @@
  */
 package org.h2.build.doclet;
 
-import java.io.IOException;
+import com.sun.javadoc.*;
 import org.h2.build.doc.XMLParser;
 import org.h2.build.indexer.HtmlConverter;
 import org.h2.util.SortedProperties;
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.Doc;
-import com.sun.javadoc.MethodDoc;
-import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.Tag;
+
+import java.io.IOException;
 
 /**
  * This custom doclet generates resources from javadoc comments.
@@ -78,34 +75,34 @@ public class ResourceDoclet {
         boolean inColumn = false;
         while (p.hasNext()) {
             String s;
-            switch(p.next()) {
-            case XMLParser.END_ELEMENT:
-                s = p.getName();
-                if ("p".equals(s) || "tr".equals(s) || "br".equals(s)) {
-                    buff.append('\n');
-                }
-                break;
-            case XMLParser.START_ELEMENT:
-                s = p.getName();
-                if ("table".equals(s)) {
-                    buff.append('\n');
-                } else if ("tr".equals(s)) {
-                    column = 0;
-                } else if ("td".equals(s)) {
-                    inColumn = true;
-                    column++;
-                    if (column == 2) {
-                        buff.append('\t');
+            switch (p.next()) {
+                case XMLParser.END_ELEMENT:
+                    s = p.getName();
+                    if ("p".equals(s) || "tr".equals(s) || "br".equals(s)) {
+                        buff.append('\n');
                     }
-                }
-                break;
-            case XMLParser.CHARACTERS:
-                s = HtmlConverter.convertHtmlToString(p.getText().trim());
-                if (inColumn && column == 1) {
-                    firstColumnSize = Math.max(s.length(), firstColumnSize);
-                }
-                buff.append(s);
-                break;
+                    break;
+                case XMLParser.START_ELEMENT:
+                    s = p.getName();
+                    if ("table".equals(s)) {
+                        buff.append('\n');
+                    } else if ("tr".equals(s)) {
+                        column = 0;
+                    } else if ("td".equals(s)) {
+                        inColumn = true;
+                        column++;
+                        if (column == 2) {
+                            buff.append('\t');
+                        }
+                    }
+                    break;
+                case XMLParser.CHARACTERS:
+                    s = HtmlConverter.convertHtmlToString(p.getText().trim());
+                    if (inColumn && column == 1) {
+                        firstColumnSize = Math.max(s.length(), firstColumnSize);
+                    }
+                    buff.append(s);
+                    break;
             }
         }
         for (int i = 0; i < buff.length(); i++) {

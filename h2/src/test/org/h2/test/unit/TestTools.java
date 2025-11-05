@@ -6,35 +6,6 @@
  */
 package org.h2.test.unit;
 
-import java.awt.Button;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.SysProperties;
 import org.h2.store.FileLister;
@@ -42,20 +13,24 @@ import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.test.trace.Player;
 import org.h2.test.utils.AssertThrows;
-import org.h2.tools.Backup;
-import org.h2.tools.ChangeFileEncryption;
+import org.h2.tools.*;
 import org.h2.tools.Console;
-import org.h2.tools.ConvertTraceFile;
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.Recover;
-import org.h2.tools.Restore;
-import org.h2.tools.RunScript;
-import org.h2.tools.Script;
-import org.h2.tools.Server;
-import org.h2.tools.SimpleResultSet;
 import org.h2.tools.SimpleResultSet.SimpleArray;
 import org.h2.util.JdbcUtils;
 import org.h2.util.Task;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Tests the database tools.
@@ -348,7 +323,7 @@ public class TestTools extends TestBase {
         assertTrue(rs.wasNull());
 
         // all updateX methods
-        for (Method m: rs.getClass().getMethods()) {
+        for (Method m : rs.getClass().getMethods()) {
             if (m.getName().startsWith("update")) {
                 if (m.getName().equals("updateRow")) {
                     continue;
@@ -542,9 +517,9 @@ public class TestTools extends TestBase {
                 getConnection("jdbc:h2:ssl://localhost:9001/mem:", "sa", "sa");
 
         result = runServer(0, new String[]{
-                        "-web", "-webPort", "9002", "-webAllowOthers", "-webSSL",
-                        "-pg", "-pgAllowOthers", "-pgPort", "9003",
-                        "-tcp", "-tcpAllowOthers", "-tcpPort", "9006", "-tcpPassword", "abc"});
+                "-web", "-webPort", "9002", "-webAllowOthers", "-webSSL",
+                "-pg", "-pgAllowOthers", "-pgPort", "9003",
+                "-tcp", "-tcpAllowOthers", "-tcpPort", "9006", "-tcpPassword", "abc"});
         Server stop = server;
         assertTrue(result.indexOf("https://") >= 0);
         assertTrue(result.indexOf(":9002") >= 0);
@@ -600,8 +575,8 @@ public class TestTools extends TestBase {
         prep.setBigDecimal(3, new BigDecimal("10.20"));
         prep.executeUpdate();
         stat.execute("create table test2(id int primary key,\n" +
-                "a real, b double, c bigint,\n" +
-                "d smallint, e boolean, f binary, g date, h time, i timestamp)",
+                        "a real, b double, c bigint,\n" +
+                        "d smallint, e boolean, f binary, g date, h time, i timestamp)",
                 Statement.NO_GENERATED_KEYS);
         prep = conn.prepareStatement(
                 "insert into test2 values(1, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -610,7 +585,7 @@ public class TestTools extends TestBase {
         prep.setLong(3, Long.MIN_VALUE);
         prep.setShort(4, Short.MIN_VALUE);
         prep.setBoolean(5, false);
-        prep.setBytes(6, new byte[] { (byte) 10, (byte) 20 });
+        prep.setBytes(6, new byte[]{(byte) 10, (byte) 20});
         prep.setDate(7, java.sql.Date.valueOf("2007-12-31"));
         prep.setTime(8, java.sql.Time.valueOf("23:59:59"));
         prep.setTimestamp(9, java.sql.Timestamp.valueOf("2007-12-31 23:59:59"));
@@ -662,7 +637,7 @@ public class TestTools extends TestBase {
         assertEquals(Long.MIN_VALUE, rs.getLong("c"));
         assertEquals(Short.MIN_VALUE, rs.getShort("d"));
         assertTrue(!rs.getBoolean("e"));
-        assertEquals(new byte[] { (byte) 10, (byte) 20 }, rs.getBytes("f"));
+        assertEquals(new byte[]{(byte) 10, (byte) 20}, rs.getBytes("f"));
         assertEquals("2007-12-31", rs.getString("g"));
         assertEquals("23:59:59", rs.getString("h"));
         assertEquals("2007-12-31 23:59:59.0", rs.getString("i"));
@@ -919,11 +894,11 @@ public class TestTools extends TestBase {
         stat.execute("CREATE TABLE TEST(ID INT PRIMARY KEY, DATA CLOB) "
                 + "AS SELECT X, SPACE(3000) FROM SYSTEM_RANGE(1, 300)");
         conn.close();
-        String[] args = { "-dir", dir, "-db", "testChangeFileEncryption",
-                "-cipher", "AES", "-decrypt", "abc", "-quiet" };
+        String[] args = {"-dir", dir, "-db", "testChangeFileEncryption",
+                "-cipher", "AES", "-decrypt", "abc", "-quiet"};
         ChangeFileEncryption.main(args);
-        args = new String[] { "-dir", dir, "-db", "testChangeFileEncryption",
-                "-cipher", "AES", "-encrypt", "def", "-quiet" };
+        args = new String[]{"-dir", dir, "-db", "testChangeFileEncryption",
+                "-cipher", "AES", "-encrypt", "def", "-quiet"};
         ChangeFileEncryption.main(args);
         conn = getConnection(url + "/testChangeFileEncryption;CIPHER=AES",
                 "sa", "def 123");
@@ -932,14 +907,14 @@ public class TestTools extends TestBase {
         new AssertThrows(ErrorCode.CANNOT_CHANGE_SETTING_WHEN_OPEN_1) {
             @Override
             public void test() throws SQLException {
-                ChangeFileEncryption.main(new String[] { "-dir", dir, "-db",
+                ChangeFileEncryption.main(new String[]{"-dir", dir, "-db",
                         "testChangeFileEncryption", "-cipher", "AES",
-                        "-decrypt", "def", "-quiet" });
+                        "-decrypt", "def", "-quiet"});
             }
         };
         conn.close();
-        args = new String[] { "-dir", dir, "-db", "testChangeFileEncryption",
-                "-quiet" };
+        args = new String[]{"-dir", dir, "-db", "testChangeFileEncryption",
+                "-quiet"};
         DeleteDbFiles.main(args);
     }
 
@@ -947,9 +922,9 @@ public class TestTools extends TestBase {
         Connection conn;
         deleteDb("test");
         Server tcpServer = Server.createTcpServer(
-                        "-baseDir", getBaseDir(),
-                        "-tcpPort", "9192",
-                        "-tcpAllowOthers").start();
+                "-baseDir", getBaseDir(),
+                "-tcpPort", "9192",
+                "-tcpAllowOthers").start();
         conn = getConnection("jdbc:h2:tcp://localhost:9192/test", "sa", "");
         conn.close();
         // must not be able to use a different base dir
@@ -957,36 +932,41 @@ public class TestTools extends TestBase {
             @Override
             public void test() throws SQLException {
                 getConnection("jdbc:h2:tcp://localhost:9192/../test", "sa", "");
-        }};
+            }
+        };
         new AssertThrows(ErrorCode.IO_EXCEPTION_1) {
             @Override
             public void test() throws SQLException {
                 getConnection("jdbc:h2:tcp://localhost:9192/../test2/test", "sa", "");
-        }};
+            }
+        };
         tcpServer.stop();
         Server.createTcpServer(
-                        "-ifExists",
-                        "-tcpPassword", "abc",
-                        "-baseDir", getBaseDir(),
-                        "-tcpPort", "9192").start();
+                "-ifExists",
+                "-tcpPassword", "abc",
+                "-baseDir", getBaseDir(),
+                "-tcpPort", "9192").start();
         // must not be able to create new db
         new AssertThrows(ErrorCode.DATABASE_NOT_FOUND_1) {
             @Override
             public void test() throws SQLException {
                 getConnection("jdbc:h2:tcp://localhost:9192/test2", "sa", "");
-        }};
+            }
+        };
         new AssertThrows(ErrorCode.DATABASE_NOT_FOUND_1) {
             @Override
             public void test() throws SQLException {
                 getConnection("jdbc:h2:tcp://localhost:9192/test2;ifexists=false", "sa", "");
-        }};
+            }
+        };
         conn = getConnection("jdbc:h2:tcp://localhost:9192/test", "sa", "");
         conn.close();
         new AssertThrows(ErrorCode.WRONG_USER_OR_PASSWORD) {
             @Override
             public void test() throws SQLException {
                 Server.shutdownTcpServer("tcp://localhost:9192", "", true, false);
-        }};
+            }
+        };
         conn = getConnection("jdbc:h2:tcp://localhost:9192/test", "sa", "");
         // conn.close();
         Server.shutdownTcpServer("tcp://localhost:9192", "abc", true, false);
@@ -999,9 +979,9 @@ public class TestTools extends TestBase {
         // Test filesystem prefix and escape from baseDir
         deleteDb("testSplit");
         server = Server.createTcpServer(
-                        "-baseDir", getBaseDir(),
-                        "-tcpPort", "9192",
-                        "-tcpAllowOthers").start();
+                "-baseDir", getBaseDir(),
+                "-tcpPort", "9192",
+                "-tcpAllowOthers").start();
         conn = getConnection("jdbc:h2:tcp://localhost:9192/split:testSplit", "sa", "");
         conn.close();
 
@@ -1044,7 +1024,7 @@ public class TestTools extends TestBase {
         /**
          * Get the reader.
          *
-         * @param pos the position
+         * @param pos    the position
          * @param length the length
          * @return the reader
          */
@@ -1129,7 +1109,7 @@ public class TestTools extends TestBase {
         /**
          * Get the binary stream.
          *
-         * @param pos the position
+         * @param pos    the position
          * @param length the length
          * @return the input stream
          */

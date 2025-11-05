@@ -6,18 +6,6 @@
  */
 package org.h2.test.store;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
@@ -32,6 +20,12 @@ import org.h2.tools.Recover;
 import org.h2.tools.Restore;
 import org.h2.util.JdbcUtils;
 import org.h2.util.Task;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.sql.*;
 
 /**
  * Tests the MVStore in a database.
@@ -94,12 +88,12 @@ public class TestMVTableEngine extends TestBase {
                 "insert into test2 values(?, ?)");
         prep.setInt(1, 1);
         assertThrows(ErrorCode.IO_EXCEPTION_1, prep).
-            setBinaryStream(1, createFailingStream(new IOException()));
+                setBinaryStream(1, createFailingStream(new IOException()));
         prep.setInt(1, 2);
         assertThrows(ErrorCode.IO_EXCEPTION_1, prep).
-            setBinaryStream(1, createFailingStream(new IllegalStateException()));
+                setBinaryStream(1, createFailingStream(new IllegalStateException()));
         conn.close();
-        MVStore s = MVStore.open(getBaseDir()+ "/mvstore.mv.db");
+        MVStore s = MVStore.open(getBaseDir() + "/mvstore.mv.db");
         assertTrue(s.hasMap("lobData"));
         MVMap<Long, byte[]> lobData = s.openMap("lobData");
         assertEquals(0, lobData.sizeAsLong());
@@ -126,7 +120,7 @@ public class TestMVTableEngine extends TestBase {
         stat.execute("create table test(id identity, data geometry)");
         stat.execute("create spatial index on test(data)");
         stat.execute("insert into test(data) select 'polygon(('||" +
-                "(1+x)||' '||(1+y)||', '||(2+x)||' '||(2+y)||', "+
+                "(1+x)||' '||(1+y)||', '||(2+x)||' '||(2+y)||', " +
                 "'||(3+x)||' '||(1+y)||', '||(1+x)||' '||(1+y)||'))' from coordinates;");
         conn.close();
     }
@@ -319,7 +313,7 @@ public class TestMVTableEngine extends TestBase {
             }
             ResultSet rs = stat.executeQuery(
                     "select value from information_schema.settings " +
-                    "where name='RETENTION_TIME'");
+                            "where name='RETENTION_TIME'");
             assertTrue(rs.next());
             assertEquals(retentionTime, rs.getInt(1));
             stat.execute("create table test(id int primary key, data varchar)");
@@ -535,7 +529,7 @@ public class TestMVTableEngine extends TestBase {
 
         stat.execute("create table parent(id int, name varchar)");
         stat.execute("create table child(id int, parentid int, " +
-        "foreign key(parentid) references parent(id))");
+                "foreign key(parentid) references parent(id))");
         stat.execute("insert into parent values(1, 'mary'), (2, 'john')");
         stat.execute("insert into child values(10, 1), (11, 1), (20, 2), (21, 2)");
         stat.execute("update parent set name = 'marc' where id = 1");
@@ -570,7 +564,7 @@ public class TestMVTableEngine extends TestBase {
         stat.execute("insert into child values(2)");
         try {
             stat.execute("alter table child add constraint cp " +
-                        "foreign key(pid) references parent(id)");
+                    "foreign key(pid) references parent(id)");
             fail();
         } catch (SQLException e) {
             assertEquals(
@@ -673,7 +667,7 @@ public class TestMVTableEngine extends TestBase {
         stat.execute("create table test(id int, name blob)");
         PreparedStatement prep = conn.prepareStatement(
                 "insert into test values(1, ?)");
-        prep.setBinaryStream(1,  new ByteArrayInputStream(new byte[129]));
+        prep.setBinaryStream(1, new ByteArrayInputStream(new byte[129]));
         prep.execute();
         conn.close();
         conn = getConnection(dbName);
@@ -795,7 +789,7 @@ public class TestMVTableEngine extends TestBase {
                 "sm smallint," +
                 "bi bigint," +
                 "de decimal," +
-                "re real,"+
+                "re real," +
                 "do double," +
                 "ti time," +
                 "da date," +
@@ -920,7 +914,7 @@ public class TestMVTableEngine extends TestBase {
         prep.setObject(3, stat.executeQuery("select 1 from dual"));
         prep.setObject(4, new Object[]{
                 new BigDecimal(new String(
-                new char[1000]).replace((char) 0, '1'))});
+                        new char[1000]).replace((char) 0, '1'))});
         prep.setObject(5, "test");
         prep.execute();
         if (!config.memory) {

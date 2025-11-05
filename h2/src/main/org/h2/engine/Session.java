@@ -6,12 +6,6 @@
  */
 package org.h2.engine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.Command;
 import org.h2.command.CommandInterface;
@@ -36,11 +30,9 @@ import org.h2.store.LobStorageFrontend;
 import org.h2.table.Table;
 import org.h2.util.New;
 import org.h2.util.SmallLRUCache;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueString;
+import org.h2.value.*;
+
+import java.util.*;
 
 /**
  * A session represents an embedded database connection. When using the server
@@ -143,7 +135,7 @@ public class Session extends SessionWithState {
     /**
      * Set the value of the given variable for this session.
      *
-     * @param name the name of the variable (may not be null)
+     * @param name  the name of the variable (may not be null)
      * @param value the new value (may not be null)
      */
     public void setVariable(String name, Value value) {
@@ -380,7 +372,7 @@ public class Session extends SessionWithState {
 
     @Override
     public synchronized CommandInterface prepareCommand(String sql,
-            int fetchSize) {
+                                                        int fetchSize) {
         return prepareLocal(sql);
     }
 
@@ -398,7 +390,7 @@ public class Session extends SessionWithState {
     /**
      * Parse and prepare the given SQL statement.
      *
-     * @param sql the SQL statement
+     * @param sql           the SQL statement
      * @param rightsChecked true if the rights have already been checked
      * @return the prepared statement
      */
@@ -585,7 +577,7 @@ public class Session extends SessionWithState {
     /**
      * Partially roll back the current transaction.
      *
-     * @param savepoint the savepoint to which should be rolled back
+     * @param savepoint  the savepoint to which should be rolled back
      * @param trimToSize if the list should be trimmed
      */
     public void rollbackTo(Savepoint savepoint, boolean trimToSize) {
@@ -695,9 +687,9 @@ public class Session extends SessionWithState {
     /**
      * Add an undo log entry to this session.
      *
-     * @param table the table
+     * @param table     the table
      * @param operation the operation type (see {@link UndoLogRecord})
-     * @param row the row
+     * @param row       the row
      */
     public void log(Table table, short operation, Row row) {
         if (table.isMVStore()) {
@@ -849,7 +841,7 @@ public class Session extends SessionWithState {
      * committed.
      *
      * @param logId the transaction log id
-     * @param pos the position of the log entry in the transaction log
+     * @param pos   the position of the log entry in the transaction log
      */
     public void addLogPos(int logId, int pos) {
         if (firstUncommittedLog == Session.LOG_WRITTEN) {
@@ -938,7 +930,7 @@ public class Session extends SessionWithState {
      * Commit or roll back the given transaction.
      *
      * @param transactionName the name of the transaction
-     * @param commit true for commit, false for rollback
+     * @param commit          true for commit, false for rollback
      */
     public void setPreparedTransaction(String transactionName, boolean commit) {
         if (currentTransactionName != null &&
@@ -955,7 +947,7 @@ public class Session extends SessionWithState {
                     : InDoubtTransaction.ROLLBACK;
             boolean found = false;
             if (list != null) {
-                for (InDoubtTransaction p: list) {
+                for (InDoubtTransaction p : list) {
                     if (p.getTransactionName().equals(transactionName)) {
                         p.setState(state);
                         found = true;
@@ -1311,7 +1303,7 @@ public class Session extends SessionWithState {
      * Set the table this session is waiting for, and the thread that is
      * waiting.
      *
-     * @param waitForLock the table
+     * @param waitForLock       the table
      * @param waitForLockThread the current thread (the one that is waiting)
      */
     public void setWaitForLock(Table waitForLock, Thread waitForLockThread) {

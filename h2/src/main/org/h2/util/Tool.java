@@ -6,16 +6,16 @@
  */
 package org.h2.util;
 
+import org.h2.api.ErrorCode;
+import org.h2.message.DbException;
+import org.h2.store.FileLister;
+import org.h2.store.fs.FileUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.Properties;
-
-import org.h2.api.ErrorCode;
-import org.h2.message.DbException;
-import org.h2.store.FileLister;
-import org.h2.store.fs.FileUtils;
 
 /**
  * Command line tools implement the tool interface so that they can be used in
@@ -74,7 +74,7 @@ public abstract class Tool {
      * Print to the output stream that no database files have been found.
      *
      * @param dir the directory or null
-     * @param db the database name or null
+     * @param db  the database name or null
      */
     protected void printNoDatabaseFilesFound(String dir, String db) {
         StringBuilder buff;
@@ -111,7 +111,7 @@ public abstract class Tool {
         }
         String className = getClass().getName();
         out.println(resources.get(className));
-        out.println("Usage: java "+getClass().getName() + " <options>");
+        out.println("Usage: java " + getClass().getName() + " <options>");
         out.println(resources.get(className + ".main"));
         out.println("See also http://h2database.com/javadoc/" +
                 className.replace('.', '/') + ".html");
@@ -122,7 +122,7 @@ public abstract class Tool {
      * If the argument starts with this option, but doesn't match,
      * then an exception is thrown.
      *
-     * @param arg the argument
+     * @param arg    the argument
      * @param option the command line option
      * @return true if it matches
      */

@@ -6,13 +6,14 @@
  */
 package org.h2.test.unit;
 
+import org.h2.dev.sort.InPlaceStableMergeSort;
+import org.h2.dev.sort.InPlaceStableQuicksort;
+import org.h2.test.TestBase;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.h2.dev.sort.InPlaceStableMergeSort;
-import org.h2.dev.sort.InPlaceStableQuicksort;
-import org.h2.test.TestBase;
 
 /**
  * Tests the stable in-place sorting implementations.
@@ -89,7 +90,7 @@ public class TestSort extends TestBase {
      *
      * @param type the type of data
      */
-    private void  test(String type) throws Exception {
+    private void test(String type) throws Exception {
         compareCount.set(0);
 
         // long t = System.currentTimeMillis();

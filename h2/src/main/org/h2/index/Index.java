@@ -40,7 +40,7 @@ public interface Index extends SchemaObject {
      * Add a row to the index.
      *
      * @param session the session to use
-     * @param row the row to add
+     * @param row     the row to add
      */
     void add(Session session, Row row);
 
@@ -48,7 +48,7 @@ public interface Index extends SchemaObject {
      * Remove a row from the index.
      *
      * @param session the session
-     * @param row the row
+     * @param row     the row
      */
     void remove(Session session, Row row);
 
@@ -57,8 +57,8 @@ public interface Index extends SchemaObject {
      * result.
      *
      * @param session the session
-     * @param first the first row, or null for no limit
-     * @param last the last row, or null for no limit
+     * @param first   the first row, or null for no limit
+     * @param last    the last row, or null for no limit
      * @return the cursor to iterate over the results
      */
     Cursor find(Session session, SearchRow first, SearchRow last);
@@ -68,9 +68,9 @@ public interface Index extends SchemaObject {
      * result.
      *
      * @param filter the table filter (which possibly knows about additional
-     *            conditions)
-     * @param first the first row, or null for no limit
-     * @param last the last row, or null for no limit
+     *               conditions)
+     * @param first  the first row, or null for no limit
+     * @param last   the last row, or null for no limit
      * @return the cursor to iterate over the results
      */
     Cursor find(TableFilter filter, SearchRow first, SearchRow last);
@@ -80,15 +80,15 @@ public interface Index extends SchemaObject {
      * There is one element per column in the search mask.
      * For possible search masks, see IndexCondition.
      *
-     * @param session the session
-     * @param masks per-column comparison bit masks, null means 'always false',
-     *              see constants in IndexCondition
-     * @param filter the table filter
+     * @param session   the session
+     * @param masks     per-column comparison bit masks, null means 'always false',
+     *                  see constants in IndexCondition
+     * @param filter    the table filter
      * @param sortOrder the sort order
      * @return the estimated cost
      */
     double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder);
+                   SortOrder sortOrder);
 
     /**
      * Remove the index.
@@ -123,9 +123,9 @@ public interface Index extends SchemaObject {
      * Find a row or a list of rows that is larger and create a cursor to
      * iterate over the result.
      *
-     * @param session the session
+     * @param session    the session
      * @param higherThan the lower limit (excluding)
-     * @param last the last row, or null for no limit
+     * @param last       the last row, or null for no limit
      * @return the cursor
      */
     Cursor findNext(Session session, SearchRow higherThan, SearchRow last);
@@ -135,8 +135,8 @@ public interface Index extends SchemaObject {
      * positioned on the correct row, or on null if no row has been found.
      *
      * @param session the session
-     * @param first true if the first (lowest for ascending indexes) or last
-     *            value should be returned
+     * @param first   true if the first (lowest for ascending indexes) or last
+     *                value should be returned
      * @return a cursor (never null)
      */
     Cursor findFirstOrLast(Session session, boolean first);
@@ -177,7 +177,7 @@ public interface Index extends SchemaObject {
      * @param rowData the first row
      * @param compare the second row
      * @return 0 if both rows are equal, -1 if the first row is smaller,
-     *         otherwise 1
+     * otherwise 1
      */
     int compareRows(SearchRow rowData, SearchRow compare);
 
@@ -222,7 +222,7 @@ public interface Index extends SchemaObject {
      * indexes. The method is only called if multi-version is enabled.
      *
      * @param operation the operation type
-     * @param row the row
+     * @param row       the row
      */
     void commit(int operation, Row row);
 
@@ -230,7 +230,7 @@ public interface Index extends SchemaObject {
      * Get the row with the given key.
      *
      * @param session the session
-     * @param key the unique key
+     * @param key     the unique key
      * @return the row
      */
     Row getRow(Session session, long key);

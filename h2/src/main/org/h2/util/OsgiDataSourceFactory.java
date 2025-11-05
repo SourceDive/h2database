@@ -6,15 +6,16 @@
  */
 package org.h2.util;
 
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
-import java.util.Properties;
-import javax.sql.ConnectionPoolDataSource;
-import javax.sql.DataSource;
-import javax.sql.XADataSource;
 import org.h2.engine.Constants;
 import org.h2.jdbcx.JdbcDataSource;
 import org.osgi.service.jdbc.DataSourceFactory;
+
+import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 
 /**
  * This class implements the OSGi DataSourceFactory interface for the H2 JDBC
@@ -46,9 +47,9 @@ public class OsgiDataSourceFactory implements DataSourceFactory {
      * Creates a basic data source.
      *
      * @param properties the properties for the data source.
-     * @throws SQLException if unsupported properties are supplied, or if data
-     *             source can not be created.
      * @return a new data source.
+     * @throws SQLException if unsupported properties are supplied, or if data
+     *                      source can not be created.
      */
     @Override
     public DataSource createDataSource(Properties properties)
@@ -76,9 +77,9 @@ public class OsgiDataSourceFactory implements DataSourceFactory {
      * Creates a pooled data source.
      *
      * @param properties the properties for the data source.
-     * @throws SQLException if unsupported properties are supplied, or if data
-     *             source can not be created.
      * @return a new data source.
+     * @throws SQLException if unsupported properties are supplied, or if data
+     *                      source can not be created.
      */
     @Override
     public ConnectionPoolDataSource createConnectionPoolDataSource(
@@ -106,9 +107,9 @@ public class OsgiDataSourceFactory implements DataSourceFactory {
      * Creates a pooled XA data source.
      *
      * @param properties the properties for the data source.
-     * @throws SQLException if unsupported properties are supplied, or if data
-     *             source can not be created.
      * @return a new data source.
+     * @throws SQLException if unsupported properties are supplied, or if data
+     *                      source can not be created.
      */
     @Override
     public XADataSource createXADataSource(Properties properties)
@@ -136,8 +137,8 @@ public class OsgiDataSourceFactory implements DataSourceFactory {
      * Returns a driver. The H2 driver does not support any properties.
      *
      * @param properties must be null or empty list.
-     * @throws SQLException if any property is supplied.
      * @return a driver.
+     * @throws SQLException if any property is supplied.
      */
     @Override
     public java.sql.Driver createDriver(Properties properties)
@@ -155,7 +156,7 @@ public class OsgiDataSourceFactory implements DataSourceFactory {
      *
      * @param p the properties to check
      * @throws SQLFeatureNotSupportedException if unsupported properties are
-     *             present
+     *                                         present
      */
     private static void rejectUnsupportedOptions(Properties p)
             throws SQLFeatureNotSupportedException {
@@ -177,10 +178,10 @@ public class OsgiDataSourceFactory implements DataSourceFactory {
      * properties will be applied as H2 options.
      *
      * @param dataSource the data source to configure
-     * @param p the properties to apply to the data source
+     * @param p          the properties to apply to the data source
      */
     private static void setupH2DataSource(JdbcDataSource dataSource,
-            Properties p) {
+                                          Properties p) {
         // Setting user and password
         if (p.containsKey(DataSourceFactory.JDBC_USER)) {
             dataSource.setUser((String) p.remove(DataSourceFactory.JDBC_USER));
@@ -265,7 +266,7 @@ public class OsgiDataSourceFactory implements DataSourceFactory {
      *
      * @param p the properties to check
      * @throws SQLFeatureNotSupportedException if unsupported properties are
-     *             present
+     *                                         present
      */
     private static void rejectPoolingOptions(Properties p)
             throws SQLFeatureNotSupportedException {

@@ -6,9 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 import org.h2.command.CommandInterface;
 import org.h2.command.Prepared;
 import org.h2.engine.Database;
@@ -22,6 +19,10 @@ import org.h2.store.PageStore;
 import org.h2.table.Column;
 import org.h2.value.Value;
 import org.h2.value.ValueString;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * This class represents the statement
@@ -60,7 +61,7 @@ public class Explain extends Prepared {
         Column column = new Column("PLAN", Value.STRING);
         Database db = session.getDatabase();
         ExpressionColumn expr = new ExpressionColumn(db, column);
-        Expression[] expressions = { expr };
+        Expression[] expressions = {expr};
         result = new LocalResult(session, expressions, 1);
         if (maxrows >= 0) {
             String plan;
@@ -122,7 +123,7 @@ public class Explain extends Prepared {
     }
 
     private void add(String text) {
-        Value[] row = { ValueString.get(text) };
+        Value[] row = {ValueString.get(text)};
         result.addRow(row);
     }
 

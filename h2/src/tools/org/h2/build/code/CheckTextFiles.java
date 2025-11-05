@@ -26,13 +26,13 @@ public class CheckTextFiles {
     private static final String LICENSE = "Multiple-Licensed " +
             "under the H2 License";
 
-    private static final String[] SUFFIX_CHECK = { "html", "jsp", "js", "css",
+    private static final String[] SUFFIX_CHECK = {"html", "jsp", "js", "css",
             "bat", "nsi", "java", "txt", "properties", "sql", "xml", "csv",
-            "Driver", "prefs" };
-    private static final String[] SUFFIX_IGNORE = { "gif", "png", "odg", "ico",
+            "Driver", "prefs"};
+    private static final String[] SUFFIX_IGNORE = {"gif", "png", "odg", "ico",
             "sxd", "layout", "res", "win", "jar", "task", "svg", "MF", "mf",
-            "sh", "DS_Store", "prop" };
-    private static final String[] SUFFIX_CRLF = { "bat" };
+            "sh", "DS_Store", "prop"};
+    private static final String[] SUFFIX_CRLF = {"bat"};
 
     private static final boolean ALLOW_TAB = false;
     private static final boolean ALLOW_CR = true;
@@ -44,7 +44,7 @@ public class CheckTextFiles {
     private boolean useCRLF;
     private final String[] suffixIgnoreLicense = {
             "bat", "nsi", "txt", "properties", "xml",
-            "java.sql.Driver", "task", "sh", "prefs" };
+            "java.sql.Driver", "task", "sh", "prefs"};
     private boolean hasError;
 
     /**
@@ -94,7 +94,7 @@ public class CheckTextFiles {
 //            }
             if (name.endsWith(".utf8.txt") ||
                     (name.startsWith("_docs_") &&
-                    name.endsWith(".properties"))) {
+                            name.endsWith(".properties"))) {
                 check = false;
                 ignore = true;
             }
@@ -133,8 +133,8 @@ public class CheckTextFiles {
      * newline characters, tab characters, and characters codes (only characters
      * below 128 are allowed).
      *
-     * @param file the file to check
-     * @param fix automatically fix newline characters and trailing spaces
+     * @param file         the file to check
+     * @param fix          automatically fix newline characters and trailing spaces
      * @param checkLicense check the license and copyright
      */
     public void checkOrFixFile(File file, boolean fix, boolean checkLicense)

@@ -6,18 +6,14 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.result.SortOrder;
 import org.h2.test.TestBase;
 import org.h2.util.New;
+
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Index tests.
@@ -98,7 +94,7 @@ public class TestIndex extends TestBase {
     private void testIndexTypes() throws SQLException {
         Connection conn = getConnection("index");
         stat = conn.createStatement();
-        for (String type : new String[] { "unique", "hash", "unique hash" }) {
+        for (String type : new String[]{"unique", "hash", "unique hash"}) {
             stat.execute("create table test(id int)");
             stat.execute("create " + type + " index idx_name on test(id)");
             stat.execute("insert into test select x from system_range(1, 1000)");
@@ -242,26 +238,26 @@ public class TestIndex extends TestBase {
         int len = getSize(100, 1000);
         for (int i = 0; i < len; i++) {
             switch (rand.nextInt(4)) {
-            case 0:
-                if (rand.nextInt(10) == 0) {
-                    if (reopen) {
-                        trace("reconnect");
-                        reconnect();
+                case 0:
+                    if (rand.nextInt(10) == 0) {
+                        if (reopen) {
+                            trace("reconnect");
+                            reconnect();
+                        }
                     }
-                }
-                break;
-            case 1:
-                trace("insert");
-                stat.execute("insert into test(id) values(null)");
-                break;
-            case 2:
-                trace("delete");
-                stat.execute("delete from test");
-                break;
-            case 3:
-                trace("insert 1-100");
-                stat.execute("insert into test select null from system_range(1, 100)");
-                break;
+                    break;
+                case 1:
+                    trace("insert");
+                    stat.execute("insert into test(id) values(null)");
+                    break;
+                case 2:
+                    trace("delete");
+                    stat.execute("delete from test");
+                    break;
+                case 3:
+                    trace("insert 1-100");
+                    stat.execute("insert into test select null from system_range(1, 100)");
+                    break;
             }
         }
         stat.execute("drop table test");
@@ -280,17 +276,17 @@ public class TestIndex extends TestBase {
         for (int i = 0; i < len; i++) {
             int x = rand.nextInt(len);
             String sql = "";
-            switch(rand.nextInt(3)) {
-            case 0:
-                sql = "delete from testA where id = " + x;
-                break;
-            case 1:
-                sql = "update testA set name = " + rand.nextInt(100) + " where id = " + x;
-                break;
-            case 2:
-                sql = "select name from testA where id = " + x;
-                break;
-            default:
+            switch (rand.nextInt(3)) {
+                case 0:
+                    sql = "delete from testA where id = " + x;
+                    break;
+                case 1:
+                    sql = "update testA set name = " + rand.nextInt(100) + " where id = " + x;
+                    break;
+                case 2:
+                    sql = "select name from testA where id = " + x;
+                    break;
+                default:
             }
             boolean result = stat.execute(sql);
             if (result) {

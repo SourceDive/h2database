@@ -6,11 +6,11 @@
  */
 package org.h2.engine;
 
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.util.Utils;
+
+import java.util.HashMap;
 
 /**
  * The base class for settings.
@@ -26,7 +26,7 @@ public class SettingsBase {
     /**
      * Get the setting for the given key.
      *
-     * @param key the key
+     * @param key          the key
      * @param defaultValue the default value
      * @return the setting
      */
@@ -43,7 +43,7 @@ public class SettingsBase {
     /**
      * Get the setting for the given key.
      *
-     * @param key the key
+     * @param key          the key
      * @param defaultValue the default value
      * @return the setting
      */
@@ -60,7 +60,7 @@ public class SettingsBase {
     /**
      * Get the setting for the given key.
      *
-     * @param key the key
+     * @param key          the key
      * @param defaultValue the default value
      * @return the setting
      */

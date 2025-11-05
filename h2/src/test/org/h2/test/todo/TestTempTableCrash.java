@@ -6,13 +6,14 @@
  */
 package org.h2.test.todo;
 
+import org.h2.store.fs.FilePathRec;
+import org.h2.test.unit.TestReopen;
+import org.h2.tools.DeleteDbFiles;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Random;
-import org.h2.store.fs.FilePathRec;
-import org.h2.test.unit.TestReopen;
-import org.h2.tools.DeleteDbFiles;
 
 /**
  * Test crashing a database by creating a lot of temporary tables.

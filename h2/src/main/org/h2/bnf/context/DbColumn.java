@@ -64,7 +64,7 @@ public class DbColumn {
      * Create a column from a DatabaseMetaData.getProcedureColumns row.
      *
      * @param contents the database contents
-     * @param rs the result set
+     * @param rs       the result set
      * @return the column
      */
     public static DbColumn getProcedureColumn(DbContents contents, ResultSet rs)
@@ -76,7 +76,7 @@ public class DbColumn {
      * Create a column from a DatabaseMetaData.getColumns row.
      *
      * @param contents the database contents
-     * @param rs the result set
+     * @param rs       the result set
      * @return the column
      */
     public static DbColumn getColumn(DbContents contents, ResultSet rs)

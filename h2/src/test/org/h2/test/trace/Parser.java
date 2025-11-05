@@ -21,11 +21,11 @@
  */
 package org.h2.test.trace;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
 
 /**
  * Parses an entry in a Java-style log file.
@@ -49,7 +49,7 @@ class Parser {
      * Parse a Java statement.
      *
      * @param player the player
-     * @param line the statement text
+     * @param line   the statement text
      * @return the statement
      */
     static Statement parseStatement(Player player, String line) {
@@ -97,59 +97,59 @@ class Parser {
         int start = pos;
         char ch = line.charAt(pos);
         switch (ch) {
-        case '\"':
-            tokenType = STRING;
-            pos++;
-            while (pos < line.length()) {
-                ch = line.charAt(pos);
-                if (ch == '\\') {
-                    pos += 2;
-                } else if (ch == '\"') {
-                    pos++;
-                    break;
-                } else {
-                    pos++;
-                }
-            }
-            break;
-        case '.':
-        case ',':
-        case '(':
-        case ')':
-        case ';':
-        case '{':
-        case '}':
-        case '[':
-        case ']':
-        case '=':
-            tokenType = SPECIAL;
-            pos++;
-            break;
-        default:
-            if (Character.isLetter(ch) || ch == '_') {
-                tokenType = NAME;
+            case '\"':
+                tokenType = STRING;
                 pos++;
-                while (true) {
+                while (pos < line.length()) {
                     ch = line.charAt(pos);
-                    if (Character.isLetterOrDigit(ch) || ch == '_') {
+                    if (ch == '\\') {
+                        pos += 2;
+                    } else if (ch == '\"') {
                         pos++;
-                    } else {
                         break;
+                    } else {
+                        pos++;
                     }
                 }
-            } else if (ch == '-' || Character.isDigit(ch)) {
-                tokenType = NUMBER;
+                break;
+            case '.':
+            case ',':
+            case '(':
+            case ')':
+            case ';':
+            case '{':
+            case '}':
+            case '[':
+            case ']':
+            case '=':
+                tokenType = SPECIAL;
                 pos++;
-                while (true) {
-                    ch = line.charAt(pos);
-                    if (Character.isDigit(ch)
-                            || ".+-eElLxabcdefABCDEF".indexOf(ch) >= 0) {
-                        pos++;
-                    } else {
-                        break;
+                break;
+            default:
+                if (Character.isLetter(ch) || ch == '_') {
+                    tokenType = NAME;
+                    pos++;
+                    while (true) {
+                        ch = line.charAt(pos);
+                        if (Character.isLetterOrDigit(ch) || ch == '_') {
+                            pos++;
+                        } else {
+                            break;
+                        }
+                    }
+                } else if (ch == '-' || Character.isDigit(ch)) {
+                    tokenType = NUMBER;
+                    pos++;
+                    while (true) {
+                        ch = line.charAt(pos);
+                        if (Character.isDigit(ch)
+                                || ".+-eElLxabcdefABCDEF".indexOf(ch) >= 0) {
+                            pos++;
+                        } else {
+                            break;
+                        }
                     }
                 }
-            }
         }
         token = line.substring(start, pos);
     }

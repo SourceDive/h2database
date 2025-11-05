@@ -6,6 +6,15 @@
  */
 package org.h2.jdbcx;
 
+import org.h2.Driver;
+import org.h2.jdbc.JdbcConnection;
+import org.h2.message.TraceObject;
+import org.h2.util.StringUtils;
+
+import javax.naming.Reference;
+import javax.naming.Referenceable;
+import javax.naming.StringRefAddr;
+import javax.sql.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
@@ -13,20 +22,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import javax.naming.Reference;
-import javax.naming.Referenceable;
-import javax.naming.StringRefAddr;
-import javax.sql.ConnectionPoolDataSource;
-import javax.sql.DataSource;
-import javax.sql.PooledConnection;
-import javax.sql.XAConnection;
-import javax.sql.XADataSource;
-import org.h2.Driver;
-import org.h2.jdbc.JdbcConnection;
-import org.h2.message.TraceObject;
-import org.h2.util.StringUtils;
-
-//## Java 1.7 ##
 import java.util.logging.Logger;
 //*/
 
@@ -47,7 +42,7 @@ import java.util.logging.Logger;
  * Context ctx = new InitialContext();
  * ctx.bind(&quot;jdbc/dsName&quot;, ds);
  * </pre>
- *
+ * <p>
  * To use a data source that is already registered, use the following code:
  *
  * <pre>
@@ -59,7 +54,7 @@ import java.util.logging.Logger;
  * DataSource ds = (DataSource) ctx.lookup(&quot;jdbc/dsName&quot;);
  * Connection conn = ds.getConnection();
  * </pre>
- *
+ * <p>
  * In this example the user name and password are serialized as
  * well; this may be a security problem in some cases.
  */
@@ -72,7 +67,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
     private transient PrintWriter logWriter;
     private int loginTimeout;
     private String userName = "";
-    private char[] passwordChars = { };
+    private char[] passwordChars = {};
     private String url = "";
     private String description;
 
@@ -167,7 +162,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
      * Open a new connection using the current URL and the specified user name
      * and password.
      *
-     * @param user the user name
+     * @param user     the user name
      * @param password the password
      * @return the connection
      */
@@ -175,7 +170,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
     public Connection getConnection(String user, String password)
             throws SQLException {
         if (isDebugEnabled()) {
-            debugCode("getConnection("+quote(user)+", \"\");");
+            debugCode("getConnection(" + quote(user) + ", \"\");");
         }
         return getJdbcConnection(user, convertToCharArray(password));
     }
@@ -183,7 +178,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
     private JdbcConnection getJdbcConnection(String user, char[] password)
             throws SQLException {
         if (isDebugEnabled()) {
-            debugCode("getJdbcConnection("+quote(user)+", new char[0]);");
+            debugCode("getJdbcConnection(" + quote(user) + ", new char[0]);");
         }
         Properties info = new Properties();
         info.setProperty("user", user);
@@ -359,7 +354,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
      * Open a new XA connection using the current URL and the specified user
      * name and password.
      *
-     * @param user the user name
+     * @param user     the user name
      * @param password the password
      * @return the connection
      */
@@ -367,7 +362,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
     public XAConnection getXAConnection(String user, String password)
             throws SQLException {
         if (isDebugEnabled()) {
-            debugCode("getXAConnection("+quote(user)+", \"\");");
+            debugCode("getXAConnection(" + quote(user) + ", \"\");");
         }
         int id = getNextId(XA_DATA_SOURCE);
         return new JdbcXAConnection(factory, id, getJdbcConnection(user,
@@ -390,7 +385,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
      * Open a new pooled connection using the current URL and the specified user
      * name and password.
      *
-     * @param user the user name
+     * @param user     the user name
      * @param password the password
      * @return the connection
      */
@@ -398,7 +393,7 @@ public class JdbcDataSource extends TraceObject implements XADataSource,
     public PooledConnection getPooledConnection(String user, String password)
             throws SQLException {
         if (isDebugEnabled()) {
-            debugCode("getPooledConnection("+quote(user)+", \"\");");
+            debugCode("getPooledConnection(" + quote(user) + ", \"\");");
         }
         return getXAConnection(user, password);
     }

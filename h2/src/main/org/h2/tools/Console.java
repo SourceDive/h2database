@@ -7,49 +7,31 @@
 package org.h2.tools;
 
 //## AWT ##
-import java.awt.Button;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Label;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.PopupMenu;
-import java.awt.SystemColor;
-import java.awt.TextField;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
+
 import org.h2.server.ShutdownHandler;
 import org.h2.util.JdbcUtils;
 import org.h2.util.Tool;
 import org.h2.util.Utils;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 /**
  * Starts the H2 Console (web-) server, as well as the TCP and PG server.
- * @h2.resource
  *
  * @author Thomas Mueller, Ridvan Agar
+ * @h2.resource
  */
 public class Console extends Tool implements
 //## AWT ##
-ActionListener, MouseListener, WindowListener,
+        ActionListener, MouseListener, WindowListener,
 //*/
-ShutdownHandler {
+        ShutdownHandler {
 
-//## AWT ##
+    //## AWT ##
     private Frame frame;
     private boolean trayIconUsed;
     private Font font;
@@ -57,7 +39,7 @@ ShutdownHandler {
     private TextField urlText;
     private Object tray;
     private Object trayIcon;
-//*/
+    //*/
     private Server web, tcp, pg;
     private boolean isWindows;
     private long lastOpen;
@@ -92,9 +74,9 @@ ShutdownHandler {
      * for details, see the Server tool.<br />
      * If a service can not be started, the program
      * terminates with an exit code of 1.
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new Console().runTool(args);
@@ -357,7 +339,7 @@ ShutdownHandler {
         // System.exit(0);
     }
 
-//## AWT ##
+    //## AWT ##
     private void loadFont() {
         if (isWindows) {
             font = new Font("Dialog", Font.PLAIN, 11);

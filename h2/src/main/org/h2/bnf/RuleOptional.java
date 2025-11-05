@@ -31,6 +31,7 @@ public class RuleOptional implements Rule {
             mapSet = true;
         }
     }
+
     @Override
     public boolean autoComplete(Sentence sentence) {
         sentence.stopIfRequired();

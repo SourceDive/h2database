@@ -20,7 +20,7 @@ public interface SQLDialect {
      * Get the SQL snippet for the table name.
      *
      * @param schema the schema name, or null for no schema
-     * @param table the table name
+     * @param table  the table name
      * @return the SQL snippet
      */
     String getTableName(String schema, String table);
@@ -29,8 +29,8 @@ public interface SQLDialect {
      * Get the CREATE INDEX statement.
      *
      * @param schema the schema name
-     * @param table the table name
-     * @param index the index definition
+     * @param table  the table name
+     * @param index  the index definition
      * @return the SQL statement
      */
     String getCreateIndex(String schema, String table, IndexDefinition index);
@@ -38,7 +38,7 @@ public interface SQLDialect {
     /**
      * Append "LIMIT limit" to the SQL statement.
      *
-     * @param stat the statement
+     * @param stat  the statement
      * @param limit the limit
      */
     void appendLimit(SQLStatement stat, long limit);
@@ -46,7 +46,7 @@ public interface SQLDialect {
     /**
      * Append "OFFSET offset" to the SQL statement.
      *
-     * @param stat the statement
+     * @param stat   the statement
      * @param offset the offset
      */
     void appendOffset(SQLStatement stat, long offset);
@@ -79,21 +79,21 @@ public interface SQLDialect {
 
         @Override
         public String getCreateIndex(String schema, String table,
-                IndexDefinition index) {
+                                     IndexDefinition index) {
             StatementBuilder buff = new StatementBuilder();
             buff.append("CREATE ");
             switch (index.type) {
-            case STANDARD:
-                break;
-            case UNIQUE:
-                buff.append("UNIQUE ");
-                break;
-            case HASH:
-                buff.append("HASH ");
-                break;
-            case UNIQUE_HASH:
-                buff.append("UNIQUE HASH ");
-                break;
+                case STANDARD:
+                    break;
+                case UNIQUE:
+                    buff.append("UNIQUE ");
+                    break;
+                case HASH:
+                    buff.append("HASH ");
+                    break;
+                case UNIQUE_HASH:
+                    buff.append("UNIQUE HASH ");
+                    break;
             }
             buff.append("INDEX IF NOT EXISTS ");
             buff.append(index.indexName);

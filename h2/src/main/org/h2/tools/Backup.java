@@ -6,6 +6,14 @@
  */
 package org.h2.tools;
 
+import org.h2.command.dml.BackupCommand;
+import org.h2.engine.Constants;
+import org.h2.message.DbException;
+import org.h2.store.FileLister;
+import org.h2.store.fs.FileUtils;
+import org.h2.util.IOUtils;
+import org.h2.util.Tool;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,13 +22,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.h2.command.dml.BackupCommand;
-import org.h2.engine.Constants;
-import org.h2.message.DbException;
-import org.h2.store.FileLister;
-import org.h2.store.fs.FileUtils;
-import org.h2.util.IOUtils;
-import org.h2.util.Tool;
 
 /**
  * Creates a backup of a database.
@@ -50,9 +51,9 @@ public class Backup extends Tool {
      * <tr><td>[-quiet]</td>
      * <td>Do not print progress information</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new Backup().runTool(args);
@@ -92,13 +93,13 @@ public class Backup extends Tool {
      * Backs up database files.
      *
      * @param zipFileName the name of the target backup file (including path)
-     * @param directory the source directory name
-     * @param db the source database name (null if there is only one database,
-     *            and and empty string to backup all files in this directory)
-     * @param quiet don't print progress information
+     * @param directory   the source directory name
+     * @param db          the source database name (null if there is only one database,
+     *                    and and empty string to backup all files in this directory)
+     * @param quiet       don't print progress information
      */
     public static void execute(String zipFileName, String directory, String db,
-            boolean quiet) throws SQLException {
+                               boolean quiet) throws SQLException {
         try {
             new Backup().process(zipFileName, directory, db, quiet);
         } catch (Exception e) {
@@ -107,7 +108,7 @@ public class Backup extends Tool {
     }
 
     private void process(String zipFileName, String directory, String db,
-            boolean quiet) throws SQLException {
+                         boolean quiet) throws SQLException {
         List<String> list;
         boolean allFiles = db != null && db.length() == 0;
         if (allFiles) {

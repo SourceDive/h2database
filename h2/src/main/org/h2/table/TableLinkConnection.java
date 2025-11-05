@@ -6,13 +6,14 @@
  */
 package org.h2.table;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
 import org.h2.message.DbException;
 import org.h2.util.JdbcUtils;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * A connection for a linked table. The same connection may be used for multiple
@@ -53,12 +54,12 @@ public class TableLinkConnection {
     /**
      * Open a new connection.
      *
-     * @param map the map where the connection should be stored
-     *      (if shared connections are enabled).
-     * @param driver the JDBC driver class name
-     * @param url the database URL
-     * @param user the user name
-     * @param password the password
+     * @param map                    the map where the connection should be stored
+     *                               (if shared connections are enabled).
+     * @param driver                 the JDBC driver class name
+     * @param url                    the database URL
+     * @param user                   the user name
+     * @param password               the password
      * @param shareLinkedConnections if connections should be shared
      * @return a connection
      */
@@ -129,7 +130,7 @@ public class TableLinkConnection {
      * Closes the connection if this is the last link to it.
      *
      * @param force if the connection needs to be closed even if it is still
-     *            used elsewhere (for example, because the connection is broken)
+     *              used elsewhere (for example, because the connection is broken)
      */
     void close(boolean force) {
         boolean actuallyClose = false;

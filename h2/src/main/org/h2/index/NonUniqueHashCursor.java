@@ -6,11 +6,12 @@
  */
 package org.h2.index;
 
-import java.util.ArrayList;
 import org.h2.engine.Session;
 import org.h2.result.Row;
 import org.h2.result.SearchRow;
 import org.h2.table.RegularTable;
+
+import java.util.ArrayList;
 
 /**
  * Cursor implementation for non-unique hash index
@@ -26,7 +27,7 @@ public class NonUniqueHashCursor implements Cursor {
     private int index = -1;
 
     public NonUniqueHashCursor(Session session, RegularTable tableData,
-            ArrayList<Long> positions) {
+                               ArrayList<Long> positions) {
         this.session = session;
         this.tableData = tableData;
         this.positions = positions;

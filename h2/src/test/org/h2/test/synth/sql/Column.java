@@ -15,10 +15,10 @@ import java.sql.Types;
  */
 class Column {
 
-    private static final int[] TYPES = { Types.INTEGER, Types.VARCHAR,
+    private static final int[] TYPES = {Types.INTEGER, Types.VARCHAR,
             Types.DECIMAL, Types.DATE, Types.TIME, Types.TIMESTAMP,
             Types.BOOLEAN, Types.BINARY, Types.VARBINARY, Types.CLOB,
-            Types.BLOB, Types.DOUBLE, Types.BIGINT, Types.TIMESTAMP, Types.BIT, };
+            Types.BLOB, Types.DOUBLE, Types.BIGINT, Types.TIMESTAMP, Types.BIT,};
 
     private TestSynth config;
     private String name;
@@ -37,33 +37,33 @@ class Column {
         name = meta.getColumnLabel(index);
         type = meta.getColumnType(index);
         switch (type) {
-        case Types.DECIMAL:
-            precision = meta.getPrecision(index);
-            scale = meta.getScale(index);
-            break;
-        case Types.BLOB:
-        case Types.BINARY:
-        case Types.VARBINARY:
-        case Types.CLOB:
-        case Types.LONGVARCHAR:
-        case Types.DATE:
-        case Types.TIME:
-        case Types.INTEGER:
-        case Types.VARCHAR:
-        case Types.CHAR:
-        case Types.BIGINT:
-        case Types.NUMERIC:
-        case Types.TIMESTAMP:
-        case Types.NULL:
-        case Types.LONGVARBINARY:
-        case Types.DOUBLE:
-        case Types.REAL:
-        case Types.OTHER:
-        case Types.BIT:
-        case Types.BOOLEAN:
-            break;
-        default:
-            throw new AssertionError("type=" + type);
+            case Types.DECIMAL:
+                precision = meta.getPrecision(index);
+                scale = meta.getScale(index);
+                break;
+            case Types.BLOB:
+            case Types.BINARY:
+            case Types.VARBINARY:
+            case Types.CLOB:
+            case Types.LONGVARCHAR:
+            case Types.DATE:
+            case Types.TIME:
+            case Types.INTEGER:
+            case Types.VARCHAR:
+            case Types.CHAR:
+            case Types.BIGINT:
+            case Types.NUMERIC:
+            case Types.TIMESTAMP:
+            case Types.NULL:
+            case Types.LONGVARBINARY:
+            case Types.DOUBLE:
+            case Types.REAL:
+            case Types.OTHER:
+            case Types.BIT:
+            case Types.BOOLEAN:
+                break;
+            default:
+                throw new AssertionError("type=" + type);
         }
     }
 
@@ -71,90 +71,90 @@ class Column {
      * Check if this data type supports comparisons for this database.
      *
      * @param config the configuration
-     * @param type the SQL type
+     * @param type   the SQL type
      * @return true if the value can be used in conditions
      */
     static boolean isConditionType(TestSynth config, int type) {
         switch (config.getMode()) {
-        case TestSynth.H2:
-        case TestSynth.H2_MEM:
-            return true;
-        case TestSynth.MYSQL:
-        case TestSynth.HSQLDB:
-        case TestSynth.POSTGRESQL:
-            switch (type) {
-            case Types.INTEGER:
-            case Types.VARCHAR:
-            case Types.DECIMAL:
-            case Types.DATE:
-            case Types.TIME:
-            case Types.TIMESTAMP:
-            case Types.DOUBLE:
-            case Types.BIGINT:
-            case Types.BOOLEAN:
-            case Types.BIT:
+            case TestSynth.H2:
+            case TestSynth.H2_MEM:
                 return true;
-            case Types.BINARY:
-            case Types.VARBINARY:
-            case Types.BLOB:
-            case Types.CLOB:
-            case Types.LONGVARCHAR:
-            case Types.LONGVARBINARY:
-                return false;
+            case TestSynth.MYSQL:
+            case TestSynth.HSQLDB:
+            case TestSynth.POSTGRESQL:
+                switch (type) {
+                    case Types.INTEGER:
+                    case Types.VARCHAR:
+                    case Types.DECIMAL:
+                    case Types.DATE:
+                    case Types.TIME:
+                    case Types.TIMESTAMP:
+                    case Types.DOUBLE:
+                    case Types.BIGINT:
+                    case Types.BOOLEAN:
+                    case Types.BIT:
+                        return true;
+                    case Types.BINARY:
+                    case Types.VARBINARY:
+                    case Types.BLOB:
+                    case Types.CLOB:
+                    case Types.LONGVARCHAR:
+                    case Types.LONGVARBINARY:
+                        return false;
+                    default:
+                        throw new AssertionError("type=" + type);
+                }
             default:
                 throw new AssertionError("type=" + type);
-            }
-        default:
-            throw new AssertionError("type=" + type);
         }
     }
 
     private String getTypeName() {
         switch (type) {
-        case Types.INTEGER:
-            return "INT";
-        case Types.VARCHAR:
-            return "VARCHAR(" + precision + ")";
-        case Types.DECIMAL:
-            return "NUMERIC(" + precision + ", " + scale + ")";
-        case Types.DATE:
-            return "DATE";
-        case Types.TIME:
-            return "TIME";
-        case Types.TIMESTAMP:
-            return "TIMESTAMP";
-        case Types.BINARY:
-        case Types.VARBINARY:
-            if (config.is(TestSynth.POSTGRESQL)) {
-                return "BYTEA";
+            case Types.INTEGER:
+                return "INT";
+            case Types.VARCHAR:
+                return "VARCHAR(" + precision + ")";
+            case Types.DECIMAL:
+                return "NUMERIC(" + precision + ", " + scale + ")";
+            case Types.DATE:
+                return "DATE";
+            case Types.TIME:
+                return "TIME";
+            case Types.TIMESTAMP:
+                return "TIMESTAMP";
+            case Types.BINARY:
+            case Types.VARBINARY:
+                if (config.is(TestSynth.POSTGRESQL)) {
+                    return "BYTEA";
+                }
+                return "BINARY(" + precision + ")";
+            case Types.CLOB: {
+                if (config.is(TestSynth.HSQLDB)) {
+                    return "LONGVARCHAR";
+                } else if (config.is(TestSynth.POSTGRESQL)) {
+                    return "TEXT";
+                }
+                return "CLOB";
             }
-            return "BINARY(" + precision + ")";
-        case Types.CLOB: {
-            if (config.is(TestSynth.HSQLDB)) {
-                return "LONGVARCHAR";
-            } else if (config.is(TestSynth.POSTGRESQL)) {
-                return "TEXT";
+            case Types.BLOB: {
+                if (config.is(TestSynth.HSQLDB)) {
+                    return "LONGVARBINARY";
+                }
+                return "BLOB";
             }
-            return "CLOB";
-        }
-        case Types.BLOB: {
-            if (config.is(TestSynth.HSQLDB)) {
-                return "LONGVARBINARY";
-            }
-            return "BLOB";
-        }
-        case Types.DOUBLE:
-            if (config.is(TestSynth.POSTGRESQL)) {
-                return "DOUBLE PRECISION";
-            }
-            return "DOUBLE";
-        case Types.BIGINT:
-            return "BIGINT";
-        case Types.BOOLEAN:
-        case Types.BIT:
-            return "BOOLEAN";
-        default:
-            throw new AssertionError("type=" + type);
+            case Types.DOUBLE:
+                if (config.is(TestSynth.POSTGRESQL)) {
+                    return "DOUBLE PRECISION";
+                }
+                return "DOUBLE";
+            case Types.BIGINT:
+                return "BIGINT";
+            case Types.BOOLEAN:
+            case Types.BIT:
+                return "BOOLEAN";
+            default:
+                throw new AssertionError("type=" + type);
         }
     }
 

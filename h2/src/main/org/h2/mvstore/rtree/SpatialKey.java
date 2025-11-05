@@ -19,7 +19,7 @@ public class SpatialKey {
     /**
      * Create a new key.
      *
-     * @param id the id
+     * @param id     the id
      * @param minMax min x, max x, min y, max y, and so on
      */
     public SpatialKey(long id, float... minMax) {
@@ -41,7 +41,7 @@ public class SpatialKey {
      * Set the minimum value for the given dimension.
      *
      * @param dim the dimension
-     * @param x the value
+     * @param x   the value
      */
     public void setMin(int dim, float x) {
         minMax[dim + dim] = x;
@@ -61,7 +61,7 @@ public class SpatialKey {
      * Set the maximum value for the given dimension.
      *
      * @param dim the dimension
-     * @param x the value
+     * @param x   the value
      */
     public void setMax(int dim, float x) {
         minMax[dim + dim + 1] = x;

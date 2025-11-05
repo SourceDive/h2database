@@ -6,9 +6,10 @@
  */
 package org.h2.store;
 
-import java.lang.reflect.Array;
 import org.h2.engine.Session;
 import org.h2.util.CacheObject;
+
+import java.lang.reflect.Array;
 
 /**
  * A page. Format:
@@ -81,7 +82,7 @@ public abstract class Page extends CacheObject {
      * location, and free up the current page.
      *
      * @param session the session
-     * @param newPos the new position
+     * @param newPos  the new position
      */
     public abstract void moveTo(Session session, int newPos);
 
@@ -93,10 +94,10 @@ public abstract class Page extends CacheObject {
     /**
      * Insert a value in an array. A new array is created if required.
      *
-     * @param old the old array
+     * @param old     the old array
      * @param oldSize the old size
-     * @param pos the position
-     * @param x the value to insert
+     * @param pos     the position
+     * @param x       the value to insert
      * @return the (new) array
      */
     @SuppressWarnings("unchecked")
@@ -122,9 +123,9 @@ public abstract class Page extends CacheObject {
     /**
      * Delete a value in an array. A new array is created if required.
      *
-     * @param old the old array
+     * @param old     the old array
      * @param oldSize the old size
-     * @param pos the position
+     * @param pos     the position
      * @return the (new) array
      */
     @SuppressWarnings("unchecked")
@@ -148,10 +149,10 @@ public abstract class Page extends CacheObject {
     /**
      * Insert a value in an array. A new array is created if required.
      *
-     * @param old the old array
+     * @param old     the old array
      * @param oldSize the old size
-     * @param pos the position
-     * @param x the value to insert
+     * @param pos     the position
+     * @param x       the value to insert
      * @return the (new) array
      */
     protected static long[] insert(long[] old, int oldSize, int pos, long x) {
@@ -174,9 +175,9 @@ public abstract class Page extends CacheObject {
     /**
      * Delete a value in an array. A new array is created if required.
      *
-     * @param old the old array
+     * @param old     the old array
      * @param oldSize the old size
-     * @param pos the position
+     * @param pos     the position
      * @return the (new) array
      */
     protected static long[] remove(long[] old, int oldSize, int pos) {
@@ -194,10 +195,10 @@ public abstract class Page extends CacheObject {
     /**
      * Insert a value in an array. A new array is created if required.
      *
-     * @param old the old array
+     * @param old     the old array
      * @param oldSize the old size
-     * @param pos the position
-     * @param x the value to insert
+     * @param pos     the position
+     * @param x       the value to insert
      * @return the (new) array
      */
     protected static int[] insert(int[] old, int oldSize, int pos, int x) {
@@ -220,9 +221,9 @@ public abstract class Page extends CacheObject {
     /**
      * Delete a value in an array. A new array is created if required.
      *
-     * @param old the old array
+     * @param old     the old array
      * @param oldSize the old size
-     * @param pos the position
+     * @param pos     the position
      * @return the (new) array
      */
     protected static int[] remove(int[] old, int oldSize, int pos) {
@@ -243,9 +244,9 @@ public abstract class Page extends CacheObject {
      * Add a value to a subset of the array.
      *
      * @param array the array
-     * @param from the index of the first element (including)
-     * @param to the index of the last element (excluding)
-     * @param x the value to add
+     * @param from  the index of the first element (including)
+     * @param to    the index of the last element (excluding)
+     * @param x     the value to add
      */
     protected static void add(int[] array, int from, int to, int x) {
         for (int i = from; i < to; i++) {

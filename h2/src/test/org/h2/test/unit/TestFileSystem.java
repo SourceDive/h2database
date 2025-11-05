@@ -6,24 +6,6 @@
  */
 package org.h2.test.unit;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
-import java.nio.channels.FileLock;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Random;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import org.h2.dev.fs.FilePathZip2;
 import org.h2.message.DbException;
 import org.h2.mvstore.DataUtils;
@@ -38,6 +20,20 @@ import org.h2.test.utils.FilePathDebug;
 import org.h2.tools.Backup;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.util.IOUtils;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
+import java.nio.channels.FileLock;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.Random;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Tests various file system.
@@ -138,66 +134,66 @@ public class TestFileSystem extends TestBase {
             for (int i = 0; i < 100; i++) {
                 trace("op " + i);
                 switch (r.nextInt(5)) {
-                case 0: {
-                    int p = r.nextInt(data.length);
-                    trace("seek " + p);
-                    buff.append("seek " + p + "\n");
-                    fc.position(p);
-                    pos = p;
-                    break;
-                }
-                case 1: {
-                    int len = r.nextInt(1000);
-                    int offset = r.nextInt(100);
-                    int arrayLen = len + offset;
-                    len = Math.min(len, data.length - pos);
-                    byte[] b1 = new byte[arrayLen];
-                    byte[] b2 = new byte[arrayLen];
-                    trace("readFully " + len);
-                    buff.append("readFully " + len + "\n");
-                    System.arraycopy(data, pos, b1, offset, len);
-                    ByteBuffer byteBuff = createSlicedBuffer(b2, offset, len);
-                    FileUtils.readFully(fc, byteBuff);
-                    assertEquals(b1, b2);
-                    pos += len;
-                    break;
-                }
-                case 2: {
-                    int len = r.nextInt(1000);
-                    int offset = r.nextInt(100);
-                    int arrayLen = len + offset;
-                    int p = r.nextInt(data.length);
-                    len = Math.min(len, data.length - p);
-                    byte[] b1 = new byte[arrayLen];
-                    byte[] b2 = new byte[arrayLen];
-                    trace("readFully " + p + " " + len);
-                    buff.append("readFully " + p + " " + len + "\n");
-                    System.arraycopy(data, p, b1, offset, len);
-                    ByteBuffer byteBuff = createSlicedBuffer(b2, offset, len);
-                    DataUtils.readFully(fc, p, byteBuff);
-                    assertEquals(b1, b2);
-                    break;
-                }
-                case 3: {
-                    trace("getFilePointer");
-                    buff.append("getFilePointer\n");
-                    assertEquals(pos, fc.position());
-                    break;
-                }
-                case 4: {
-                    trace("length " + data.length);
-                    buff.append("length " + data.length + "\n");
-                    assertEquals(data.length, fc.size());
-                    break;
-                }
-                default:
+                    case 0: {
+                        int p = r.nextInt(data.length);
+                        trace("seek " + p);
+                        buff.append("seek " + p + "\n");
+                        fc.position(p);
+                        pos = p;
+                        break;
+                    }
+                    case 1: {
+                        int len = r.nextInt(1000);
+                        int offset = r.nextInt(100);
+                        int arrayLen = len + offset;
+                        len = Math.min(len, data.length - pos);
+                        byte[] b1 = new byte[arrayLen];
+                        byte[] b2 = new byte[arrayLen];
+                        trace("readFully " + len);
+                        buff.append("readFully " + len + "\n");
+                        System.arraycopy(data, pos, b1, offset, len);
+                        ByteBuffer byteBuff = createSlicedBuffer(b2, offset, len);
+                        FileUtils.readFully(fc, byteBuff);
+                        assertEquals(b1, b2);
+                        pos += len;
+                        break;
+                    }
+                    case 2: {
+                        int len = r.nextInt(1000);
+                        int offset = r.nextInt(100);
+                        int arrayLen = len + offset;
+                        int p = r.nextInt(data.length);
+                        len = Math.min(len, data.length - p);
+                        byte[] b1 = new byte[arrayLen];
+                        byte[] b2 = new byte[arrayLen];
+                        trace("readFully " + p + " " + len);
+                        buff.append("readFully " + p + " " + len + "\n");
+                        System.arraycopy(data, p, b1, offset, len);
+                        ByteBuffer byteBuff = createSlicedBuffer(b2, offset, len);
+                        DataUtils.readFully(fc, p, byteBuff);
+                        assertEquals(b1, b2);
+                        break;
+                    }
+                    case 3: {
+                        trace("getFilePointer");
+                        buff.append("getFilePointer\n");
+                        assertEquals(pos, fc.position());
+                        break;
+                    }
+                    case 4: {
+                        trace("length " + data.length);
+                        buff.append("length " + data.length + "\n");
+                        assertEquals(data.length, fc.size());
+                        break;
+                    }
+                    default:
                 }
             }
             fc.close();
             file.delete();
         } catch (Throwable e) {
             e.printStackTrace();
-            fail("Exception: " + e + "\n"+ buff.toString());
+            fail("Exception: " + e + "\n" + buff.toString());
         }
     }
 
@@ -250,17 +246,17 @@ public class TestFileSystem extends TestBase {
         FileUtils.deleteRecursive(dir, false);
         Connection conn;
         Statement stat;
-        conn = getConnection("jdbc:h2:split:18:"+dir+"/test");
+        conn = getConnection("jdbc:h2:split:18:" + dir + "/test");
         stat = conn.createStatement();
         stat.execute(
                 "create table test(id int primary key, name varchar) " +
-                "as select x, space(10000) from system_range(1, 100)");
+                        "as select x, space(10000) from system_range(1, 100)");
         stat.execute("shutdown defrag");
         conn.close();
         Backup.execute(dir + "/test.zip", dir, "", true);
         DeleteDbFiles.execute("split:" + dir, "test", true);
         conn = getConnection(
-                "jdbc:h2:split:zip:"+dir+"/test.zip!/test");
+                "jdbc:h2:split:zip:" + dir + "/test.zip!/test");
         conn.createStatement().execute("select * from test where id=1");
         conn.close();
         FileUtils.deleteRecursive(dir, false);
@@ -350,31 +346,43 @@ public class TestFileSystem extends TestBase {
     }
 
     private void testReadOnly(final String f) throws IOException {
-        new AssertThrows(IOException.class) { @Override
-        public void test() throws IOException {
-            FileUtils.newOutputStream(f, false);
-        }};
-        new AssertThrows(DbException.class) { @Override
-        public void test() {
-            FileUtils.moveTo(f, f);
-        }};
-        new AssertThrows(DbException.class) { @Override
-        public void test() {
-            FileUtils.moveTo(f, f);
-        }};
-        new AssertThrows(IOException.class) { @Override
-        public void test() throws IOException {
-            FileUtils.createTempFile(f, ".tmp", false, false);
-        }};
+        new AssertThrows(IOException.class) {
+            @Override
+            public void test() throws IOException {
+                FileUtils.newOutputStream(f, false);
+            }
+        };
+        new AssertThrows(DbException.class) {
+            @Override
+            public void test() {
+                FileUtils.moveTo(f, f);
+            }
+        };
+        new AssertThrows(DbException.class) {
+            @Override
+            public void test() {
+                FileUtils.moveTo(f, f);
+            }
+        };
+        new AssertThrows(IOException.class) {
+            @Override
+            public void test() throws IOException {
+                FileUtils.createTempFile(f, ".tmp", false, false);
+            }
+        };
         final FileChannel channel = FileUtils.open(f, "r");
-        new AssertThrows(IOException.class) { @Override
-        public void test() throws IOException {
-            channel.write(ByteBuffer.allocate(1));
-        }};
-        new AssertThrows(IOException.class) { @Override
-        public void test() throws IOException {
-            channel.truncate(0);
-        }};
+        new AssertThrows(IOException.class) {
+            @Override
+            public void test() throws IOException {
+                channel.write(ByteBuffer.allocate(1));
+            }
+        };
+        new AssertThrows(IOException.class) {
+            @Override
+            public void test() throws IOException {
+                channel.truncate(0);
+            }
+        };
         assertTrue(null == channel.tryLock());
         channel.force(false);
         channel.close();
@@ -413,14 +421,18 @@ public class TestFileSystem extends TestBase {
             FileUtils.delete(fileName);
         }
         if (FileUtils.createFile(fileName)) {
-            new AssertThrows(DbException.class) { @Override
-            public void test() {
-                FileUtils.createDirectory(fileName);
-            }};
-            new AssertThrows(DbException.class) { @Override
-            public void test() {
-                FileUtils.createDirectories(fileName + "/test");
-            }};
+            new AssertThrows(DbException.class) {
+                @Override
+                public void test() {
+                    FileUtils.createDirectory(fileName);
+                }
+            };
+            new AssertThrows(DbException.class) {
+                @Override
+                public void test() {
+                    FileUtils.createDirectories(fileName + "/test");
+                }
+            };
             FileUtils.delete(fileName);
         }
     }
@@ -434,16 +446,20 @@ public class TestFileSystem extends TestBase {
         if (FileUtils.createFile(fileName)) {
             FileUtils.moveTo(fileName, fileName2);
             FileUtils.createFile(fileName);
-            new AssertThrows(DbException.class) { @Override
-            public void test() {
-                FileUtils.moveTo(fileName2, fileName);
-            }};
+            new AssertThrows(DbException.class) {
+                @Override
+                public void test() {
+                    FileUtils.moveTo(fileName2, fileName);
+                }
+            };
             FileUtils.delete(fileName);
             FileUtils.delete(fileName2);
-            new AssertThrows(DbException.class) { @Override
-            public void test() {
-                FileUtils.moveTo(fileName, fileName2);
-            }};
+            new AssertThrows(DbException.class) {
+                @Override
+                public void test() {
+                    FileUtils.moveTo(fileName, fileName2);
+                }
+            };
         }
     }
 
@@ -454,30 +470,42 @@ public class TestFileSystem extends TestBase {
         }
         if (FileUtils.createFile(fileName)) {
             final FileChannel channel = FileUtils.open(fileName, "rw");
-            new AssertThrows(UnsupportedOperationException.class) { @Override
-            public void test() throws IOException {
-                channel.map(MapMode.PRIVATE, 0, channel.size());
-            }};
-            new AssertThrows(UnsupportedOperationException.class) { @Override
-            public void test() throws IOException {
-                channel.read(new ByteBuffer[]{ByteBuffer.allocate(10)}, 0, 0);
-            }};
-            new AssertThrows(UnsupportedOperationException.class) { @Override
-            public void test() throws IOException {
-                channel.write(new ByteBuffer[]{ByteBuffer.allocate(10)}, 0, 0);
-            }};
-            new AssertThrows(UnsupportedOperationException.class) { @Override
-            public void test() throws IOException {
-                channel.transferFrom(channel, 0, 0);
-            }};
-            new AssertThrows(UnsupportedOperationException.class) { @Override
-            public void test() throws IOException {
-                channel.transferTo(0, 0, channel);
-            }};
-            new AssertThrows(UnsupportedOperationException.class) { @Override
-            public void test() throws IOException {
-                channel.lock();
-            }};
+            new AssertThrows(UnsupportedOperationException.class) {
+                @Override
+                public void test() throws IOException {
+                    channel.map(MapMode.PRIVATE, 0, channel.size());
+                }
+            };
+            new AssertThrows(UnsupportedOperationException.class) {
+                @Override
+                public void test() throws IOException {
+                    channel.read(new ByteBuffer[]{ByteBuffer.allocate(10)}, 0, 0);
+                }
+            };
+            new AssertThrows(UnsupportedOperationException.class) {
+                @Override
+                public void test() throws IOException {
+                    channel.write(new ByteBuffer[]{ByteBuffer.allocate(10)}, 0, 0);
+                }
+            };
+            new AssertThrows(UnsupportedOperationException.class) {
+                @Override
+                public void test() throws IOException {
+                    channel.transferFrom(channel, 0, 0);
+                }
+            };
+            new AssertThrows(UnsupportedOperationException.class) {
+                @Override
+                public void test() throws IOException {
+                    channel.transferTo(0, 0, channel);
+                }
+            };
+            new AssertThrows(UnsupportedOperationException.class) {
+                @Override
+                public void test() throws IOException {
+                    channel.lock();
+                }
+            };
             channel.close();
             FileUtils.delete(fileName);
         }
@@ -588,7 +616,7 @@ public class TestFileSystem extends TestBase {
         assertTrue(FileUtils.tryDelete(fsBase + "/test2"));
         FileUtils.delete(fsBase + "/test");
         if (fsBase.indexOf("memFS:") < 0 && fsBase.indexOf("memLZF:") < 0
-            && fsBase.indexOf("nioMemFS:") < 0 && fsBase.indexOf("nioMemLZF:") < 0) {
+                && fsBase.indexOf("nioMemFS:") < 0 && fsBase.indexOf("nioMemLZF:") < 0) {
             FileUtils.createDirectories(fsBase + "/testDir");
             assertTrue(FileUtils.isDirectory(fsBase + "/testDir"));
             if (!fsBase.startsWith("jdbc:")) {
@@ -656,84 +684,84 @@ public class TestFileSystem extends TestBase {
             for (int i = 0; i < size; i++) {
                 trace("op " + i);
                 int pos = random.nextInt(10000);
-                switch(random.nextInt(7)) {
-                case 0: {
-                    pos = (int) Math.min(pos, ra.length());
-                    trace("seek " + pos);
-                    buff.append("seek " + pos + "\n");
-                    f.position(pos);
-                    ra.seek(pos);
-                    break;
-                }
-                case 1: {
-                    int arrayLen = random.nextInt(1000);
-                    int offset = arrayLen / 10;
-                    offset = offset == 0 ? 0 : random.nextInt(offset);
-                    int len = arrayLen == 0 ? 0 : random.nextInt(arrayLen - offset);
-                    byte[] buffer = new byte[arrayLen];
-                    ByteBuffer byteBuff = createSlicedBuffer(buffer, offset, len);
-                    random.nextBytes(buffer);
-                    trace("write " + offset + " len " + len);
-                    buff.append("write " + offset + " " + len + "\n");
-                    f.write(byteBuff);
-                    ra.write(buffer, offset, len);
-                    break;
-                }
-                case 2: {
-                    trace("truncate " + pos);
-                    buff.append("truncate " + pos + "\n");
-                    f.truncate(pos);
-                    if (pos < ra.length()) {
-                        // truncate is supposed to have no effect if the
-                        // position is larger than the current size
-                        ra.setLength(pos);
+                switch (random.nextInt(7)) {
+                    case 0: {
+                        pos = (int) Math.min(pos, ra.length());
+                        trace("seek " + pos);
+                        buff.append("seek " + pos + "\n");
+                        f.position(pos);
+                        ra.seek(pos);
+                        break;
                     }
-                    assertEquals(ra.getFilePointer(), f.position());
-                    break;
-                }
-                case 3: {
-                    int len = random.nextInt(1000);
-                    int offset = random.nextInt(100);
-                    int arrayLen = len + offset;
-                    len = (int) Math.min(len, ra.length() - ra.getFilePointer());
-                    byte[] b1 = new byte[arrayLen];
-                    byte[] b2 = new byte[arrayLen];
-                    trace("readFully " + len);
-                    buff.append("readFully " + len + "\n");
-                    ra.readFully(b1, offset, len);
-                    ByteBuffer byteBuff = createSlicedBuffer(b2, offset, len);
-                    FileUtils.readFully(f, byteBuff);
-                    assertEquals(b1, b2);
-                    break;
-                }
-                case 4: {
-                    trace("getFilePointer");
-                    buff.append("getFilePointer\n");
-                    assertEquals(ra.getFilePointer(), f.position());
-                    break;
-                }
-                case 5: {
-                    trace("length " + ra.length());
-                    buff.append("length " + ra.length() + "\n");
-                    assertEquals(ra.length(), f.size());
-                    break;
-                }
-                case 6: {
-                    trace("reopen");
-                    buff.append("reopen\n");
-                    f.close();
-                    ra.close();
-                    ra = new RandomAccessFile(file, "rw");
-                    f = FileUtils.open(s, "rw");
-                    assertEquals(ra.length(), f.size());
-                    break;
-                }
-                default:
+                    case 1: {
+                        int arrayLen = random.nextInt(1000);
+                        int offset = arrayLen / 10;
+                        offset = offset == 0 ? 0 : random.nextInt(offset);
+                        int len = arrayLen == 0 ? 0 : random.nextInt(arrayLen - offset);
+                        byte[] buffer = new byte[arrayLen];
+                        ByteBuffer byteBuff = createSlicedBuffer(buffer, offset, len);
+                        random.nextBytes(buffer);
+                        trace("write " + offset + " len " + len);
+                        buff.append("write " + offset + " " + len + "\n");
+                        f.write(byteBuff);
+                        ra.write(buffer, offset, len);
+                        break;
+                    }
+                    case 2: {
+                        trace("truncate " + pos);
+                        buff.append("truncate " + pos + "\n");
+                        f.truncate(pos);
+                        if (pos < ra.length()) {
+                            // truncate is supposed to have no effect if the
+                            // position is larger than the current size
+                            ra.setLength(pos);
+                        }
+                        assertEquals(ra.getFilePointer(), f.position());
+                        break;
+                    }
+                    case 3: {
+                        int len = random.nextInt(1000);
+                        int offset = random.nextInt(100);
+                        int arrayLen = len + offset;
+                        len = (int) Math.min(len, ra.length() - ra.getFilePointer());
+                        byte[] b1 = new byte[arrayLen];
+                        byte[] b2 = new byte[arrayLen];
+                        trace("readFully " + len);
+                        buff.append("readFully " + len + "\n");
+                        ra.readFully(b1, offset, len);
+                        ByteBuffer byteBuff = createSlicedBuffer(b2, offset, len);
+                        FileUtils.readFully(f, byteBuff);
+                        assertEquals(b1, b2);
+                        break;
+                    }
+                    case 4: {
+                        trace("getFilePointer");
+                        buff.append("getFilePointer\n");
+                        assertEquals(ra.getFilePointer(), f.position());
+                        break;
+                    }
+                    case 5: {
+                        trace("length " + ra.length());
+                        buff.append("length " + ra.length() + "\n");
+                        assertEquals(ra.length(), f.size());
+                        break;
+                    }
+                    case 6: {
+                        trace("reopen");
+                        buff.append("reopen\n");
+                        f.close();
+                        ra.close();
+                        ra = new RandomAccessFile(file, "rw");
+                        f = FileUtils.open(s, "rw");
+                        assertEquals(ra.length(), f.size());
+                        break;
+                    }
+                    default:
                 }
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            fail("Exception: " + e + "\n"+ buff.toString());
+            fail("Exception: " + e + "\n" + buff.toString());
         } finally {
             f.close();
             ra.close();
@@ -743,7 +771,7 @@ public class TestFileSystem extends TestBase {
     }
 
     private static ByteBuffer createSlicedBuffer(byte[] buffer, int offset,
-            int len) {
+                                                 int len) {
         ByteBuffer byteBuff = ByteBuffer.wrap(buffer);
         byteBuff.position(offset);
         // force the arrayOffset to be non-0

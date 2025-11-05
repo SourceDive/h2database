@@ -6,9 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.api.Trigger;
 import org.h2.command.Command;
@@ -17,11 +14,7 @@ import org.h2.command.Prepared;
 import org.h2.engine.Right;
 import org.h2.engine.Session;
 import org.h2.engine.UndoLogRecord;
-import org.h2.expression.Comparison;
-import org.h2.expression.ConditionAndOr;
-import org.h2.expression.Expression;
-import org.h2.expression.ExpressionColumn;
-import org.h2.expression.Parameter;
+import org.h2.expression.*;
 import org.h2.index.Index;
 import org.h2.message.DbException;
 import org.h2.result.ResultInterface;
@@ -33,6 +26,9 @@ import org.h2.util.New;
 import org.h2.util.StatementBuilder;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This class represents the statement
@@ -81,7 +77,7 @@ public class Insert extends Prepared implements ResultTarget {
      * Keep a collection of the columns to pass to update if a duplicate key
      * happens, for MySQL-style INSERT ... ON DUPLICATE KEY UPDATE ....
      *
-     * @param column the column
+     * @param column     the column
      * @param expression the expression
      */
     public void addAssignmentForDuplicate(Column column, Expression expression) {
@@ -396,7 +392,7 @@ public class Insert extends Prepared implements ResultTarget {
                     } else {
                         condition = new ConditionAndOr(ConditionAndOr.AND, condition,
                                 new Comparison(session, Comparison.EQUAL,
-                                expr, list.get(0)[i++]));
+                                        expr, list.get(0)[i++]));
                     }
                 }
             }

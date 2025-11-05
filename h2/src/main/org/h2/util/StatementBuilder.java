@@ -26,7 +26,7 @@ package org.h2.util;
  *     buff.appendExceptFirst(&quot;, &quot;);
  *     buff.append(a);
  * }
- *</pre>
+ * </pre>
  */
 public class StatementBuilder {
 

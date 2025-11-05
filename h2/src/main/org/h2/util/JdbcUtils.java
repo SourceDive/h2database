@@ -6,15 +6,12 @@
  */
 package org.h2.util;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
+import org.h2.message.DbException;
+
 import javax.naming.Context;
 import javax.sql.DataSource;
-import org.h2.message.DbException;
+import java.sql.*;
+import java.util.Properties;
 
 /**
  * This is a utility class with JDBC helper functions.
@@ -22,31 +19,31 @@ import org.h2.message.DbException;
 public class JdbcUtils {
 
     private static final String[] DRIVERS = {
-        "h2:", "org.h2.Driver",
-        "Cache:", "com.intersys.jdbc.CacheDriver",
-        "daffodilDB://", "in.co.daffodil.db.rmi.RmiDaffodilDBDriver",
-        "daffodil", "in.co.daffodil.db.jdbc.DaffodilDBDriver",
-        "db2:", "COM.ibm.db2.jdbc.net.DB2Driver",
-        "derby:net:", "org.apache.derby.jdbc.ClientDriver",
-        "derby://", "org.apache.derby.jdbc.ClientDriver",
-        "derby:", "org.apache.derby.jdbc.EmbeddedDriver",
-        "FrontBase:", "com.frontbase.jdbc.FBJDriver",
-        "firebirdsql:", "org.firebirdsql.jdbc.FBDriver",
-        "hsqldb:", "org.hsqldb.jdbcDriver",
-        "informix-sqli:", "com.informix.jdbc.IfxDriver",
-        "jtds:", "net.sourceforge.jtds.jdbc.Driver",
-        "microsoft:", "com.microsoft.jdbc.sqlserver.SQLServerDriver",
-        "mimer:", "com.mimer.jdbc.Driver",
-        "mysql:", "com.mysql.jdbc.Driver",
-        "odbc:", "sun.jdbc.odbc.JdbcOdbcDriver",
-        "oracle:", "oracle.jdbc.driver.OracleDriver",
-        "pervasive:", "com.pervasive.jdbc.v2.Driver",
-        "pointbase:micro:", "com.pointbase.me.jdbc.jdbcDriver",
-        "pointbase:", "com.pointbase.jdbc.jdbcUniversalDriver",
-        "postgresql:", "org.postgresql.Driver",
-        "sybase:", "com.sybase.jdbc3.jdbc.SybDriver",
-        "sqlserver:", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-        "teradata:", "com.ncr.teradata.TeraDriver",
+            "h2:", "org.h2.Driver",
+            "Cache:", "com.intersys.jdbc.CacheDriver",
+            "daffodilDB://", "in.co.daffodil.db.rmi.RmiDaffodilDBDriver",
+            "daffodil", "in.co.daffodil.db.jdbc.DaffodilDBDriver",
+            "db2:", "COM.ibm.db2.jdbc.net.DB2Driver",
+            "derby:net:", "org.apache.derby.jdbc.ClientDriver",
+            "derby://", "org.apache.derby.jdbc.ClientDriver",
+            "derby:", "org.apache.derby.jdbc.EmbeddedDriver",
+            "FrontBase:", "com.frontbase.jdbc.FBJDriver",
+            "firebirdsql:", "org.firebirdsql.jdbc.FBDriver",
+            "hsqldb:", "org.hsqldb.jdbcDriver",
+            "informix-sqli:", "com.informix.jdbc.IfxDriver",
+            "jtds:", "net.sourceforge.jtds.jdbc.Driver",
+            "microsoft:", "com.microsoft.jdbc.sqlserver.SQLServerDriver",
+            "mimer:", "com.mimer.jdbc.Driver",
+            "mysql:", "com.mysql.jdbc.Driver",
+            "odbc:", "sun.jdbc.odbc.JdbcOdbcDriver",
+            "oracle:", "oracle.jdbc.driver.OracleDriver",
+            "pervasive:", "com.pervasive.jdbc.v2.Driver",
+            "pointbase:micro:", "com.pointbase.me.jdbc.jdbcDriver",
+            "pointbase:", "com.pointbase.jdbc.jdbcUniversalDriver",
+            "postgresql:", "org.postgresql.Driver",
+            "sybase:", "com.sybase.jdbc3.jdbc.SybDriver",
+            "sqlserver:", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+            "teradata:", "com.ncr.teradata.TeraDriver",
     };
 
     private JdbcUtils() {
@@ -101,14 +98,14 @@ public class JdbcUtils {
     /**
      * Open a new database connection with the given settings.
      *
-     * @param driver the driver class name
-     * @param url the database URL
-     * @param user the user name
+     * @param driver   the driver class name
+     * @param url      the database URL
+     * @param user     the user name
      * @param password the password
      * @return the database connection
      */
     public static Connection getConnection(String driver, String url,
-            String user, String password) throws SQLException {
+                                           String user, String password) throws SQLException {
         Properties prop = new Properties();
         if (user != null) {
             prop.setProperty("user", user);
@@ -123,12 +120,12 @@ public class JdbcUtils {
      * Open a new database connection with the given settings.
      *
      * @param driver the driver class name
-     * @param url the database URL
-     * @param prop the properties containing at least the user name and password
+     * @param url    the database URL
+     * @param prop   the properties containing at least the user name and password
      * @return the database connection
      */
     public static Connection getConnection(String driver, String url,
-            Properties prop) throws SQLException {
+                                           Properties prop) throws SQLException {
         if (StringUtils.isNullOrEmpty(driver)) {
             JdbcUtils.load(url);
         } else {

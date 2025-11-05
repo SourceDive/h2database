@@ -6,15 +6,15 @@
  */
 package org.h2.value;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.util.DateTimeUtils;
 import org.h2.util.MathUtils;
 import org.h2.util.StringUtils;
+
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Implementation of the DATE data type.
@@ -142,7 +142,7 @@ public class ValueDate extends Value {
     /**
      * Append a date to the string builder.
      *
-     * @param buff the target string builder
+     * @param buff      the target string builder
      * @param dateValue the date value
      */
     static void appendDate(StringBuilder buff, long dateValue) {

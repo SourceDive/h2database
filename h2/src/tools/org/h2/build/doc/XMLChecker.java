@@ -6,11 +6,11 @@
  */
 package org.h2.build.doc;
 
+import org.h2.util.IOUtils;
+
 import java.io.File;
 import java.io.FileReader;
 import java.util.Stack;
-
-import org.h2.util.IOUtils;
 
 /**
  * This class checks that the HTML and XML part of the source code
@@ -106,7 +106,7 @@ public class XMLChecker {
                     }
                 }
                 if (name != null) {
-                    stack.add(new Object[] { name, parser.getPos() });
+                    stack.add(new Object[]{name, parser.getPos()});
                 }
             } else if (event == XMLParser.END_ELEMENT) {
                 String name = parser.getName();

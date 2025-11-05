@@ -6,8 +6,9 @@
  */
 package org.h2.engine;
 
-import java.util.ArrayList;
 import org.h2.table.Table;
+
+import java.util.ArrayList;
 
 /**
  * <p>数据库对象的统一抽象接口。</p>
@@ -132,7 +133,7 @@ public interface DbObject {
      * Build a SQL statement to re-create the object, or to create a copy of the
      * object with a different name or referencing a different table
      *
-     * @param table the new table
+     * @param table      the new table
      * @param quotedName the quoted name
      * @return the SQL statement
      */

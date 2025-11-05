@@ -79,7 +79,7 @@ public class MVMapConcurrent<K, V> extends MVMap<K, V> {
                 result = (V) remove(p, v, key);
                 if (!p.isLeaf() && p.getTotalCount() == 0) {
                     p.removePage();
-                    p = Page.createEmpty(this,  p.getVersion());
+                    p = Page.createEmpty(this, p.getVersion());
                 }
                 newRoot(p);
             }

@@ -6,13 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Session;
@@ -26,6 +19,8 @@ import org.h2.table.IndexColumn;
 import org.h2.table.RegularTable;
 import org.h2.table.TableFilter;
 import org.h2.util.New;
+
+import java.util.*;
 
 /**
  * The scan index is not really an 'index' in the strict sense, because it can
@@ -43,7 +38,7 @@ public class ScanIndex extends BaseIndex {
     private long rowCount;
 
     public ScanIndex(RegularTable table, int id, IndexColumn[] columns,
-            IndexType indexType) {
+                     IndexType indexType) {
         initBaseIndex(table, id, table.getName() + "_DATA", columns, indexType);
         if (database.isMultiVersion()) {
             sessionRowCount = New.hashMap();
@@ -176,7 +171,7 @@ public class ScanIndex extends BaseIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return tableData.getRowCountApproximation() + Constants.COST_ROW_OFFSET;
     }
 

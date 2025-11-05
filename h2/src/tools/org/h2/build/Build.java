@@ -6,6 +6,9 @@
  */
 package org.h2.build;
 
+import org.h2.build.code.SwitchSource;
+import org.h2.build.doc.XMLParser;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -13,11 +16,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.Map.Entry;
-
-import org.h2.build.code.SwitchSource;
-import org.h2.build.doc.XMLParser;
+import java.util.TreeMap;
 
 /**
  * The build definition.
@@ -116,18 +116,18 @@ public class Build extends BuildBase {
                 "emma", "emma", "2.0.5312",
                 "30a40933caf67d88d9e75957950ccf353b181ab7");
         String cp = "temp" + File.pathSeparator + "bin" +
-            File.pathSeparator + "ext/emma-2.0.5312.jar" +
-            File.pathSeparator + "ext/postgresql-8.3-603.jdbc3.jar" +
-            File.pathSeparator + "ext/servlet-api-2.4.jar" +
-            File.pathSeparator + "ext/lucene-core-3.0.2.jar" +
-            File.pathSeparator + "ext/h2mig_pagestore_addon.jar" +
-            File.pathSeparator + "ext/org.osgi.core-4.2.0.jar" +
-            File.pathSeparator + "ext/org.osgi.enterprise-4.2.0.jar" +
-            File.pathSeparator + "ext/jts-1.13.jar" +
-            File.pathSeparator + "ext/slf4j-api-1.6.0.jar" +
-            File.pathSeparator + "ext/slf4j-nop-1.6.0.jar" +
-            File.pathSeparator + System.getProperty("java.home") +
-            "/../lib/tools.jar";
+                File.pathSeparator + "ext/emma-2.0.5312.jar" +
+                File.pathSeparator + "ext/postgresql-8.3-603.jdbc3.jar" +
+                File.pathSeparator + "ext/servlet-api-2.4.jar" +
+                File.pathSeparator + "ext/lucene-core-3.0.2.jar" +
+                File.pathSeparator + "ext/h2mig_pagestore_addon.jar" +
+                File.pathSeparator + "ext/org.osgi.core-4.2.0.jar" +
+                File.pathSeparator + "ext/org.osgi.enterprise-4.2.0.jar" +
+                File.pathSeparator + "ext/jts-1.13.jar" +
+                File.pathSeparator + "ext/slf4j-api-1.6.0.jar" +
+                File.pathSeparator + "ext/slf4j-nop-1.6.0.jar" +
+                File.pathSeparator + System.getProperty("java.home") +
+                "/../lib/tools.jar";
         // -XX:-UseSplitVerifier is for Java 7 compatibility
         exec("java", args(
                 "-Xmx128m",
@@ -137,7 +137,7 @@ public class Build extends BuildBase {
                 "-sp", "src/main",
                 "-r", "html,txt",
                 "-ix", "-org.h2.test.*,-org.h2.dev.*," +
-                "-org.h2.jaqu.*,-org.h2.mode.*,-org.h2.server.pg.*",
+                        "-org.h2.jaqu.*,-org.h2.mode.*,-org.h2.server.pg.*",
                 "org.h2.test.TestAll"));
     }
 
@@ -184,7 +184,7 @@ public class Build extends BuildBase {
     }
 
     private void compile(boolean debugInfo, boolean clientOnly,
-            boolean basicResourcesOnly) {
+                         boolean basicResourcesOnly) {
         switchSource(debugInfo);
         clean();
         mkdir("temp");
@@ -232,15 +232,15 @@ public class Build extends BuildBase {
                     "-classpath", classpath);
             javac(args, files);
             files = files("src/test").
-                exclude("*.java").
-                exclude("*/package.html");
+                    exclude("*.java").
+                    exclude("*/package.html");
             copy("temp", files, "src/test");
         }
         resources(clientOnly, basicResourcesOnly);
     }
 
     private static void filter(String source, String target, String old,
-            String replacement) {
+                               String replacement) {
         String text = new String(readFile(new File(source)));
         text = replaceAll(text, old, replacement);
         writeFile(new File(target), text.getBytes());
@@ -299,7 +299,7 @@ public class Build extends BuildBase {
     }
 
     private void downloadOrVerify(String target, String group, String artifact,
-            String version, String sha1Checksum, boolean offline) {
+                                  String version, String sha1Checksum, boolean offline) {
         if (offline) {
             File targetFile = new File(target);
             if (targetFile.exists()) {
@@ -380,7 +380,7 @@ public class Build extends BuildBase {
     }
 
     private static void updateChecksum(String fileName, String sha1Zip,
-            String sha1Exe) {
+                                       String sha1Exe) {
         String checksums = new String(readFile(new File(fileName)));
         checksums = replaceAll(checksums, "<!-- sha1Zip -->",
                 "(SHA1 checksum: " + sha1Zip + ")");
@@ -398,21 +398,21 @@ public class Build extends BuildBase {
         compile();
         manifest("H2 Database Engine", "org.h2.tools.Console");
         FileList files = files("temp").
-            exclude("temp/android/*").
-            exclude("temp/org/h2/android/*").
-            exclude("temp/org/h2/build/*").
-            exclude("temp/org/h2/dev/*").
-            exclude("temp/org/h2/jcr/*").
-            exclude("temp/org/h2/jaqu/*").
-            exclude("temp/org/h2/java/*").
-            exclude("temp/org/h2/jcr/*").
-            exclude("temp/org/h2/mode/*").
-            exclude("temp/org/h2/samples/*").
-            exclude("temp/org/h2/server/ftp/*").
-            exclude("temp/org/h2/test/*").
-            exclude("*.bat").
-            exclude("*.sh").
-            exclude("*.txt");
+                exclude("temp/android/*").
+                exclude("temp/org/h2/android/*").
+                exclude("temp/org/h2/build/*").
+                exclude("temp/org/h2/dev/*").
+                exclude("temp/org/h2/jcr/*").
+                exclude("temp/org/h2/jaqu/*").
+                exclude("temp/org/h2/java/*").
+                exclude("temp/org/h2/jcr/*").
+                exclude("temp/org/h2/mode/*").
+                exclude("temp/org/h2/samples/*").
+                exclude("temp/org/h2/server/ftp/*").
+                exclude("temp/org/h2/test/*").
+                exclude("*.bat").
+                exclude("*.sh").
+                exclude("*.txt");
         jar("bin/h2" + getJarSuffix(), files, "temp");
         filter("src/installer/h2.sh", "bin/h2.sh", "h2.jar", "h2" + getJarSuffix());
         filter("src/installer/h2.bat", "bin/h2.bat", "h2.jar", "h2" + getJarSuffix());
@@ -426,23 +426,23 @@ public class Build extends BuildBase {
     public void jarAndroid() {
         compile(false, false, true);
         FileList files = files("temp").
-            exclude("temp/org/h2/bnf/*").
-            exclude("temp/org/h2/build/*").
-            exclude("temp/org/h2/dev/*").
-            exclude("temp/org/h2/fulltext/*").
-            exclude("temp/org/h2/jaqu/*").
-            exclude("temp/org/h2/java/*").
-            exclude("temp/org/h2/jdbcx/*").
-            exclude("temp/org/h2/jcr/*").
-            exclude("temp/org/h2/jmx/*").
-            exclude("temp/org/h2/mode/*").
-            exclude("temp/org/h2/samples/*").
-            exclude("temp/org/h2/server/*").
-            exclude("temp/org/h2/test/*").
-            exclude("temp/org/h2/tools/*").
-            exclude("*.bat").
-            exclude("*.sh").
-            exclude("*.txt");
+                exclude("temp/org/h2/bnf/*").
+                exclude("temp/org/h2/build/*").
+                exclude("temp/org/h2/dev/*").
+                exclude("temp/org/h2/fulltext/*").
+                exclude("temp/org/h2/jaqu/*").
+                exclude("temp/org/h2/java/*").
+                exclude("temp/org/h2/jdbcx/*").
+                exclude("temp/org/h2/jcr/*").
+                exclude("temp/org/h2/jmx/*").
+                exclude("temp/org/h2/mode/*").
+                exclude("temp/org/h2/samples/*").
+                exclude("temp/org/h2/server/*").
+                exclude("temp/org/h2/test/*").
+                exclude("temp/org/h2/tools/*").
+                exclude("*.bat").
+                exclude("*.sh").
+                exclude("*.txt");
         files.add(new File("temp/org/h2/tools/DeleteDbFiles.class"));
         files.add(new File("temp/org/h2/tools/CompressTool.class"));
         jar("bin/h2android" + getJarSuffix(), files, "temp");
@@ -455,17 +455,17 @@ public class Build extends BuildBase {
     public void jarClient() {
         compile(true, true, false);
         FileList files = files("temp").
-            exclude("temp/org/h2/build/*").
-            exclude("temp/org/h2/dev/*").
-            exclude("temp/org/h2/jaqu/*").
-            exclude("temp/org/h2/java/*").
-            exclude("temp/org/h2/jcr/*").
-            exclude("temp/org/h2/mode/*").
-            exclude("temp/org/h2/samples/*").
-            exclude("temp/org/h2/test/*").
-            exclude("*.bat").
-            exclude("*.sh").
-            exclude("*.txt");
+                exclude("temp/org/h2/build/*").
+                exclude("temp/org/h2/dev/*").
+                exclude("temp/org/h2/jaqu/*").
+                exclude("temp/org/h2/java/*").
+                exclude("temp/org/h2/jcr/*").
+                exclude("temp/org/h2/mode/*").
+                exclude("temp/org/h2/samples/*").
+                exclude("temp/org/h2/test/*").
+                exclude("*.bat").
+                exclude("*.sh").
+                exclude("*.txt");
         long kb = jar("bin/h2client" + getJarSuffix(), files, "temp");
         if (kb < 350 || kb > 450) {
             throw new RuntimeException("Expected file size 350 - 450 KB, got: " + kb);
@@ -488,27 +488,27 @@ public class Build extends BuildBase {
     public void jarSmall() {
         compile(false, false, true);
         FileList files = files("temp").
-            exclude("temp/android/*").
-            exclude("temp/org/h2/android/*").
-            exclude("temp/org/h2/build/*").
-            exclude("temp/org/h2/dev/*").
-            exclude("temp/org/h2/jcr/*").
-            exclude("temp/org/h2/jaqu/*").
-            exclude("temp/org/h2/java/*").
-            exclude("temp/org/h2/jcr/*").
-            exclude("temp/org/h2/mode/*").
-            exclude("temp/org/h2/samples/*").
-            exclude("temp/org/h2/server/ftp/*").
-            exclude("temp/org/h2/test/*").
-            exclude("temp/org/h2/bnf/*").
-            exclude("temp/org/h2/fulltext/*").
-            exclude("temp/org/h2/jdbcx/*").
-            exclude("temp/org/h2/jmx/*").
-            exclude("temp/org/h2/server/*").
-            exclude("temp/org/h2/tools/*").
-            exclude("*.bat").
-            exclude("*.sh").
-            exclude("*.txt");
+                exclude("temp/android/*").
+                exclude("temp/org/h2/android/*").
+                exclude("temp/org/h2/build/*").
+                exclude("temp/org/h2/dev/*").
+                exclude("temp/org/h2/jcr/*").
+                exclude("temp/org/h2/jaqu/*").
+                exclude("temp/org/h2/java/*").
+                exclude("temp/org/h2/jcr/*").
+                exclude("temp/org/h2/mode/*").
+                exclude("temp/org/h2/samples/*").
+                exclude("temp/org/h2/server/ftp/*").
+                exclude("temp/org/h2/test/*").
+                exclude("temp/org/h2/bnf/*").
+                exclude("temp/org/h2/fulltext/*").
+                exclude("temp/org/h2/jdbcx/*").
+                exclude("temp/org/h2/jmx/*").
+                exclude("temp/org/h2/server/*").
+                exclude("temp/org/h2/tools/*").
+                exclude("*.bat").
+                exclude("*.sh").
+                exclude("*.txt");
         files.add(new File("temp/org/h2/tools/DeleteDbFiles.class"));
         files.add(new File("temp/org/h2/tools/CompressTool.class"));
         jar("bin/h2small" + getJarSuffix(), files, "temp");
@@ -537,7 +537,7 @@ public class Build extends BuildBase {
                 "org.h2.tools", "org.h2.api", "org.h2.engine", "org.h2.fulltext",
                 "-classpath",
                 "ext/lucene-core-3.0.2.jar" +
-                File.pathSeparator + "ext/jts-1.13.jar",
+                        File.pathSeparator + "ext/jts-1.13.jar",
                 "-docletpath", "bin" + File.pathSeparator + "temp",
                 "-doclet", "org.h2.build.doclet.Doclet");
         copy("docs/javadoc", files("src/docsrc/javadoc"), "src/docsrc/javadoc");
@@ -550,34 +550,34 @@ public class Build extends BuildBase {
         compileTools();
         mkdir("docs/javadocImpl2");
         javadoc("-sourcepath", "src/main" +
-                File.pathSeparator + "src/test" +
-                File.pathSeparator + "src/tools" ,
+                        File.pathSeparator + "src/test" +
+                        File.pathSeparator + "src/tools",
                 "-noindex",
                 "-tag", "h2.resource",
                 "-d", "docs/javadocImpl2",
                 "-classpath", System.getProperty("java.home") +
-                "/../lib/tools.jar" +
-                File.pathSeparator + "ext/slf4j-api-1.6.0.jar" +
-                File.pathSeparator + "ext/servlet-api-2.4.jar" +
-                File.pathSeparator + "ext/lucene-core-3.0.2.jar" +
-                File.pathSeparator + "ext/org.osgi.core-4.2.0.jar" +
-                File.pathSeparator + "ext/org.osgi.enterprise-4.2.0.jar" +
-                File.pathSeparator + "ext/jts-1.13.jar",
+                        "/../lib/tools.jar" +
+                        File.pathSeparator + "ext/slf4j-api-1.6.0.jar" +
+                        File.pathSeparator + "ext/servlet-api-2.4.jar" +
+                        File.pathSeparator + "ext/lucene-core-3.0.2.jar" +
+                        File.pathSeparator + "ext/org.osgi.core-4.2.0.jar" +
+                        File.pathSeparator + "ext/org.osgi.enterprise-4.2.0.jar" +
+                        File.pathSeparator + "ext/jts-1.13.jar",
                 "-subpackages", "org.h2",
                 "-exclude", "org.h2.test.jaqu:org.h2.jaqu");
         System.setProperty("h2.interfacesOnly", "false");
         System.setProperty("h2.javadocDestDir", "docs/javadocImpl");
         javadoc("-sourcepath", "src/main" +
-                File.pathSeparator + "src/test" +
-                File.pathSeparator + "src/tools",
+                        File.pathSeparator + "src/test" +
+                        File.pathSeparator + "src/tools",
                 "-classpath",
                 System.getProperty("java.home") + "/../lib/tools.jar" +
-                File.pathSeparator + "ext/slf4j-api-1.6.0.jar" +
-                File.pathSeparator + "ext/servlet-api-2.4.jar" +
-                File.pathSeparator + "ext/lucene-core-3.0.2.jar" +
-                File.pathSeparator + "ext/org.osgi.core-4.2.0.jar" +
-                File.pathSeparator + "ext/org.osgi.enterprise-4.2.0.jar" +
-                File.pathSeparator + "ext/jts-1.13.jar",
+                        File.pathSeparator + "ext/slf4j-api-1.6.0.jar" +
+                        File.pathSeparator + "ext/servlet-api-2.4.jar" +
+                        File.pathSeparator + "ext/lucene-core-3.0.2.jar" +
+                        File.pathSeparator + "ext/org.osgi.core-4.2.0.jar" +
+                        File.pathSeparator + "ext/org.osgi.enterprise-4.2.0.jar" +
+                        File.pathSeparator + "ext/jts-1.13.jar",
                 "-subpackages", "org.h2",
                 "-exclude", "org.h2.test.jaqu:org.h2.jaqu",
                 "-package",
@@ -593,7 +593,7 @@ public class Build extends BuildBase {
         manifest = replaceAll(manifest, "${version}", getVersion());
         manifest = replaceAll(manifest, "${buildJdk}", getJavaSpecVersion());
         String createdBy = System.getProperty("java.runtime.version") +
-            " (" + System.getProperty("java.vm.vendor") + ")";
+                " (" + System.getProperty("java.vm.vendor") + ")";
         manifest = replaceAll(manifest, "${createdBy}", createdBy);
         String mainClassTag = manifest == null ? "" : "Main-Class: " + mainClassName;
         manifest = replaceAll(manifest, "${mainClassTag}", mainClassTag);
@@ -632,7 +632,7 @@ public class Build extends BuildBase {
                 "-DartifactId=h2",
                 "-DgroupId=com.h2database"
                 // ,"-DgeneratePom=false"
-                ));
+        ));
 
         // generate and deploy the h2*-javadoc.jar file
         javadocImpl();
@@ -648,7 +648,7 @@ public class Build extends BuildBase {
                 "-DartifactId=h2",
                 "-DgroupId=com.h2database"
                 // ,"-DgeneratePom=false"
-                ));
+        ));
 
         // generate and deploy the h2*.jar file
         jar();
@@ -706,15 +706,15 @@ public class Build extends BuildBase {
             javadoc("-sourcepath", "src/main", "org.h2.tools", "org.h2.jmx",
                     "-classpath",
                     "ext/lucene-core-3.0.2.jar" +
-                    File.pathSeparator + "ext/jts-1.13.jar",
+                            File.pathSeparator + "ext/jts-1.13.jar",
                     "-docletpath", "bin" + File.pathSeparator + "temp",
                     "-doclet", "org.h2.build.doclet.ResourceDoclet");
         }
         FileList files = files("src/main").
-            exclude("*.MF").
-            exclude("*.java").
-            exclude("*/package.html").
-            exclude("*/java.sql.Driver");
+                exclude("*.MF").
+                exclude("*.java").
+                exclude("*/package.html").
+                exclude("*/java.sql.Driver");
         if (basicOnly) {
             files = files.keep("src/main/org/h2/res/_messages_en.*");
         }
@@ -900,7 +900,7 @@ public class Build extends BuildBase {
         }
         XMLParser p = new XMLParser(new String(BuildBase.readFile(file)));
         HashMap<String, String> prop = new HashMap<String, String>();
-        for (String name = ""; p.hasNext();) {
+        for (String name = ""; p.hasNext(); ) {
             int event = p.next();
             if (event == XMLParser.START_ELEMENT) {
                 name += "/" + p.getName();

@@ -6,9 +6,10 @@
  */
 package org.h2.test.jaqu;
 
-import java.util.List;
 import org.h2.jaqu.Db;
 import org.h2.test.TestBase;
+
+import java.util.List;
 
 /**
  * Tests that columns (p.unitsInStock) are not compared by value with the value
@@ -36,9 +37,9 @@ public class AliasMapTest extends TestBase {
 
         Product p = new Product();
         List<Product> products = db
-            .from(p)
-            .where(p.unitsInStock).is(9)
-            .orderBy(p.productId).select();
+                .from(p)
+                .where(p.unitsInStock).is(9)
+                .orderBy(p.productId).select();
 
         assertEquals("[]", products.toString());
 

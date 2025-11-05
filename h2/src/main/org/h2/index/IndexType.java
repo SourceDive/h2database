@@ -18,7 +18,7 @@ public class IndexType {
      * Create a primary key index.
      *
      * @param persistent if the index is persistent
-     * @param hash if a hash index should be used
+     * @param hash       if a hash index should be used
      * @return the index type
      */
     public static IndexType createPrimaryKey(boolean persistent, boolean hash) {
@@ -34,7 +34,7 @@ public class IndexType {
      * Create a unique index.
      *
      * @param persistent if the index is persistent
-     * @param hash if a hash index should be used
+     * @param hash       if a hash index should be used
      * @return the index type
      */
     public static IndexType createUnique(boolean persistent, boolean hash) {
@@ -59,12 +59,12 @@ public class IndexType {
      * Create a non-unique index.
      *
      * @param persistent if the index is persistent
-     * @param hash if a hash index should be used
-     * @param spatial if a spatial index should be used
+     * @param hash       if a hash index should be used
+     * @param spatial    if a spatial index should be used
      * @return the index type
      */
     public static IndexType createNonUnique(boolean persistent, boolean hash,
-            boolean spatial) {
+                                            boolean spatial) {
         IndexType type = new IndexType();
         type.persistent = persistent;
         type.hash = hash;

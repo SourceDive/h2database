@@ -6,16 +6,13 @@
  */
 package org.h2.test.unit;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Random;
 import org.h2.compress.LZFInputStream;
 import org.h2.compress.LZFOutputStream;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
+
+import java.io.*;
+import java.util.Random;
 
 /**
  * Tests the LZF stream.
@@ -38,8 +35,8 @@ public class TestStreams extends TestBase {
     }
 
     private static byte[] getRandomBytes(Random random) {
-        int[] sizes = { 0, 1, random.nextInt(1000), random.nextInt(100000),
-                random.nextInt(1000000) };
+        int[] sizes = {0, 1, random.nextInt(1000), random.nextInt(100000),
+                random.nextInt(1000000)};
         int size = sizes[random.nextInt(sizes.length)];
         byte[] buffer = new byte[size];
         if (random.nextInt(5) == 1) {
@@ -79,8 +76,8 @@ public class TestStreams extends TestBase {
             if (random.nextInt(10) == 1) {
                 comp.write(buffer);
             } else {
-                for (int j = 0; j < buffer.length;) {
-                    int[] sizes = { 0, 1, random.nextInt(100), random.nextInt(100000) };
+                for (int j = 0; j < buffer.length; ) {
+                    int[] sizes = {0, 1, random.nextInt(100), random.nextInt(100000)};
                     int size = sizes[random.nextInt(sizes.length)];
                     size = Math.min(size, buffer.length - j);
                     if (size == 1) {
@@ -96,8 +93,8 @@ public class TestStreams extends TestBase {
             ByteArrayInputStream in = new ByteArrayInputStream(compressed);
             LZFInputStream decompress = new LZFInputStream(in);
             byte[] test = new byte[buffer.length];
-            for (int j = 0; j < buffer.length;) {
-                int[] sizes = { 0, 1, random.nextInt(100), random.nextInt(100000) };
+            for (int j = 0; j < buffer.length; ) {
+                int[] sizes = {0, 1, random.nextInt(100), random.nextInt(100000)};
                 int size = sizes[random.nextInt(sizes.length)];
                 if (size == 1) {
                     int x = decompress.read();

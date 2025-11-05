@@ -31,7 +31,7 @@ public class CompressNo implements Compressor {
 
     @Override
     public void expand(byte[] in, int inPos, int inLen, byte[] out, int outPos,
-            int outLen) {
+                       int outLen) {
         System.arraycopy(in, inPos, out, outPos, outLen);
     }
 

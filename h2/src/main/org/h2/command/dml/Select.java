@@ -6,11 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import org.h2.api.ErrorCode;
 import org.h2.api.Trigger;
 import org.h2.command.CommandInterface;
@@ -18,28 +13,13 @@ import org.h2.engine.Constants;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
 import org.h2.engine.SysProperties;
-import org.h2.expression.Comparison;
-import org.h2.expression.ConditionAndOr;
-import org.h2.expression.Expression;
-import org.h2.expression.ExpressionColumn;
-import org.h2.expression.ExpressionVisitor;
-import org.h2.expression.Parameter;
-import org.h2.expression.Wildcard;
+import org.h2.expression.*;
 import org.h2.index.Cursor;
 import org.h2.index.Index;
 import org.h2.index.IndexType;
 import org.h2.message.DbException;
-import org.h2.result.LocalResult;
-import org.h2.result.ResultInterface;
-import org.h2.result.ResultTarget;
-import org.h2.result.Row;
-import org.h2.result.SearchRow;
-import org.h2.result.SortOrder;
-import org.h2.table.Column;
-import org.h2.table.ColumnResolver;
-import org.h2.table.IndexColumn;
-import org.h2.table.Table;
-import org.h2.table.TableFilter;
+import org.h2.result.*;
+import org.h2.table.*;
 import org.h2.util.New;
 import org.h2.util.StatementBuilder;
 import org.h2.util.StringUtils;
@@ -48,14 +28,19 @@ import org.h2.value.Value;
 import org.h2.value.ValueArray;
 import org.h2.value.ValueNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+
 /**
  * This class represents a simple SELECT statement.
- *
+ * <p>
  * For each select statement,
  * visibleColumnCount &lt;= distinctColumnCount &lt;= expressionCount.
  * The expression list count could include ORDER BY and GROUP BY expressions
  * that are not in the select list.
- *
+ * <p>
  * The call sequence is init(), mapColumns() if it's a subquery, prepare().
  *
  * @author Thomas Mueller
@@ -93,7 +78,7 @@ public class Select extends Query {
      * Add a table to the query.
      *
      * @param filter the table to add
-     * @param isTop if the table can be the first table in the query plan
+     * @param isTop  if the table can be the first table in the query plan
      */
     public void addTableFilter(TableFilter filter, boolean isTop) {
         // Oracle doesn't check on duplicate aliases
@@ -200,7 +185,7 @@ public class Select extends Query {
     }
 
     private void addGroupSortedRow(Value[] keyValues, int columnCount,
-            ResultTarget result) {
+                                   ResultTarget result) {
         Value[] row = new Value[columnCount];
         for (int j = 0; groupIndex != null && j < groupIndex.length; j++) {
             row[groupIndex[j]] = keyValues[j];
@@ -500,7 +485,7 @@ public class Select extends Query {
                 first = topTableFilter.getTable().getTemplateSimpleRow(true);
             }
             first.setValue(columnIndex, value);
-            Value[] row = { value };
+            Value[] row = {value};
             result.addRow(row);
             rowNumber++;
             if ((sort == null || sortUsingIndex) && limitRows > 0 &&
@@ -875,8 +860,8 @@ public class Select extends Query {
                     // if another index is faster
                     if (columnIndex.canFindNext() && ascending &&
                             (current == null ||
-                            current.getIndexType().isScan() ||
-                            columnIndex == current)) {
+                                    current.getIndexType().isScan() ||
+                                    columnIndex == current)) {
                         IndexType type = columnIndex.getIndexType();
                         // hash indexes don't work, and unique single column
                         // indexes don't work
@@ -1208,7 +1193,7 @@ public class Select extends Query {
 
     @Override
     public void addGlobalCondition(Parameter param, int columnId,
-            int comparisonType) {
+                                   int comparisonType) {
         addParameter(param);
         Expression comp;
         Expression col = expressions.get(columnId);
@@ -1265,43 +1250,43 @@ public class Select extends Query {
 
     @Override
     public boolean isEverything(ExpressionVisitor visitor) {
-        switch(visitor.getType()) {
-        case ExpressionVisitor.DETERMINISTIC: {
-            if (isForUpdate) {
-                return false;
-            }
-            for (int i = 0, size = filters.size(); i < size; i++) {
-                TableFilter f = filters.get(i);
-                if (!f.getTable().isDeterministic()) {
+        switch (visitor.getType()) {
+            case ExpressionVisitor.DETERMINISTIC: {
+                if (isForUpdate) {
                     return false;
                 }
+                for (int i = 0, size = filters.size(); i < size; i++) {
+                    TableFilter f = filters.get(i);
+                    if (!f.getTable().isDeterministic()) {
+                        return false;
+                    }
+                }
+                break;
             }
-            break;
-        }
-        case ExpressionVisitor.SET_MAX_DATA_MODIFICATION_ID: {
-            for (int i = 0, size = filters.size(); i < size; i++) {
-                TableFilter f = filters.get(i);
-                long m = f.getTable().getMaxDataModificationId();
-                visitor.addDataModificationId(m);
+            case ExpressionVisitor.SET_MAX_DATA_MODIFICATION_ID: {
+                for (int i = 0, size = filters.size(); i < size; i++) {
+                    TableFilter f = filters.get(i);
+                    long m = f.getTable().getMaxDataModificationId();
+                    visitor.addDataModificationId(m);
+                }
+                break;
             }
-            break;
-        }
-        case ExpressionVisitor.EVALUATABLE: {
-            if (!session.getDatabase().getSettings().optimizeEvaluatableSubqueries) {
-                return false;
+            case ExpressionVisitor.EVALUATABLE: {
+                if (!session.getDatabase().getSettings().optimizeEvaluatableSubqueries) {
+                    return false;
+                }
+                break;
             }
-            break;
-        }
-        case ExpressionVisitor.GET_DEPENDENCIES: {
-            for (int i = 0, size = filters.size(); i < size; i++) {
-                TableFilter f = filters.get(i);
-                Table table = f.getTable();
-                visitor.addDependency(table);
-                table.addDependencies(visitor.getDependencies());
+            case ExpressionVisitor.GET_DEPENDENCIES: {
+                for (int i = 0, size = filters.size(); i < size; i++) {
+                    TableFilter f = filters.get(i);
+                    Table table = f.getTable();
+                    visitor.addDependency(table);
+                    table.addDependencies(visitor.getDependencies());
+                }
+                break;
             }
-            break;
-        }
-        default:
+            default:
         }
         ExpressionVisitor v2 = visitor.incrementQueryLevel(1);
         boolean result = true;

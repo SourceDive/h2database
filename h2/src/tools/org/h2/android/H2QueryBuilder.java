@@ -6,10 +6,11 @@
  */
 package org.h2.android;
 
+import android.database.Cursor;
+import org.h2.util.StringUtils;
+
 import java.util.Map;
 import java.util.Set;
-import org.h2.util.StringUtils;
-import android.database.Cursor;
 
 /**
  * This helper class is used to build SQL statements.
@@ -25,7 +26,7 @@ public class H2QueryBuilder {
      * Append the column to the string builder. The columns are separated by
      * comma.
      *
-     * @param s the target string builder
+     * @param s       the target string builder
      * @param columns the columns
      */
     static void appendColumns(StringBuilder s, String[] columns) {
@@ -41,18 +42,18 @@ public class H2QueryBuilder {
      * Return the SELECT statement for the given parameters.
      *
      * @param distinct if only distinct rows should be returned
-     * @param tables the list of tables
-     * @param columns the list of columns
-     * @param where the where condition or null
-     * @param groupBy the group by list or null
-     * @param having the having condition or null
-     * @param orderBy the order by list or null
-     * @param limit the limit or null
+     * @param tables   the list of tables
+     * @param columns  the list of columns
+     * @param where    the where condition or null
+     * @param groupBy  the group by list or null
+     * @param having   the having condition or null
+     * @param orderBy  the order by list or null
+     * @param limit    the limit or null
      * @return the query
      */
     static String buildQueryString(boolean distinct, String tables,
-            String[] columns, String where, String groupBy, String having,
-            String orderBy, String limit) {
+                                   String[] columns, String where, String groupBy, String having,
+                                   String orderBy, String limit) {
         StringBuilder s = new StringBuilder();
         s.append("select ");
         if (distinct) {
@@ -99,18 +100,18 @@ public class H2QueryBuilder {
     /**
      * Return the SELECT UNION statement for the given parameters.
      *
-     * @param projectionIn TODO
-     * @param selection TODO
+     * @param projectionIn  TODO
+     * @param selection     TODO
      * @param selectionArgs TODO
-     * @param groupBy the group by list or null
-     * @param having the having condition or null
-     * @param orderBy the order by list or null
-     * @param limit the limit or null
+     * @param groupBy       the group by list or null
+     * @param having        the having condition or null
+     * @param orderBy       the order by list or null
+     * @param limit         the limit or null
      * @return the query
      */
     String buildQuery(String[] projectionIn, String selection,
-            String[] selectionArgs, String groupBy, String having,
-            String orderBy, String limit) {
+                      String[] selectionArgs, String groupBy, String having,
+                      String orderBy, String limit) {
         return null;
     }
 
@@ -118,8 +119,8 @@ public class H2QueryBuilder {
      * Return the SELECT UNION statement for the given parameters.
      *
      * @param subQueries TODO
-     * @param orderBy the order by list or null
-     * @param limit the limit or null
+     * @param orderBy    the order by list or null
+     * @param limit      the limit or null
      * @return the query
      */
     String buildUnionQuery(String[] subQueries, String orderBy, String limit) {
@@ -131,21 +132,21 @@ public class H2QueryBuilder {
      * Return the SELECT UNION statement for the given parameters.
      *
      * @param typeDiscriminatorColumn TODO
-     * @param unionColumns TODO
-     * @param columnsPresentInTable TODO
-     * @param computedColumnsOffset TODO
-     * @param typeDiscriminatorValue TODO
-     * @param selection TODO
-     * @param selectionArgs TODO
-     * @param groupBy the group by list or null
-     * @param having the having condition or null
+     * @param unionColumns            TODO
+     * @param columnsPresentInTable   TODO
+     * @param computedColumnsOffset   TODO
+     * @param typeDiscriminatorValue  TODO
+     * @param selection               TODO
+     * @param selectionArgs           TODO
+     * @param groupBy                 the group by list or null
+     * @param having                  the having condition or null
      * @return the query
      */
     String buildUnionSubQuery(String typeDiscriminatorColumn,
-            String[] unionColumns, Set<String> columnsPresentInTable,
-            int computedColumnsOffset, String typeDiscriminatorValue,
-            String selection, String[] selectionArgs, String groupBy,
-            String having) {
+                              String[] unionColumns, Set<String> columnsPresentInTable,
+                              int computedColumnsOffset, String typeDiscriminatorValue,
+                              String selection, String[] selectionArgs, String groupBy,
+                              String having) {
         return null;
 
     }
@@ -162,37 +163,37 @@ public class H2QueryBuilder {
     /**
      * Run the query for the given parameters.
      *
-     * @param db the connection
-     * @param projectionIn TODO
-     * @param selection TODO
+     * @param db            the connection
+     * @param projectionIn  TODO
+     * @param selection     TODO
      * @param selectionArgs TODO
-     * @param groupBy the group by list or null
-     * @param having the having condition or null
-     * @param orderBy the order by list or null
+     * @param groupBy       the group by list or null
+     * @param having        the having condition or null
+     * @param orderBy       the order by list or null
      * @return the cursor
      */
     Cursor query(H2Database db, String[] projectionIn, String selection,
-            String[] selectionArgs, String groupBy, String having,
-            String orderBy) {
+                 String[] selectionArgs, String groupBy, String having,
+                 String orderBy) {
         return null;
     }
 
     /**
      * Run the query for the given parameters.
      *
-     * @param db the connection
-     * @param projectionIn TODO
-     * @param selection TODO
+     * @param db            the connection
+     * @param projectionIn  TODO
+     * @param selection     TODO
      * @param selectionArgs TODO
-     * @param groupBy the group by list or null
-     * @param having the having condition or null
-     * @param orderBy the order by list or null
-     * @param limit the limit or null
+     * @param groupBy       the group by list or null
+     * @param having        the having condition or null
+     * @param orderBy       the order by list or null
+     * @param limit         the limit or null
      * @return the cursor
      */
     Cursor query(H2Database db, String[] projectionIn, String selection,
-            String[] selectionArgs, String groupBy, String having,
-            String orderBy, String limit) {
+                 String[] selectionArgs, String groupBy, String having,
+                 String orderBy, String limit) {
         return null;
     }
 

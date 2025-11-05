@@ -37,14 +37,14 @@ public class PageOutputStream {
     /**
      * Create a new page output stream.
      *
-     * @param store the page store
+     * @param store     the page store
      * @param trunkPage the first trunk page (already allocated)
-     * @param exclude the pages not to use
-     * @param logKey the log key of the first trunk page
-     * @param atEnd whether only pages at the end of the file should be used
+     * @param exclude   the pages not to use
+     * @param logKey    the log key of the first trunk page
+     * @param atEnd     whether only pages at the end of the file should be used
      */
     public PageOutputStream(PageStore store, int trunkPage, BitField exclude,
-            int logKey, boolean atEnd) {
+                            int logKey, boolean atEnd) {
         this.trace = store.getTrace();
         this.store = store;
         this.trunkPageId = trunkPage;
@@ -111,7 +111,7 @@ public class PageOutputStream {
     /**
      * Write the data.
      *
-     * @param b the buffer
+     * @param b   the buffer
      * @param off the offset
      * @param len the length
      */

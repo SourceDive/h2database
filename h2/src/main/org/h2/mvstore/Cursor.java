@@ -101,7 +101,7 @@ public class Cursor<K, V> implements Iterator<K> {
      * Fetch the next entry that is equal or larger than the given key, starting
      * from the given page. This method retains the stack.
      *
-     * @param p the page to start
+     * @param p    the page to start
      * @param from the key to search
      */
     private void min(Page p, K from) {

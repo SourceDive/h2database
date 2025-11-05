@@ -79,7 +79,7 @@ public class OffHeapStore extends FileStore {
                 throw DataUtils.newIllegalStateException(
                         DataUtils.ERROR_READING_FAILED,
                         "Could not write to position {0}; " +
-                        "partial overwrite is not supported", pos);
+                                "partial overwrite is not supported", pos);
             }
             writeCount++;
             writeBytes += length;
@@ -91,7 +91,7 @@ public class OffHeapStore extends FileStore {
             throw DataUtils.newIllegalStateException(
                     DataUtils.ERROR_READING_FAILED,
                     "Could not write to position {0}; " +
-                    "partial overwrite is not supported", pos);
+                            "partial overwrite is not supported", pos);
         }
         writeNewEntry(pos, src);
     }
@@ -115,7 +115,7 @@ public class OffHeapStore extends FileStore {
             return;
         }
         fileSize = size;
-        for (Iterator<Long> it = memory.keySet().iterator(); it.hasNext();) {
+        for (Iterator<Long> it = memory.keySet().iterator(); it.hasNext(); ) {
             long pos = it.next();
             if (pos < size) {
                 break;
@@ -125,7 +125,7 @@ public class OffHeapStore extends FileStore {
                 throw DataUtils.newIllegalStateException(
                         DataUtils.ERROR_READING_FAILED,
                         "Could not truncate to {0}; " +
-                        "partial truncate is not supported", pos);
+                                "partial truncate is not supported", pos);
             }
             it.remove();
         }

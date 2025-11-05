@@ -6,12 +6,13 @@
  */
 package org.h2.value;
 
-import java.lang.reflect.Method;
-import java.util.Comparator;
-import java.util.Locale;
 import org.h2.message.DbException;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
+import java.lang.reflect.Method;
+import java.util.Comparator;
+import java.util.Locale;
 
 /**
  * An implementation of CompareMode that uses the ICU4J Collator.
@@ -36,7 +37,7 @@ public class CompareModeIcu4J extends CompareMode {
 
     @Override
     public boolean equalsChars(String a, int ai, String b, int bi,
-            boolean ignoreCase) {
+                               boolean ignoreCase) {
         return compareString(a.substring(ai, ai + 1), b.substring(bi, bi + 1),
                 ignoreCase) == 0;
     }

@@ -6,10 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import org.h2.command.CommandInterface;
 import org.h2.command.Prepared;
 import org.h2.engine.Constants;
@@ -17,6 +13,11 @@ import org.h2.engine.Session;
 import org.h2.message.DbException;
 import org.h2.result.ResultInterface;
 import org.h2.util.ScriptReader;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 /**
  * This class represents the statement

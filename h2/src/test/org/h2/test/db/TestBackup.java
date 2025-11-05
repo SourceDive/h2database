@@ -6,18 +6,18 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.h2.api.DatabaseEventListener;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.tools.Backup;
 import org.h2.tools.Restore;
 import org.h2.util.Task;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Test for the BACKUP SQL statement.
@@ -84,7 +84,7 @@ public class TestBackup extends TestBase {
         task.execute();
         for (int i = 0; i < 10; i++) {
             updateEnd.set(System.currentTimeMillis() + 2000);
-            stat2.execute("backup to '"+getBaseDir()+"/backup.zip'");
+            stat2.execute("backup to '" + getBaseDir() + "/backup.zip'");
             stat2.execute("checkpoint");
             Restore.execute(getBaseDir() + "/backup.zip", getBaseDir() + "/t2", "backup");
             Connection conn3;
@@ -163,7 +163,7 @@ public class TestBackup extends TestBase {
         conn.createStatement().execute(
                 "create table test(x clob) as select space(10000)");
         conn.createStatement().execute("backup to '" +
-                getBaseDir() + "/backup.zip"+"'");
+                getBaseDir() + "/backup.zip" + "'");
         conn.close();
         deleteDb("backup");
         Restore.execute(getBaseDir() + "/backup.zip",

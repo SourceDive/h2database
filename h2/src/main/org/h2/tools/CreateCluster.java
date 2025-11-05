@@ -6,13 +6,6 @@
  */
 package org.h2.tools;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.message.DbException;
@@ -21,10 +14,18 @@ import org.h2.util.IOUtils;
 import org.h2.util.JdbcUtils;
 import org.h2.util.Tool;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 /**
  * Creates a cluster from a standalone database.
  * <br />
  * Copies a database to another location if required.
+ *
  * @h2.resource
  */
 public class CreateCluster extends Tool {
@@ -45,9 +46,9 @@ public class CreateCluster extends Tool {
      * <tr><td>[-serverList &lt;list&gt;]</td>
      * <td>The comma separated list of host names or IP addresses</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new CreateCluster().runTool(args);
@@ -89,19 +90,19 @@ public class CreateCluster extends Tool {
     /**
      * Creates a cluster.
      *
-     * @param urlSource the database URL of the original database
-     * @param urlTarget the database URL of the copy
-     * @param user the user name
-     * @param password the password
+     * @param urlSource  the database URL of the original database
+     * @param urlTarget  the database URL of the copy
+     * @param user       the user name
+     * @param password   the password
      * @param serverList the server list
      */
     public void execute(String urlSource, String urlTarget,
-            String user, String password, String serverList) throws SQLException {
+                        String user, String password, String serverList) throws SQLException {
         process(urlSource, urlTarget, user, password, serverList);
     }
 
     private void process(String urlSource, String urlTarget,
-            String user, String password, String serverList) throws SQLException {
+                         String user, String password, String serverList) throws SQLException {
         Connection connSource = null, connTarget = null;
         Statement statSource = null, statTarget = null;
         String scriptFile = "backup.sql";
@@ -113,7 +114,7 @@ public class CreateCluster extends Tool {
             boolean exists = true;
             try {
                 connTarget = DriverManager.getConnection(urlTarget +
-                        ";IFEXISTS=TRUE;CLUSTER=" + Constants.CLUSTERING_ENABLED,
+                                ";IFEXISTS=TRUE;CLUSTER=" + Constants.CLUSTERING_ENABLED,
                         user, password);
                 Statement stat = connTarget.createStatement();
                 stat.execute("DROP ALL OBJECTS DELETE FILES");
@@ -131,7 +132,7 @@ public class CreateCluster extends Tool {
             if (exists) {
                 throw new SQLException(
                         "Target database must not yet exist. Please delete it first: " +
-                        urlTarget);
+                                urlTarget);
             }
 
             // use cluster='' so connecting is possible

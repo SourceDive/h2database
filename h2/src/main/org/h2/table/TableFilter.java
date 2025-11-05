@@ -6,7 +6,6 @@
  */
 package org.h2.table;
 
-import java.util.ArrayList;
 import org.h2.command.Parser;
 import org.h2.command.dml.Select;
 import org.h2.engine.Right;
@@ -30,6 +29,8 @@ import org.h2.util.StringUtils;
 import org.h2.value.Value;
 import org.h2.value.ValueLong;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
 
 /**
  * A table filter represents a table that is used in a query. There is one such
@@ -108,14 +109,14 @@ public class TableFilter implements ColumnResolver {
     /**
      * Create a new table filter object.
      *
-     * @param session the session
-     * @param table the table from where to read data
-     * @param alias the alias name
+     * @param session       the session
+     * @param table         the table from where to read data
+     * @param alias         the alias name
      * @param rightsChecked true if rights are already checked
-     * @param select the select statement
+     * @param select        the select statement
      */
     public TableFilter(Session session, Table table, String alias,
-            boolean rightsChecked, Select select) {
+                       boolean rightsChecked, Select select) {
         this.session = session;
         this.table = table;
         this.alias = alias;
@@ -139,9 +140,9 @@ public class TableFilter implements ColumnResolver {
     /**
      * Lock the table. This will also lock joined tables.
      *
-     * @param s the session
+     * @param s         the session
      * @param exclusive true if an exclusive lock is required
-     * @param force lock even in the MVCC mode
+     * @param force     lock even in the MVCC mode
      */
     public void lock(Session s, boolean exclusive, boolean force) {
         table.lock(s, exclusive, force);
@@ -154,7 +155,7 @@ public class TableFilter implements ColumnResolver {
      * Get the best plan item (index, cost) to use use for the current join
      * order.
      *
-     * @param s the session
+     * @param s     the session
      * @param level 1 for the first table in a join, 2 for the second, and so on
      * @return the best plan item
      */
@@ -491,7 +492,7 @@ public class TableFilter implements ColumnResolver {
      * Add a filter condition.
      *
      * @param condition the condition
-     * @param isJoin if this is in fact a join condition
+     * @param isJoin    if this is in fact a join condition
      */
     public void addFilterCondition(Expression condition, boolean isJoin) {
         if (isJoin) {
@@ -515,12 +516,12 @@ public class TableFilter implements ColumnResolver {
      * Add a joined table.
      *
      * @param filter the joined table filter
-     * @param outer if this is an outer join
+     * @param outer  if this is an outer join
      * @param nested if this is a nested join
-     * @param on the join condition
+     * @param on     the join condition
      */
     public void addJoin(TableFilter filter, boolean outer, boolean nested,
-            final Expression on) {
+                        final Expression on) {
         if (on != null) {
             on.mapColumns(this, 0);
             if (session.getDatabase().getSettings().nestedJoins) {
@@ -815,7 +816,7 @@ public class TableFilter implements ColumnResolver {
      * return rows or not.
      *
      * @param filter the table filter
-     * @param b the new flag
+     * @param b      the new flag
      */
     public void setEvaluatable(TableFilter filter, boolean b) {
         filter.setEvaluatable(b);

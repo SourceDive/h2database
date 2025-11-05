@@ -6,6 +6,10 @@
  */
 package org.h2.store.fs;
 
+import org.h2.message.DbException;
+import org.h2.util.IOUtils;
+import org.h2.util.New;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.h2.message.DbException;
-import org.h2.util.IOUtils;
-import org.h2.util.New;
 
 /**
  * This is a read-only file system that allows
@@ -104,7 +105,7 @@ public class FilePathZip extends FilePath {
                     String n = entry.getName();
                     if (n.equals(entryName)) {
                         return entry.isDirectory();
-                    } else  if (n.startsWith(entryName)) {
+                    } else if (n.startsWith(entryName)) {
                         if (n.length() == entryName.length() + 1) {
                             if (n.equals(entryName + "/")) {
                                 return true;
@@ -249,7 +250,7 @@ public class FilePathZip extends FilePath {
 
     @Override
     public FilePath createTempFile(String suffix, boolean deleteOnExit,
-            boolean inTempDir) throws IOException {
+                                   boolean inTempDir) throws IOException {
         if (!inTempDir) {
             throw new IOException("File system is read-only");
         }
@@ -365,7 +366,7 @@ class FileZip extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         if (shared) {
             // cast to FileChannel to avoid JDK 1.7 ambiguity
             return new FileLock((FileChannel) null, position, size, shared) {
@@ -378,7 +379,8 @@ class FileZip extends FileBase {
                 @Override
                 public void release() throws IOException {
                     // ignore
-                }};
+                }
+            };
         }
         return null;
     }

@@ -26,7 +26,7 @@ public class ViewCursor implements Cursor {
     private Row current;
 
     ViewCursor(Index index, ResultInterface result, SearchRow first,
-            SearchRow last) {
+               SearchRow last) {
         this.table = index.getTable();
         this.index = index;
         this.result = result;

@@ -6,15 +6,10 @@
  */
 package org.h2.samples;
 
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.Trigger;
+
+import java.math.BigDecimal;
+import java.sql.*;
 
 /**
  * This sample application shows how to use database triggers.
@@ -67,34 +62,34 @@ public class TriggerSample {
         /**
          * Initializes the trigger.
          *
-         * @param conn a connection to the database
-         * @param schemaName the name of the schema
+         * @param conn        a connection to the database
+         * @param schemaName  the name of the schema
          * @param triggerName the name of the trigger used in the CREATE TRIGGER
-         *            statement
-         * @param tableName the name of the table
-         * @param before whether the fire method is called before or after the
-         *            operation is performed
-         * @param type the operation type: INSERT, UPDATE, or DELETE
+         *                    statement
+         * @param tableName   the name of the table
+         * @param before      whether the fire method is called before or after the
+         *                    operation is performed
+         * @param type        the operation type: INSERT, UPDATE, or DELETE
          */
         @Override
         public void init(Connection conn, String schemaName,
-                String triggerName, String tableName, boolean before, int type) {
+                         String triggerName, String tableName, boolean before, int type) {
             // initialize the trigger object is necessary
         }
 
         /**
          * This method is called for each triggered action.
          *
-         * @param conn a connection to the database
+         * @param conn   a connection to the database
          * @param oldRow the old row, or null if no old row is available (for
-         *            INSERT)
+         *               INSERT)
          * @param newRow the new row, or null if no new row is available (for
-         *            DELETE)
+         *               DELETE)
          * @throws SQLException if the operation must be undone
          */
         @Override
         public void fire(Connection conn,
-                Object[] oldRow, Object[] newRow)
+                         Object[] oldRow, Object[] newRow)
                 throws SQLException {
             BigDecimal diff = null;
             if (newRow != null) {

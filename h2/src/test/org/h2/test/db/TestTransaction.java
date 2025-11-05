@@ -6,19 +6,13 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.util.New;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Transactional tests, including transaction isolation tests, and tests related
@@ -91,7 +85,7 @@ public class TestTransaction extends TestBase {
             assertEquals(0, rs.getInt(1));
         } else {
             assertThrows(ErrorCode.LOCK_TIMEOUT_1, stat2).
-                executeQuery("select count(*) from test");
+                    executeQuery("select count(*) from test");
         }
 
         // should commit
@@ -354,44 +348,44 @@ public class TestTransaction extends TestBase {
             String table = "TEST" + tableId;
             int op = random.nextInt(6);
             switch (op) {
-            case 0:
-                stat.execute("INSERT INTO " + table + "(NAME) VALUES('op" + i + "')");
-                count[tableId]++;
-                break;
-            case 1:
-                if (count[tableId] > 0) {
-                    int updateCount = stat.executeUpdate(
-                            "DELETE FROM " + table +
-                            " WHERE ID=SELECT MIN(ID) FROM " + table);
-                    assertEquals(1, updateCount);
-                    count[tableId]--;
-                }
-                break;
-            case 2:
-                sp = conn.setSavepoint();
-                countSave[0] = count[0];
-                countSave[1] = count[1];
-                break;
-            case 3:
-                if (sp != null) {
-                    conn.rollback(sp);
-                    count[0] = countSave[0];
-                    count[1] = countSave[1];
-                }
-                break;
-            case 4:
-                conn.commit();
-                sp = null;
-                countCommitted[0] = count[0];
-                countCommitted[1] = count[1];
-                break;
-            case 5:
-                conn.rollback();
-                sp = null;
-                count[0] = countCommitted[0];
-                count[1] = countCommitted[1];
-                break;
-            default:
+                case 0:
+                    stat.execute("INSERT INTO " + table + "(NAME) VALUES('op" + i + "')");
+                    count[tableId]++;
+                    break;
+                case 1:
+                    if (count[tableId] > 0) {
+                        int updateCount = stat.executeUpdate(
+                                "DELETE FROM " + table +
+                                        " WHERE ID=SELECT MIN(ID) FROM " + table);
+                        assertEquals(1, updateCount);
+                        count[tableId]--;
+                    }
+                    break;
+                case 2:
+                    sp = conn.setSavepoint();
+                    countSave[0] = count[0];
+                    countSave[1] = count[1];
+                    break;
+                case 3:
+                    if (sp != null) {
+                        conn.rollback(sp);
+                        count[0] = countSave[0];
+                        count[1] = countSave[1];
+                    }
+                    break;
+                case 4:
+                    conn.commit();
+                    sp = null;
+                    countCommitted[0] = count[0];
+                    countCommitted[1] = count[1];
+                    break;
+                case 5:
+                    conn.rollback();
+                    sp = null;
+                    count[0] = countCommitted[0];
+                    count[1] = countCommitted[1];
+                    break;
+                default:
             }
             checkTableCount(stat, "TEST0", count[0]);
             checkTableCount(stat, "TEST1", count[1]);

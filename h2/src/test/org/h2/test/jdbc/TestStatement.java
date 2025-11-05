@@ -6,21 +6,16 @@
  */
 package org.h2.test.jdbc;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLClientInfoException;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Properties;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.SysProperties;
 import org.h2.jdbc.JdbcStatement;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.util.New;
+
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * Tests for the Statement implementation.
@@ -56,21 +51,21 @@ public class TestStatement extends TestBase {
     private void testUnsupportedOperations() throws Exception {
         Statement stat = conn.createStatement();
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, stat).
-            isWrapperFor(Object.class);
+                isWrapperFor(Object.class);
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, stat).
-            unwrap(Object.class);
+                unwrap(Object.class);
 
         conn.setTypeMap(null);
         HashMap<String, Class<?>> map = New.hashMap();
         conn.setTypeMap(map);
         map.put("x", Object.class);
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, conn).
-            setTypeMap(map);
+                setTypeMap(map);
 
         assertThrows(SQLClientInfoException.class, conn).
-            setClientInfo("X", "Y");
+                setClientInfo("X", "Y");
         assertThrows(SQLClientInfoException.class, conn).
-            setClientInfo(new Properties());
+                setClientInfo(new Properties());
     }
 
     private void testTraceError() throws Exception {
@@ -355,13 +350,13 @@ public class TestStatement extends TestBase {
         assertEquals(2, rs.getInt(1));
         assertFalse(rs.next());
         stat.execute("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
-                new int[] { 1 });
+                new int[]{1});
         rs = stat.getGeneratedKeys();
         rs.next();
         assertEquals(3, rs.getInt(1));
         assertFalse(rs.next());
         stat.execute("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
-                new String[] { "ID" });
+                new String[]{"ID"});
         rs = stat.getGeneratedKeys();
         rs.next();
         assertEquals(4, rs.getInt(1));
@@ -373,13 +368,13 @@ public class TestStatement extends TestBase {
         assertEquals(5, rs.getInt(1));
         assertFalse(rs.next());
         stat.executeUpdate("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
-                new int[] { 1 });
+                new int[]{1});
         rs = stat.getGeneratedKeys();
         rs.next();
         assertEquals(6, rs.getInt(1));
         assertFalse(rs.next());
         stat.executeUpdate("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
-                new String[] { "ID" });
+                new String[]{"ID"});
         rs = stat.getGeneratedKeys();
         rs.next();
         assertEquals(7, rs.getInt(1));

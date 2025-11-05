@@ -6,31 +6,19 @@
  */
 package org.h2.server;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import org.h2.Driver;
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.message.DbException;
 import org.h2.message.TraceSystem;
-import org.h2.util.JdbcUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.New;
-import org.h2.util.StringUtils;
-import org.h2.util.Tool;
+import org.h2.util.*;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.sql.*;
+import java.util.*;
 
 /**
  * The TCP server implements the native H2 database server protocol.
@@ -128,8 +116,8 @@ public class TcpServer implements Service {
     /**
      * Add a connection to the management database.
      *
-     * @param id the connection id
-     * @param url the database URL
+     * @param id   the connection id
+     * @param url  the database URL
      * @param user the user name
      */
     synchronized void addConnection(int id, String url, String user) {
@@ -327,8 +315,8 @@ public class TcpServer implements Service {
      * Stop a running server. This method is called via reflection from the
      * STOP_SERVER function.
      *
-     * @param port the port where the server runs, or 0 for all running servers
-     * @param password the password (or null)
+     * @param port         the port where the server runs, or 0 for all running servers
+     * @param password     the password (or null)
      * @param shutdownMode the shutdown mode, SHUTDOWN_NORMAL or SHUTDOWN_FORCE.
      */
     public static void stopServer(int port, String password, int shutdownMode) {
@@ -390,6 +378,7 @@ public class TcpServer implements Service {
             System.out.println(s);
         }
     }
+
     /**
      * Print a stack trace if the trace flag is enabled.
      *
@@ -423,14 +412,14 @@ public class TcpServer implements Service {
     /**
      * Stop the TCP server with the given URL.
      *
-     * @param url the database URL
+     * @param url      the database URL
      * @param password the password
-     * @param force if the server should be stopped immediately
-     * @param all whether all TCP servers that are running in the JVM should be
-     *            stopped
+     * @param force    if the server should be stopped immediately
+     * @param all      whether all TCP servers that are running in the JVM should be
+     *                 stopped
      */
     public static synchronized void shutdown(String url, String password,
-            boolean force, boolean all) throws SQLException {
+                                             boolean force, boolean all) throws SQLException {
         try {
             int port = Constants.DEFAULT_TCP_PORT;
             int idx = url.lastIndexOf(':');
@@ -484,7 +473,7 @@ public class TcpServer implements Service {
     /**
      * Cancel a running statement.
      *
-     * @param sessionId the session id
+     * @param sessionId   the session id
      * @param statementId the statement id
      */
     void cancelStatement(String sessionId, int statementId) {

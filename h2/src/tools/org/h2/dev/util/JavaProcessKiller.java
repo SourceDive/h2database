@@ -21,7 +21,7 @@ public class JavaProcessKiller {
      * Kill a certain Java process. The JDK (jps) needs to be in the path.
      *
      * @param args the Java process name as listed by jps -l. If not set the
-     *            Java processes are listed
+     *             Java processes are listed
      */
 
     public static void main(String... args) {

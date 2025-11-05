@@ -6,12 +6,13 @@
  */
 package org.h2.store;
 
+import org.h2.value.Value;
+import org.h2.value.ValueLobDb;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import org.h2.value.Value;
-import org.h2.value.ValueLobDb;
 
 /**
  * This factory creates in-memory objects and temporary files. It is used on the
@@ -43,14 +44,14 @@ public class LobStorageFrontend implements LobStorageInterface {
     /**
      * Get the input stream for the given lob.
      *
-     * @param lob the lob
-     * @param hmac the message authentication code (for remote input streams)
+     * @param lob       the lob
+     * @param hmac      the message authentication code (for remote input streams)
      * @param byteCount the number of bytes to read, or -1 if not known
      * @return the stream
      */
     @Override
     public InputStream getInputStream(ValueLobDb lob, byte[] hmac,
-            long byteCount) throws IOException {
+                                      long byteCount) throws IOException {
         if (byteCount < 0) {
             byteCount = Long.MAX_VALUE;
         }
@@ -84,7 +85,7 @@ public class LobStorageFrontend implements LobStorageInterface {
     /**
      * Create a CLOB object.
      *
-     * @param reader the reader
+     * @param reader    the reader
      * @param maxLength the maximum length (-1 if not known)
      * @return the LOB
      */

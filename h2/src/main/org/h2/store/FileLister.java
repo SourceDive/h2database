@@ -6,12 +6,6 @@
  */
 package org.h2.store;
 
-import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.message.DbException;
@@ -19,6 +13,12 @@ import org.h2.message.TraceSystem;
 import org.h2.store.fs.FilePath;
 import org.h2.store.fs.FileUtils;
 import org.h2.util.New;
+
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class to list the files of a database.
@@ -33,7 +33,7 @@ public class FileLister {
      * Try to lock the database, and then unlock it. If this worked, the
      * .lock.db file will be removed.
      *
-     * @param files the database files to check
+     * @param files   the database files to check
      * @param message the text to include in the error message
      * @throws SQLException if it failed
      */
@@ -91,14 +91,14 @@ public class FileLister {
      * Get the list of database files.
      *
      * @param dir the directory (must be normalized)
-     * @param db the database name (null for all databases)
+     * @param db  the database name (null for all databases)
      * @param all if true, files such as the lock, trace, and lob
      *            files are included. If false, only data, index, log,
      *            and lob files are returned
      * @return the list of files
      */
     public static ArrayList<String> getDatabaseFiles(String dir, String db,
-            boolean all) {
+                                                     boolean all) {
         ArrayList<String> files = New.arrayList();
         // for Windows, File.getCanonicalPath("...b.") returns just "...b"
         String start = db == null ? null : (FileUtils.toRealPath(dir + "/" + db) + ".");

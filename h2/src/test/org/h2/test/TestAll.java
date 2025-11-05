@@ -6,97 +6,15 @@
  */
 package org.h2.test;
 
-import java.sql.SQLException;
-import java.util.Properties;
 import org.h2.Driver;
 import org.h2.engine.Constants;
 import org.h2.store.fs.FilePathRec;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.bench.TestPerformance;
-import org.h2.test.db.TestAlter;
-import org.h2.test.db.TestAlterSchemaRename;
-import org.h2.test.db.TestAutoRecompile;
-import org.h2.test.db.TestBackup;
-import org.h2.test.db.TestBigDb;
-import org.h2.test.db.TestBigResult;
-import org.h2.test.db.TestCases;
-import org.h2.test.db.TestCheckpoint;
-import org.h2.test.db.TestCluster;
-import org.h2.test.db.TestCompatibility;
-import org.h2.test.db.TestCsv;
-import org.h2.test.db.TestDateStorage;
-import org.h2.test.db.TestDeadlock;
-import org.h2.test.db.TestDrop;
-import org.h2.test.db.TestDuplicateKeyUpdate;
-import org.h2.test.db.TestEncryptedDb;
-import org.h2.test.db.TestExclusive;
-import org.h2.test.db.TestFullText;
-import org.h2.test.db.TestFunctionOverload;
-import org.h2.test.db.TestFunctions;
-import org.h2.test.db.TestIndex;
-import org.h2.test.db.TestLargeBlob;
-import org.h2.test.db.TestLinkedTable;
-import org.h2.test.db.TestListener;
-import org.h2.test.db.TestLob;
-import org.h2.test.db.TestMemoryUsage;
-import org.h2.test.db.TestMultiConn;
-import org.h2.test.db.TestMultiDimension;
-import org.h2.test.db.TestMultiThread;
+import org.h2.test.db.*;
 import org.h2.test.db.TestMultiThreadedKernel;
-import org.h2.test.db.TestOpenClose;
-import org.h2.test.db.TestOptimizations;
-import org.h2.test.db.TestCompatibilityOracle;
-import org.h2.test.db.TestOutOfMemory;
-import org.h2.test.db.TestPowerOff;
-import org.h2.test.db.TestQueryCache;
-import org.h2.test.db.TestReadOnly;
-import org.h2.test.db.TestRecursiveQueries;
-import org.h2.test.db.TestRights;
-import org.h2.test.db.TestRunscript;
-import org.h2.test.db.TestSQLInjection;
-import org.h2.test.db.TestScript;
-import org.h2.test.db.TestScriptSimple;
-import org.h2.test.db.TestSelectCountNonNullColumn;
-import org.h2.test.db.TestSequence;
-import org.h2.test.db.TestSessionsLocks;
-import org.h2.test.db.TestShow;
-import org.h2.test.db.TestSpaceReuse;
-import org.h2.test.db.TestSpatial;
-import org.h2.test.db.TestSpeed;
-import org.h2.test.db.TestTableEngines;
-import org.h2.test.db.TestTempTables;
-import org.h2.test.db.TestTransaction;
-import org.h2.test.db.TestTriggersConstraints;
-import org.h2.test.db.TestTwoPhaseCommit;
-import org.h2.test.db.TestUpgrade;
-import org.h2.test.db.TestView;
-import org.h2.test.db.TestViewAlterTable;
-import org.h2.test.db.TestViewDropView;
-import org.h2.test.jaqu.AliasMapTest;
-import org.h2.test.jaqu.AnnotationsTest;
-import org.h2.test.jaqu.ClobTest;
-import org.h2.test.jaqu.ModelsTest;
-import org.h2.test.jaqu.SamplesTest;
-import org.h2.test.jaqu.UpdateTest;
-import org.h2.test.jdbc.TestBatchUpdates;
-import org.h2.test.jdbc.TestCallableStatement;
-import org.h2.test.jdbc.TestCancel;
-import org.h2.test.jdbc.TestDatabaseEventListener;
-import org.h2.test.jdbc.TestDriver;
-import org.h2.test.jdbc.TestJavaObject;
-import org.h2.test.jdbc.TestJavaObjectSerializer;
-import org.h2.test.jdbc.TestLimitUpdates;
-import org.h2.test.jdbc.TestLobApi;
-import org.h2.test.jdbc.TestManyJdbcObjects;
-import org.h2.test.jdbc.TestMetaData;
-import org.h2.test.jdbc.TestNativeSQL;
-import org.h2.test.jdbc.TestPreparedStatement;
-import org.h2.test.jdbc.TestResultSet;
-import org.h2.test.jdbc.TestStatement;
-import org.h2.test.jdbc.TestTransactionIsolation;
-import org.h2.test.jdbc.TestUpdatableResultSet;
-import org.h2.test.jdbc.TestUrlJavaObjectSerializer;
-import org.h2.test.jdbc.TestZloty;
+import org.h2.test.jaqu.*;
+import org.h2.test.jdbc.*;
 import org.h2.test.jdbcx.TestConnectionPool;
 import org.h2.test.jdbcx.TestDataSource;
 import org.h2.test.jdbcx.TestXA;
@@ -110,88 +28,12 @@ import org.h2.test.server.TestAutoServer;
 import org.h2.test.server.TestInit;
 import org.h2.test.server.TestNestedLoop;
 import org.h2.test.server.TestWeb;
-import org.h2.test.store.TestCacheConcurrentLIRS;
-import org.h2.test.store.TestCacheLIRS;
-import org.h2.test.store.TestCacheLongKeyLIRS;
+import org.h2.test.store.*;
 import org.h2.test.store.TestConcurrent;
-import org.h2.test.store.TestDataUtils;
-import org.h2.test.store.TestFreeSpace;
-import org.h2.test.store.TestKillProcessWhileWriting;
-import org.h2.test.store.TestMVRTree;
-import org.h2.test.store.TestMVStore;
-import org.h2.test.store.TestMVStoreBenchmark;
-import org.h2.test.store.TestMVTableEngine;
-import org.h2.test.store.TestObjectDataType;
-import org.h2.test.store.TestRandomMapOps;
-import org.h2.test.store.TestSpinLock;
-import org.h2.test.store.TestStreamStore;
-import org.h2.test.store.TestTransactionStore;
-import org.h2.test.synth.TestBtreeIndex;
-import org.h2.test.synth.TestCrashAPI;
-import org.h2.test.synth.TestDiskFull;
-import org.h2.test.synth.TestFuzzOptimizations;
-import org.h2.test.synth.TestHaltApp;
-import org.h2.test.synth.TestJoin;
-import org.h2.test.synth.TestKill;
-import org.h2.test.synth.TestKillRestart;
-import org.h2.test.synth.TestKillRestartMulti;
-import org.h2.test.synth.TestLimit;
-import org.h2.test.synth.TestMultiThreaded;
-import org.h2.test.synth.TestNestedJoins;
-import org.h2.test.synth.TestOuterJoins;
-import org.h2.test.synth.TestRandomCompare;
-import org.h2.test.synth.TestRandomSQL;
-import org.h2.test.synth.TestTimer;
+import org.h2.test.synth.*;
 import org.h2.test.synth.sql.TestSynth;
 import org.h2.test.synth.thread.TestMulti;
-import org.h2.test.unit.TestAutoReconnect;
-import org.h2.test.unit.TestBitField;
-import org.h2.test.unit.TestBnf;
-import org.h2.test.unit.TestCache;
-import org.h2.test.unit.TestClearReferences;
-import org.h2.test.unit.TestCollation;
-import org.h2.test.unit.TestCompress;
-import org.h2.test.unit.TestConnectionInfo;
-import org.h2.test.unit.TestDataPage;
-import org.h2.test.unit.TestDate;
-import org.h2.test.unit.TestDateIso8601;
-import org.h2.test.unit.TestExit;
-import org.h2.test.unit.TestFile;
-import org.h2.test.unit.TestFileLock;
-import org.h2.test.unit.TestFileLockProcess;
-import org.h2.test.unit.TestFileLockSerialized;
-import org.h2.test.unit.TestFileSystem;
-import org.h2.test.unit.TestFtp;
-import org.h2.test.unit.TestIntArray;
-import org.h2.test.unit.TestIntIntHashMap;
-import org.h2.test.unit.TestJmx;
-import org.h2.test.unit.TestMathUtils;
-import org.h2.test.unit.TestModifyOnWrite;
-import org.h2.test.unit.TestNetUtils;
-import org.h2.test.unit.TestObjectDeserialization;
-import org.h2.test.unit.TestOldVersion;
-import org.h2.test.unit.TestOverflow;
-import org.h2.test.unit.TestPageStore;
-import org.h2.test.unit.TestPageStoreCoverage;
-import org.h2.test.unit.TestPattern;
-import org.h2.test.unit.TestPgServer;
-import org.h2.test.unit.TestReader;
-import org.h2.test.unit.TestRecovery;
-import org.h2.test.unit.TestReopen;
-import org.h2.test.unit.TestSampleApps;
-import org.h2.test.unit.TestScriptReader;
-import org.h2.test.unit.TestSecurity;
-import org.h2.test.unit.TestShell;
-import org.h2.test.unit.TestSort;
-import org.h2.test.unit.TestStreams;
-import org.h2.test.unit.TestStringCache;
-import org.h2.test.unit.TestStringUtils;
-import org.h2.test.unit.TestTools;
-import org.h2.test.unit.TestTraceSystem;
-import org.h2.test.unit.TestUtils;
-import org.h2.test.unit.TestValue;
-import org.h2.test.unit.TestValueHashMap;
-import org.h2.test.unit.TestValueMemory;
+import org.h2.test.unit.*;
 import org.h2.test.utils.OutputCatcher;
 import org.h2.test.utils.SelfDestructor;
 import org.h2.tools.DeleteDbFiles;
@@ -199,6 +41,9 @@ import org.h2.tools.Server;
 import org.h2.util.Profiler;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
+import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * The main test application. JUnit is not used because loops are easier to
@@ -814,8 +659,8 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         DeleteDbFiles.execute(TestBase.BASE_TEST_DIR, null, true);
         FileUtils.deleteRecursive("trace.db", false);
         if (networked) {
-            String[] args = ssl ? new String[] { "-tcpSSL", "-tcpPort", "9192" }
-                    : new String[] { "-tcpPort", "9192" };
+            String[] args = ssl ? new String[]{"-tcpSSL", "-tcpPort", "9192"}
+                    : new String[]{"-tcpPort", "9192"};
             server = Server.createTcpServer(args);
             try {
                 server.start();
@@ -846,22 +691,22 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
                 " @ " + new java.sql.Timestamp(System.currentTimeMillis()).toString());
         System.out.println("Java " +
                 prop.getProperty("java.runtime.version") + ", " +
-                prop.getProperty("java.vm.name")+", " +
+                prop.getProperty("java.vm.name") + ", " +
                 prop.getProperty("java.vendor") + ", " +
                 prop.getProperty("sun.arch.data.model"));
         System.out.println(
                 prop.getProperty("os.name") + ", " +
-                prop.getProperty("os.arch")+", "+
-                prop.getProperty("os.version")+", "+
-                prop.getProperty("sun.os.patch.level")+", "+
-                prop.getProperty("file.separator")+" "+
-                prop.getProperty("path.separator")+" "+
-                StringUtils.javaEncode(prop.getProperty("line.separator")) + " " +
-                prop.getProperty("user.country") + " " +
-                prop.getProperty("user.language") + " " +
-                prop.getProperty("user.timezone") + " " +
-                prop.getProperty("user.variant")+" "+
-                prop.getProperty("file.encoding"));
+                        prop.getProperty("os.arch") + ", " +
+                        prop.getProperty("os.version") + ", " +
+                        prop.getProperty("sun.os.patch.level") + ", " +
+                        prop.getProperty("file.separator") + " " +
+                        prop.getProperty("path.separator") + " " +
+                        StringUtils.javaEncode(prop.getProperty("line.separator")) + " " +
+                        prop.getProperty("user.country") + " " +
+                        prop.getProperty("user.language") + " " +
+                        prop.getProperty("user.timezone") + " " +
+                        prop.getProperty("user.variant") + " " +
+                        prop.getProperty("file.encoding"));
     }
 
     @Override

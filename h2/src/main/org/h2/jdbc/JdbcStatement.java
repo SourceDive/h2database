@@ -6,13 +6,6 @@
  */
 package org.h2.jdbc;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
 import org.h2.engine.SessionInterface;
@@ -21,6 +14,9 @@ import org.h2.message.DbException;
 import org.h2.message.TraceObject;
 import org.h2.result.ResultInterface;
 import org.h2.util.New;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Represents a statement.
@@ -43,7 +39,7 @@ public class JdbcStatement extends TraceObject implements Statement {
     private boolean cancelled;
 
     JdbcStatement(JdbcConnection conn, int id, int resultSetType,
-            int resultSetConcurrency, boolean closeWithResultSet) {
+                  int resultSetConcurrency, boolean closeWithResultSet) {
         this.conn = conn;
         this.session = conn.getSession();
         setTrace(session.getTrace(), TraceObject.STATEMENT, id);
@@ -97,7 +93,7 @@ public class JdbcStatement extends TraceObject implements Statement {
      * and returns the update count.
      * If another result set exists for this statement, this will be closed
      * (even if this statement fails).
-     *
+     * <p>
      * If auto commit is on, this statement will be committed.
      * If the statement is a DDL statement (create, drop, alter) and does not
      * throw an exception, the current transaction (if any) is committed after
@@ -105,10 +101,10 @@ public class JdbcStatement extends TraceObject implements Statement {
      *
      * @param sql the SQL statement
      * @return the update count (number of row affected by an insert,
-     *         update or delete, or 0 if no rows or the statement was a
-     *         create, drop, commit or rollback)
+     * update or delete, or 0 if no rows or the statement was a
+     * create, drop, commit or rollback)
      * @throws SQLException if a database error occurred or a
-     *         select statement was executed
+     *                      select statement was executed
      */
     @Override
     public int executeUpdate(String sql) throws SQLException {
@@ -144,7 +140,7 @@ public class JdbcStatement extends TraceObject implements Statement {
     /**
      * Executes an arbitrary statement. If another result set exists for this
      * statement, this will be closed (even if this statement fails).
-     *
+     * <p>
      * If the statement is a create or drop and does not throw an exception, the
      * current transaction (if any) is committed after executing the statement.
      * If auto commit is on, and the statement is not a select, this statement
@@ -221,8 +217,8 @@ public class JdbcStatement extends TraceObject implements Statement {
      * Returns the last update count of this statement.
      *
      * @return the update count (number of row affected by an insert, update or
-     *         delete, or 0 if no rows or the statement was a create, drop,
-     *         commit or rollback; -1 if the statement was a select).
+     * delete, or 0 if no rows or the statement was a create, drop,
+     * commit or rollback; -1 if the statement was a select).
      * @throws SQLException if this object is closed or invalid
      */
     @Override
@@ -453,7 +449,7 @@ public class JdbcStatement extends TraceObject implements Statement {
      * @throws SQLException if this object is closed
      */
     @Override
-    public int getResultSetType()  throws SQLException {
+    public int getResultSetType() throws SQLException {
         try {
             debugCodeCall("getResultSetType");
             checkClosed();
@@ -508,7 +504,7 @@ public class JdbcStatement extends TraceObject implements Statement {
     public void setEscapeProcessing(boolean enable) throws SQLException {
         try {
             if (isDebugEnabled()) {
-                debugCode("setEscapeProcessing("+enable+");");
+                debugCode("setEscapeProcessing(" + enable + ");");
             }
             checkClosed();
             escapeProcessing = enable;
@@ -585,7 +581,7 @@ public class JdbcStatement extends TraceObject implements Statement {
      * and rolling back a transaction does not affect this setting.
      *
      * @param seconds the timeout in seconds - 0 means no timeout, values
-     *        smaller 0 will throw an exception
+     *                smaller 0 will throw an exception
      * @throws SQLException if this object is closed
      */
     @Override
@@ -735,8 +731,8 @@ public class JdbcStatement extends TraceObject implements Statement {
      * This method always returns false.
      *
      * @param current Statement.CLOSE_CURRENT_RESULT,
-     *          Statement.KEEP_CURRENT_RESULT,
-     *          or Statement.CLOSE_ALL_RESULTS
+     *                Statement.KEEP_CURRENT_RESULT,
+     *                or Statement.CLOSE_ALL_RESULTS
      * @return false
      */
     @Override
@@ -744,16 +740,16 @@ public class JdbcStatement extends TraceObject implements Statement {
         try {
             debugCodeCall("getMoreResults", current);
             switch (current) {
-            case Statement.CLOSE_CURRENT_RESULT:
-            case Statement.CLOSE_ALL_RESULTS:
-                checkClosed();
-                closeOldResultSet();
-                break;
-            case Statement.KEEP_CURRENT_RESULT:
-                // nothing to do
-                break;
-            default:
-                throw DbException.getInvalidValueException("current", current);
+                case Statement.CLOSE_CURRENT_RESULT:
+                case Statement.CLOSE_ALL_RESULTS:
+                    checkClosed();
+                    closeOldResultSet();
+                    break;
+                case Statement.KEEP_CURRENT_RESULT:
+                    // nothing to do
+                    break;
+                default:
+                    throw DbException.getInvalidValueException("current", current);
             }
             return false;
         } catch (Exception e) {
@@ -766,20 +762,20 @@ public class JdbcStatement extends TraceObject implements Statement {
      * This method just calls executeUpdate(String sql) internally.
      * The method getGeneratedKeys supports at most one columns and row.
      *
-     * @param sql the SQL statement
+     * @param sql               the SQL statement
      * @param autoGeneratedKeys ignored
      * @return the update count (number of row affected by an insert,
-     *         update or delete, or 0 if no rows or the statement was a
-     *         create, drop, commit or rollback)
+     * update or delete, or 0 if no rows or the statement was a
+     * create, drop, commit or rollback)
      * @throws SQLException if a database error occurred or a
-     *         select statement was executed
+     *                      select statement was executed
      */
     @Override
     public int executeUpdate(String sql, int autoGeneratedKeys)
             throws SQLException {
         try {
             if (isDebugEnabled()) {
-                debugCode("executeUpdate("+quote(sql)+", "+autoGeneratedKeys+");");
+                debugCode("executeUpdate(" + quote(sql) + ", " + autoGeneratedKeys + ");");
             }
             return executeUpdateInternal(sql);
         } catch (Exception e) {
@@ -792,19 +788,19 @@ public class JdbcStatement extends TraceObject implements Statement {
      * This method just calls executeUpdate(String sql) internally.
      * The method getGeneratedKeys supports at most one columns and row.
      *
-     * @param sql the SQL statement
+     * @param sql           the SQL statement
      * @param columnIndexes ignored
      * @return the update count (number of row affected by an insert,
-     *         update or delete, or 0 if no rows or the statement was a
-     *         create, drop, commit or rollback)
+     * update or delete, or 0 if no rows or the statement was a
+     * create, drop, commit or rollback)
      * @throws SQLException if a database error occurred or a
-     *         select statement was executed
+     *                      select statement was executed
      */
     @Override
     public int executeUpdate(String sql, int[] columnIndexes) throws SQLException {
         try {
             if (isDebugEnabled()) {
-                debugCode("executeUpdate("+quote(sql)+", "+quoteIntArray(columnIndexes)+");");
+                debugCode("executeUpdate(" + quote(sql) + ", " + quoteIntArray(columnIndexes) + ");");
             }
             return executeUpdateInternal(sql);
         } catch (Exception e) {
@@ -817,19 +813,19 @@ public class JdbcStatement extends TraceObject implements Statement {
      * This method just calls executeUpdate(String sql) internally.
      * The method getGeneratedKeys supports at most one columns and row.
      *
-     * @param sql the SQL statement
+     * @param sql         the SQL statement
      * @param columnNames ignored
      * @return the update count (number of row affected by an insert,
-     *         update or delete, or 0 if no rows or the statement was a
-     *         create, drop, commit or rollback)
+     * update or delete, or 0 if no rows or the statement was a
+     * create, drop, commit or rollback)
      * @throws SQLException if a database error occurred or a
-     *         select statement was executed
+     *                      select statement was executed
      */
     @Override
     public int executeUpdate(String sql, String[] columnNames) throws SQLException {
         try {
             if (isDebugEnabled()) {
-                debugCode("executeUpdate("+quote(sql)+", "+quoteArray(columnNames)+");");
+                debugCode("executeUpdate(" + quote(sql) + ", " + quoteArray(columnNames) + ");");
             }
             return executeUpdateInternal(sql);
         } catch (Exception e) {
@@ -842,19 +838,19 @@ public class JdbcStatement extends TraceObject implements Statement {
      * This method just calls execute(String sql) internally.
      * The method getGeneratedKeys supports at most one columns and row.
      *
-     * @param sql the SQL statement
+     * @param sql               the SQL statement
      * @param autoGeneratedKeys ignored
      * @return the update count (number of row affected by an insert,
-     *         update or delete, or 0 if no rows or the statement was a
-     *         create, drop, commit or rollback)
+     * update or delete, or 0 if no rows or the statement was a
+     * create, drop, commit or rollback)
      * @throws SQLException if a database error occurred or a
-     *         select statement was executed
+     *                      select statement was executed
      */
     @Override
     public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
         try {
             if (isDebugEnabled()) {
-                debugCode("execute("+quote(sql)+", "+autoGeneratedKeys+");");
+                debugCode("execute(" + quote(sql) + ", " + autoGeneratedKeys + ");");
             }
             return executeInternal(sql);
         } catch (Exception e) {
@@ -867,19 +863,19 @@ public class JdbcStatement extends TraceObject implements Statement {
      * This method just calls execute(String sql) internally.
      * The method getGeneratedKeys supports at most one columns and row.
      *
-     * @param sql the SQL statement
+     * @param sql           the SQL statement
      * @param columnIndexes ignored
      * @return the update count (number of row affected by an insert,
-     *         update or delete, or 0 if no rows or the statement was a
-     *         create, drop, commit or rollback)
+     * update or delete, or 0 if no rows or the statement was a
+     * create, drop, commit or rollback)
      * @throws SQLException if a database error occurred or a
-     *         select statement was executed
+     *                      select statement was executed
      */
     @Override
     public boolean execute(String sql, int[] columnIndexes) throws SQLException {
         try {
             if (isDebugEnabled()) {
-                debugCode("execute("+quote(sql)+", "+quoteIntArray(columnIndexes)+");");
+                debugCode("execute(" + quote(sql) + ", " + quoteIntArray(columnIndexes) + ");");
             }
             return executeInternal(sql);
         } catch (Exception e) {
@@ -892,19 +888,19 @@ public class JdbcStatement extends TraceObject implements Statement {
      * This method just calls execute(String sql) internally.
      * The method getGeneratedKeys supports at most one columns and row.
      *
-     * @param sql the SQL statement
+     * @param sql         the SQL statement
      * @param columnNames ignored
      * @return the update count (number of row affected by an insert,
-     *         update or delete, or 0 if no rows or the statement was a
-     *         create, drop, commit or rollback)
+     * update or delete, or 0 if no rows or the statement was a
+     * create, drop, commit or rollback)
      * @throws SQLException if a database error occurred or a
-     *         select statement was executed
+     *                      select statement was executed
      */
     @Override
     public boolean execute(String sql, String[] columnNames) throws SQLException {
         try {
             if (isDebugEnabled()) {
-                debugCode("execute("+quote(sql)+", "+quoteArray(columnNames)+");");
+                debugCode("execute(" + quote(sql) + ", " + quoteArray(columnNames) + ");");
             }
             return executeInternal(sql);
         } catch (Exception e) {
@@ -1078,6 +1074,7 @@ public class JdbcStatement extends TraceObject implements Statement {
 
     /**
      * Returns whether this object is poolable.
+     *
      * @return false
      */
     @Override
@@ -1095,7 +1092,7 @@ public class JdbcStatement extends TraceObject implements Statement {
     @Override
     public void setPoolable(boolean poolable) {
         if (isDebugEnabled()) {
-            debugCode("setPoolable("+poolable+");");
+            debugCode("setPoolable(" + poolable + ");");
         }
     }
 

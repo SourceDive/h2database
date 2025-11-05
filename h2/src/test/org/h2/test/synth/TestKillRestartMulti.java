@@ -6,21 +6,17 @@
  */
 package org.h2.test.synth;
 
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.test.utils.SelfDestructor;
 import org.h2.tools.Backup;
 import org.h2.util.New;
+
+import java.io.InputStream;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Standalone recovery test. A new process is started and then killed while it
@@ -49,10 +45,10 @@ public class TestKillRestartMulti extends TestBase {
         user = getUser();
         password = getPassword();
         String selfDestruct = SelfDestructor.getPropertyString(60);
-        String[] procDef = { "java", selfDestruct,
+        String[] procDef = {"java", selfDestruct,
                 "-cp", getClassPath(),
                 getClass().getName(), "-url", url, "-user", user,
-                "-password", password };
+                "-password", password};
         deleteDb("killRestartMulti");
         int len = getSize(3, 10);
         Random random = new Random();
@@ -95,7 +91,7 @@ public class TestKillRestartMulti extends TestBase {
             try {
                 Backup.execute(backup, getBaseDir(), "killRestartMulti", true);
                 Connection conn = null;
-                for (int j = 0;; j++) {
+                for (int j = 0; ; j++) {
                     try {
                         conn = openConnection();
                         break;

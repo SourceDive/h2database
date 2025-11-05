@@ -6,21 +6,6 @@
  */
 package org.h2.test.store;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.rtree.MVRTreeMap;
 import org.h2.mvstore.rtree.SpatialKey;
@@ -28,6 +13,15 @@ import org.h2.mvstore.type.StringDataType;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.util.New;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Tests the r-tree.
@@ -115,7 +109,7 @@ public class TestMVRTree extends TestMVStore {
         // iterate over the intersecting keys
         Iterator<SpatialKey> it = r.findIntersectingKeys(
                 new SpatialKey(0, 0f, 9f, 3f, 6f));
-        for (SpatialKey k; it.hasNext();) {
+        for (SpatialKey k; it.hasNext(); ) {
             k = it.next();
             // System.out.println(k + ": " + r.get(k));
             assertTrue(k != null);
@@ -131,7 +125,7 @@ public class TestMVRTree extends TestMVStore {
         // s.setMaxPageSize(50);
         MVRTreeMap<String> r = s.openMap("data",
                 new MVRTreeMap.Builder<String>().dimensions(2).
-                valueType(StringDataType.INSTANCE));
+                        valueType(StringDataType.INSTANCE));
         // r.setQuadraticSplit(true);
         Random rand = new Random(1);
         int len = 1000;
@@ -156,7 +150,7 @@ public class TestMVRTree extends TestMVStore {
         s = openStore(fileName);
         r = s.openMap("data",
                 new MVRTreeMap.Builder<String>().dimensions(2).
-                valueType(StringDataType.INSTANCE));
+                        valueType(StringDataType.INSTANCE));
         // t = System.currentTimeMillis();
         rand = new Random(1);
         for (int i = 0; i < len; i++) {
@@ -196,7 +190,7 @@ public class TestMVRTree extends TestMVStore {
         s = openStore(fileName);
         MVRTreeMap<String> r = s.openMap("data",
                 new MVRTreeMap.Builder<String>().dimensions(2).
-                valueType(StringDataType.INSTANCE));
+                        valueType(StringDataType.INSTANCE));
 
         add(r, "Bern", key(0, 46.57, 7.27, 124381));
         add(r, "Basel", key(1, 47.34, 7.36, 170903));
@@ -218,7 +212,7 @@ public class TestMVRTree extends TestMVStore {
         }
         Collections.sort(list);
         assertEquals("[Basel, Bellinzona, Bern, Biel/Bienne, Chur, Geneva, " +
-                "Lausanne, Lucerne, Lugano, St. Gallen, Thun, Winterthur, Zurich]",
+                        "Lausanne, Lucerne, Lugano, St. Gallen, Thun, Winterthur, Zurich]",
                 list.toString());
 
         SpatialKey k;
@@ -226,7 +220,7 @@ public class TestMVRTree extends TestMVStore {
         // intersection
         list.clear();
         k = key(0, 47.34, 7.36, 0);
-        for (Iterator<SpatialKey> it = r.findIntersectingKeys(k); it.hasNext();) {
+        for (Iterator<SpatialKey> it = r.findIntersectingKeys(k); it.hasNext(); ) {
             list.add(r.get(it.next()));
         }
         Collections.sort(list);
@@ -235,12 +229,12 @@ public class TestMVRTree extends TestMVStore {
         // contains
         list.clear();
         k = key(0, 47.34, 7.36, 0);
-        for (Iterator<SpatialKey> it = r.findContainedKeys(k); it.hasNext();) {
+        for (Iterator<SpatialKey> it = r.findContainedKeys(k); it.hasNext(); ) {
             list.add(r.get(it.next()));
         }
         assertEquals(0, list.size());
         k = key(0, 47.34, 7.36, 171000);
-        for (Iterator<SpatialKey> it = r.findContainedKeys(k); it.hasNext();) {
+        for (Iterator<SpatialKey> it = r.findContainedKeys(k); it.hasNext(); ) {
             list.add(r.get(it.next()));
         }
         assertEquals("[Basel]", list.toString());
@@ -289,7 +283,7 @@ public class TestMVRTree extends TestMVStore {
         }
         g2d.setColor(Color.red);
         ArrayList<SpatialKey> list = New.arrayList();
-        r.addNodeKeys(list,  r.getRoot());
+        r.addNodeKeys(list, r.getRoot());
         for (SpatialKey x : list) {
             int[] rect = scale(b, x, width, height);
             g2d.drawRect(rect[0], rect[1], rect[2] - rect[0], rect[3] - rect[1]);
@@ -313,7 +307,7 @@ public class TestMVRTree extends TestMVStore {
                         (b.max(0) - b.min(0)) + width * 0.05),
                 (int) ((x.max(1) - b.min(1)) * (height * 0.9) /
                         (b.max(1) - b.min(1)) + height * 0.05),
-                };
+        };
         return rect;
     }
 
@@ -389,47 +383,47 @@ public class TestMVRTree extends TestMVStore {
             String v = "" + rand.nextInt();
             Iterator<SpatialKey> it;
             switch (rand.nextInt(5)) {
-            case 0:
-                log(i + ": put " + k + " = " + v + " " + m.size());
-                m.put(k, v);
-                map.put(k, v);
-                break;
-            case 1:
-                log(i + ": remove " + k + " " + m.size());
-                m.remove(k);
-                map.remove(k);
-                break;
-            case 2: {
-                p = (float) (rk.nextFloat() * 0.01);
-                k = new SpatialKey(key, x - p, x + p, y - p, y + p);
-                it = m.findIntersectingKeys(k);
-                while (it.hasNext()) {
-                    SpatialKey n = it.next();
-                    String a = map.get(n);
-                    assertFalse(a == null);
+                case 0:
+                    log(i + ": put " + k + " = " + v + " " + m.size());
+                    m.put(k, v);
+                    map.put(k, v);
+                    break;
+                case 1:
+                    log(i + ": remove " + k + " " + m.size());
+                    m.remove(k);
+                    map.remove(k);
+                    break;
+                case 2: {
+                    p = (float) (rk.nextFloat() * 0.01);
+                    k = new SpatialKey(key, x - p, x + p, y - p, y + p);
+                    it = m.findIntersectingKeys(k);
+                    while (it.hasNext()) {
+                        SpatialKey n = it.next();
+                        String a = map.get(n);
+                        assertFalse(a == null);
+                    }
+                    break;
                 }
-                break;
-            }
-            case 3: {
-                p = (float) (rk.nextFloat() * 0.01);
-                k = new SpatialKey(key, x - p, x + p, y - p, y + p);
-                it = m.findContainedKeys(k);
-                while (it.hasNext()) {
-                    SpatialKey n = it.next();
-                    String a = map.get(n);
-                    assertFalse(a == null);
+                case 3: {
+                    p = (float) (rk.nextFloat() * 0.01);
+                    k = new SpatialKey(key, x - p, x + p, y - p, y + p);
+                    it = m.findContainedKeys(k);
+                    while (it.hasNext()) {
+                        SpatialKey n = it.next();
+                        String a = map.get(n);
+                        assertFalse(a == null);
+                    }
+                    break;
                 }
-                break;
-            }
-            default:
-                String a = map.get(k);
-                String b = m.get(k);
-                if (a == null || b == null) {
-                    assertTrue(a == b);
-                } else {
-                    assertEquals(a, b);
-                }
-                break;
+                default:
+                    String a = map.get(k);
+                    String b = m.get(k);
+                    if (a == null || b == null) {
+                        assertTrue(a == b);
+                    } else {
+                        assertEquals(a, b);
+                    }
+                    break;
             }
             assertEquals(map.size(), m.size());
         }

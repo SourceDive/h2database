@@ -6,11 +6,6 @@
  */
 package org.h2.table;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.command.ddl.Analyze;
@@ -21,18 +16,7 @@ import org.h2.engine.Constants;
 import org.h2.engine.DbObject;
 import org.h2.engine.Session;
 import org.h2.engine.SysProperties;
-import org.h2.index.Cursor;
-import org.h2.index.HashIndex;
-import org.h2.index.Index;
-import org.h2.index.IndexType;
-import org.h2.index.MultiVersionIndex;
-import org.h2.index.NonUniqueHashIndex;
-import org.h2.index.PageBtreeIndex;
-import org.h2.index.PageDataIndex;
-import org.h2.index.PageDelegateIndex;
-import org.h2.index.ScanIndex;
-import org.h2.index.SpatialTreeIndex;
-import org.h2.index.TreeIndex;
+import org.h2.index.*;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.result.Row;
@@ -43,6 +27,8 @@ import org.h2.util.New;
 import org.h2.value.CompareMode;
 import org.h2.value.DataType;
 import org.h2.value.Value;
+
+import java.util.*;
 
 /**
  * Most tables are an instance of this class. For this table, the data is stored
@@ -169,7 +155,7 @@ public class RegularTable extends TableBase {
                 if (rc != rowCount + offset) {
                     DbException.throwInternalError(
                             "rowCount expected " + (rowCount + offset) +
-                            " got " + rc + " " + getName() + "." + index.getName());
+                                    " got " + rc + " " + getName() + "." + index.getName());
                 }
             }
         }
@@ -197,8 +183,8 @@ public class RegularTable extends TableBase {
 
     @Override
     public Index addIndex(Session session, String indexName, int indexId,
-            IndexColumn[] cols, IndexType indexType, boolean create,
-            String indexComment) {
+                          IndexColumn[] cols, IndexType indexType, boolean create,
+                          String indexComment) {
         if (indexType.isPrimaryKey()) {
             for (IndexColumn c : cols) {
                 Column column = c.column;
@@ -323,14 +309,14 @@ public class RegularTable extends TableBase {
         if (first.sortType != SortOrder.ASCENDING) {
             return -1;
         }
-        switch(first.column.getType()) {
-        case Value.BYTE:
-        case Value.SHORT:
-        case Value.INT:
-        case Value.LONG:
-            break;
-        default:
-            return -1;
+        switch (first.column.getType()) {
+            case Value.BYTE:
+            case Value.SHORT:
+            case Value.INT:
+            case Value.LONG:
+                break;
+            default:
+                return -1;
         }
         return first.column.getColumnId();
     }
@@ -341,7 +327,7 @@ public class RegularTable extends TableBase {
     }
 
     private static void addRowsToIndex(Session session, ArrayList<Row> list,
-            Index index) {
+                                       Index index) {
         final Index idx = index;
         Collections.sort(list, new Comparator<Row>() {
             @Override
@@ -562,12 +548,12 @@ public class RegularTable extends TableBase {
             Table lock = s.getWaitForLock();
             Thread thread = s.getWaitForLockThread();
             buff.append("\nSession ").
-                append(s.toString()).
-                append(" on thread ").
-                append(thread.getName()).
-                append(" is waiting to lock ").
-                append(lock.toString()).
-                append(" while locking ");
+                    append(s.toString()).
+                    append(" on thread ").
+                    append(thread.getName()).
+                    append(" is waiting to lock ").
+                    append(lock.toString()).
+                    append(" while locking ");
             int i = 0;
             for (Table t : s.getLocks()) {
                 if (i++ > 0) {
@@ -589,7 +575,7 @@ public class RegularTable extends TableBase {
 
     @Override
     public ArrayList<Session> checkDeadlock(Session session, Session clash,
-            Set<Session> visited) {
+                                            Set<Session> visited) {
         // only one deadlock check at any given time
         synchronized (RegularTable.class) {
             if (clash == null) {

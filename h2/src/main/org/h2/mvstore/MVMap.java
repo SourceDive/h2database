@@ -6,20 +6,12 @@
  */
 package org.h2.mvstore;
 
-import java.util.AbstractList;
-import java.util.AbstractMap;
-import java.util.AbstractSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-
 import org.h2.mvstore.type.DataType;
 import org.h2.mvstore.type.ObjectDataType;
 import org.h2.util.New;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A stored map.
@@ -62,13 +54,13 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     protected MVMap(DataType keyType, DataType valueType) {
         this.keyType = keyType;
         this.valueType = valueType;
-        this.root = Page.createEmpty(this,  -1);
+        this.root = Page.createEmpty(this, -1);
     }
 
     /**
      * Open this map with the given store and configuration.
      *
-     * @param store the store
+     * @param store  the store
      * @param config the configuration
      */
     protected void init(MVStore store, HashMap<String, Object> config) {
@@ -82,7 +74,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
      * Create a copy of a page, if the write version is higher than the current
      * version. If a copy is created, the old page is marked as deleted.
      *
-     * @param p the page
+     * @param p            the page
      * @param writeVersion the write version
      * @return a page with the given write version
      */
@@ -96,7 +88,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Add or replace a key-value pair.
      *
-     * @param key the key (may not be null)
+     * @param key   the key (may not be null)
      * @param value the value (may not be null)
      * @return the old value if the key existed, or null otherwise
      */
@@ -120,7 +112,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Split the root page if necessary.
      *
-     * @param p the page
+     * @param p            the page
      * @param writeVersion the write version
      * @return the new sibling
      */
@@ -132,10 +124,10 @@ public class MVMap<K, V> extends AbstractMap<K, V>
         long totalCount = p.getTotalCount();
         Object k = p.getKey(at);
         Page split = p.split(at);
-        Object[] keys = { k };
-        long[] children = { p.getPos(), split.getPos() };
-        Page[] childrenPages = { p, split };
-        long[] counts = { p.getTotalCount(), split.getTotalCount() };
+        Object[] keys = {k};
+        long[] children = {p.getPos(), split.getPos()};
+        Page[] childrenPages = {p, split};
+        long[] counts = {p.getTotalCount(), split.getTotalCount()};
         p = Page.create(this, writeVersion,
                 1, keys, null,
                 2, children, childrenPages, counts,
@@ -146,10 +138,10 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Add or update a key-value pair.
      *
-     * @param p the page
+     * @param p            the page
      * @param writeVersion the write version
-     * @param key the key (may not be null)
-     * @param value the value (may not be null)
+     * @param key          the key (may not be null)
+     * @param value        the value (may not be null)
      * @return the old value, or null
      */
     protected Object put(Page p, long writeVersion, Object key, Object value) {
@@ -374,8 +366,8 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Get the smallest or largest key using the given bounds.
      *
-     * @param key the key
-     * @param min whether to retrieve the smallest key
+     * @param key       the key
+     * @param min       whether to retrieve the smallest key
      * @param excluding if the given upper/lower bound is exclusive
      * @return the key, or null if no such key exists
      */
@@ -431,7 +423,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Get the value for the given key, or null if not found.
      *
-     * @param p the page
+     * @param p   the page
      * @param key the key
      * @return the value or null
      */
@@ -470,7 +462,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Get the value for the given key, or null if not found.
      *
-     * @param p the parent page
+     * @param p   the parent page
      * @param key the key
      * @return the page or null
      */
@@ -533,7 +525,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
             V result = (V) remove(p, v, key);
             if (!p.isLeaf() && p.getTotalCount() == 0) {
                 p.removePage();
-                p = Page.createEmpty(this,  p.getVersion());
+                p = Page.createEmpty(this, p.getVersion());
             }
             newRoot(p);
             return result;
@@ -545,7 +537,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Add a key-value pair if it does not yet exist.
      *
-     * @param key the key (may not be null)
+     * @param key   the key (may not be null)
      * @param value the new value
      * @return the old value if the key existed, or null otherwise
      */
@@ -561,7 +553,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Remove a key-value pair if the value matches the stored one.
      *
-     * @param key the key (may not be null)
+     * @param key   the key (may not be null)
      * @param value the expected value
      * @return true if the item was removed
      */
@@ -594,7 +586,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Replace a value for an existing key, if the value matches.
      *
-     * @param key the key (may not be null)
+     * @param key      the key (may not be null)
      * @param oldValue the expected value
      * @param newValue the new value
      * @return true if the value was replaced
@@ -612,7 +604,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Replace a value for an existing key.
      *
-     * @param key the key (may not be null)
+     * @param key   the key (may not be null)
      * @param value the new value
      * @return the old value, if the value was replaced, or null
      */
@@ -629,9 +621,9 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Remove a key-value pair.
      *
-     * @param p the page (may not be null)
+     * @param p            the page (may not be null)
      * @param writeVersion the write version
-     * @param key the key
+     * @param key          the key
      * @return the old value, or null if the key did not exist
      */
     protected Object remove(Page p, long writeVersion, Object key) {
@@ -923,7 +915,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
      * to detect concurrent modification.
      *
      * @throws UnsupportedOperationException if the map is read-only,
-     *      or if another thread is concurrently writing
+     *                                       or if another thread is concurrently writing
      */
     protected void beforeWrite() {
         if (closed) {
@@ -1019,7 +1011,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
     /**
      * Remove the given page (make the space available).
      *
-     * @param pos the position of the page to remove
+     * @param pos    the position of the page to remove
      * @param memory the number of bytes used for this page
      */
     protected void removePage(long pos, int memory) {
@@ -1036,7 +1028,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
         if (readOnly) {
             throw DataUtils.newUnsupportedOperationException(
                     "This map is read-only; need to call " +
-                    "the method on the writable map");
+                            "the method on the writable map");
         }
         DataUtils.checkArgument(version >= createVersion,
                 "Unknown version {0}; this map was created in version is {1}",
@@ -1046,9 +1038,9 @@ public class MVMap<K, V> extends AbstractMap<K, V>
         Page r = root;
         if (version >= r.getVersion() &&
                 (version == writeVersion ||
-                r.getVersion() >= 0 ||
-                version <= createVersion ||
-                store.getFileStore() == null)) {
+                        r.getVersion() >= 0 ||
+                        version <= createVersion ||
+                        store.getFileStore() == null)) {
             newest = r;
         } else {
             // find the newest page that has a getVersion() <= version

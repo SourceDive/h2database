@@ -68,7 +68,7 @@ public class IndexColumn {
      * Map the columns using the column names and the specified table.
      *
      * @param indexColumns the column list with column names set
-     * @param table the table from where to map the column names to columns
+     * @param table        the table from where to map the column names to columns
      */
     public static void mapColumns(IndexColumn[] indexColumns, Table table) {
         for (IndexColumn col : indexColumns) {

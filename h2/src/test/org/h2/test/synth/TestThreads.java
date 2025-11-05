@@ -6,14 +6,10 @@
  */
 package org.h2.test.synth;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Random;
-
 import org.h2.test.TestBase;
+
+import java.sql.*;
+import java.util.Random;
 
 /**
  * This test starts multiple threads and executes random operations in each
@@ -134,36 +130,36 @@ public class TestThreads extends TestBase implements Runnable {
             int rid = random.nextInt(max);
             while (!master.stop) {
                 switch (type) {
-                case INSERT:
-                    max = master.incrementMaxId();
-                    stat.execute("INSERT INTO " + t + "(ID, NAME) VALUES(" + max + ", 'Hello')");
-                    break;
-                case UPDATE:
-                    stat.execute("UPDATE " + t + " SET NAME='World " + rid + "' WHERE ID=" + rid);
-                    break;
-                case DELETE:
-                    stat.execute("DELETE FROM " + t + " WHERE ID=" + rid);
-                    break;
-                case SELECT_ALL:
-                    rs = stat.executeQuery("SELECT * FROM " + t + " ORDER BY ID");
-                    while (rs.next()) {
-                        // nothing
-                    }
-                    break;
-                case SELECT_ONE:
-                    rs = stat.executeQuery("SELECT * FROM " + t + " WHERE ID=" + rid);
-                    while (rs.next()) {
-                        // nothing
-                    }
-                    break;
-                case CHECKPOINT:
-                    stat.execute("CHECKPOINT");
-                    break;
-                case RECONNECT:
-                    conn.close();
-                    conn = master.getConnection("threads");
-                    break;
-                default:
+                    case INSERT:
+                        max = master.incrementMaxId();
+                        stat.execute("INSERT INTO " + t + "(ID, NAME) VALUES(" + max + ", 'Hello')");
+                        break;
+                    case UPDATE:
+                        stat.execute("UPDATE " + t + " SET NAME='World " + rid + "' WHERE ID=" + rid);
+                        break;
+                    case DELETE:
+                        stat.execute("DELETE FROM " + t + " WHERE ID=" + rid);
+                        break;
+                    case SELECT_ALL:
+                        rs = stat.executeQuery("SELECT * FROM " + t + " ORDER BY ID");
+                        while (rs.next()) {
+                            // nothing
+                        }
+                        break;
+                    case SELECT_ONE:
+                        rs = stat.executeQuery("SELECT * FROM " + t + " WHERE ID=" + rid);
+                        while (rs.next()) {
+                            // nothing
+                        }
+                        break;
+                    case CHECKPOINT:
+                        stat.execute("CHECKPOINT");
+                        break;
+                    case RECONNECT:
+                        conn.close();
+                        conn = master.getConnection("threads");
+                        break;
+                    default:
                 }
             }
             conn.close();

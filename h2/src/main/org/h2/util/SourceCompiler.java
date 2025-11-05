@@ -6,16 +6,15 @@
  */
 package org.h2.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import java.io.Writer;
+import org.h2.api.ErrorCode;
+import org.h2.engine.Constants;
+import org.h2.engine.SysProperties;
+import org.h2.message.DbException;
+import org.h2.store.fs.FileUtils;
+
+import javax.tools.*;
+import javax.tools.JavaFileObject.Kind;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -23,22 +22,6 @@ import java.net.URI;
 import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.h2.api.ErrorCode;
-import org.h2.engine.Constants;
-import org.h2.engine.SysProperties;
-import org.h2.message.DbException;
-import org.h2.store.fs.FileUtils;
-
-import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileManager;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
 
 /**
  * This class allows to convert source code to a class. It uses one class loader
@@ -94,7 +77,7 @@ public class SourceCompiler {
      * This will reset all compiled classes.
      *
      * @param className the class name
-     * @param source the source code
+     * @param source    the source code
      */
     public void setSource(String className, String source) {
         sources.put(className, source);
@@ -196,8 +179,8 @@ public class SourceCompiler {
      * in a separate process.
      *
      * @param packageName the package name
-     * @param className the class name
-     * @param source the source code
+     * @param className   the class name
+     * @param source      the source code
      * @return the class file
      */
     byte[] javacCompile(String packageName, String className, String source) {
@@ -237,12 +220,12 @@ public class SourceCompiler {
      * on).
      *
      * @param packageName the package name
-     * @param className the class name
-     * @param source the (possibly shortened) source code
+     * @param className   the class name
+     * @param source      the (possibly shortened) source code
      * @return the full source code
      */
     static String getCompleteSourceCode(String packageName, String className,
-            String source) {
+                                        String source) {
         if (source.startsWith("package ")) {
             return source;
         }
@@ -252,9 +235,9 @@ public class SourceCompiler {
         }
         int endImport = source.indexOf("@CODE");
         String importCode =
-            "import java.util.*;\n" +
-            "import java.math.*;\n" +
-            "import java.sql.*;\n";
+                "import java.util.*;\n" +
+                        "import java.math.*;\n" +
+                        "import java.sql.*;\n";
         if (endImport >= 0) {
             importCode = source.substring(0, endImport);
             source = source.substring("@CODE".length() + endImport);
@@ -262,7 +245,7 @@ public class SourceCompiler {
         buff.append(importCode);
         buff.append("public class ").append(className).append(
                 " {\n" +
-                "    public static ").append(source).append("\n" +
+                        "    public static ").append(source).append("\n" +
                 "}\n");
         return buff.toString();
     }
@@ -271,8 +254,8 @@ public class SourceCompiler {
      * Compile using the standard java compiler.
      *
      * @param packageName the package name
-     * @param className the class name
-     * @param source the source code
+     * @param className   the class name
+     * @param source      the source code
      * @return the class
      */
     Class<?> javaxToolsJavac(String packageName, String className, String source) {
@@ -280,7 +263,7 @@ public class SourceCompiler {
         StringWriter writer = new StringWriter();
         JavaFileManager fileManager = new
                 ClassFileManager(JAVA_COMPILER
-                    .getStandardFileManager(null, null, null));
+                .getStandardFileManager(null, null, null));
         ArrayList<JavaFileObject> compilationUnits = new ArrayList<JavaFileObject>();
         compilationUnits.add(new StringJavaFileObject(fullClassName, source));
         JAVA_COMPILER.getTask(writer, fileManager, null, null,
@@ -343,11 +326,11 @@ public class SourceCompiler {
             Method compile;
             compile = JAVAC_SUN.getMethod("compile", String[].class);
             Object javac = JAVAC_SUN.newInstance();
-            compile.invoke(javac, (Object) new String[] {
+            compile.invoke(javac, (Object) new String[]{
                     "-sourcepath", COMPILE_DIR,
                     "-d", COMPILE_DIR,
                     "-encoding", "UTF-8",
-                    javaFile.getAbsolutePath() });
+                    javaFile.getAbsolutePath()});
             String err = new String(buff.toByteArray(), Constants.UTF8);
             throwSyntaxError(err);
         } catch (Exception e) {
@@ -386,14 +369,14 @@ public class SourceCompiler {
                 Object importCustomizer = Utils.newInstance(
                         "org.codehaus.groovy.control.customizers.ImportCustomizer");
                 // Call the method ImportCustomizer.addImports(String[])
-                String[] importsArray = new String[] {
+                String[] importsArray = new String[]{
                         "java.sql.Connection",
                         "java.sql.Types",
                         "java.sql.ResultSet",
                         "groovy.sql.Sql",
                         "org.h2.tools.SimpleResultSet"
                 };
-                Utils.callMethod(importCustomizer, "addImports", new Object[] { importsArray });
+                Utils.callMethod(importCustomizer, "addImports", new Object[]{importsArray});
 
                 // Call the method
                 // CompilerConfiguration.addCompilationCustomizers(
@@ -403,7 +386,7 @@ public class SourceCompiler {
                 Object configuration = Utils.newInstance(
                         "org.codehaus.groovy.control.CompilerConfiguration");
                 Utils.callMethod(configuration,
-                        "addCompilationCustomizers", new Object[] { importCustomizerArray });
+                        "addCompilationCustomizers", new Object[]{importCustomizerArray});
 
                 ClassLoader parent = GroovyCompiler.class.getClassLoader();
                 loader = Utils.newInstance(
@@ -416,7 +399,7 @@ public class SourceCompiler {
         }
 
         public static Class<?> parseClass(String source,
-                String packageAndClassName) {
+                                          String packageAndClassName) {
             if (LOADER == null) {
                 throw new RuntimeException(
                         "Compile fail: no Groovy jar in the classpath", INIT_FAIL_EXCEPTION);
@@ -443,7 +426,7 @@ public class SourceCompiler {
 
         public StringJavaFileObject(String className, String sourceCode) {
             super(URI.create("string:///" + className.replace('.', '/')
-                + Kind.SOURCE.extension), Kind.SOURCE);
+                    + Kind.SOURCE.extension), Kind.SOURCE);
             this.sourceCode = sourceCode;
         }
 
@@ -463,7 +446,7 @@ public class SourceCompiler {
 
         public JavaClassObject(String name, Kind kind) {
             super(URI.create("string:///" + name.replace('.', '/')
-                + kind.extension), kind);
+                    + kind.extension), kind);
         }
 
         public byte[] getBytes() {
@@ -506,7 +489,7 @@ public class SourceCompiler {
 
         @Override
         public JavaFileObject getJavaFileForOutput(Location location,
-                String className, Kind kind, FileObject sibling) throws IOException {
+                                                   String className, Kind kind, FileObject sibling) throws IOException {
             classObject = new JavaClassObject(className, kind);
             return classObject;
         }

@@ -6,12 +6,12 @@
  */
 package org.h2.test.unit;
 
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import org.h2.test.TestBase;
 
 /**
  * Tests the multi-threaded kernel feature.
@@ -65,11 +65,11 @@ public class TestMultiThreadedKernel extends TestBase implements Runnable {
         try {
             org.h2.Driver.load();
             Connection conn = DriverManager.getConnection(url +
-                    ";MULTI_THREADED=1;LOCK_MODE=3;WRITE_DELAY=0",
+                            ";MULTI_THREADED=1;LOCK_MODE=3;WRITE_DELAY=0",
                     user, password);
             conn.createStatement().execute(
                     "CREATE TABLE TEST" + id +
-                    "(COL1 BIGINT AUTO_INCREMENT PRIMARY KEY, COL2 BIGINT)");
+                            "(COL1 BIGINT AUTO_INCREMENT PRIMARY KEY, COL2 BIGINT)");
             PreparedStatement prep = conn.prepareStatement(
                     "insert into TEST" + id + "(col2) values (?)");
             for (int i = 0; !master.stop; i++) {

@@ -6,9 +6,10 @@
  */
 package org.h2.test.jaqu;
 
+import org.h2.jaqu.Table.JQTable;
+
 import java.util.Arrays;
 import java.util.List;
-import org.h2.jaqu.Table.JQTable;
 
 /**
  * This class inherits all its fields from a parent class which has annotated
@@ -24,15 +25,15 @@ public class ProductInheritedAnnotation extends ProductMixedAnnotation {
     }
 
     private ProductInheritedAnnotation(int productId, String productName,
-            String category, double unitPrice, int unitsInStock,
-            String mappedField) {
+                                       String category, double unitPrice, int unitsInStock,
+                                       String mappedField) {
         super(productId, productName, category, unitPrice, unitsInStock,
                 mappedField);
     }
 
     private static ProductInheritedAnnotation create(int productId,
-            String productName, String category, double unitPrice,
-            int unitsInStock, String mappedField) {
+                                                     String productName, String category, double unitPrice,
+                                                     int unitsInStock, String mappedField) {
         return new ProductInheritedAnnotation(productId, productName, category,
                 unitPrice, unitsInStock, mappedField);
     }
@@ -49,7 +50,7 @@ public class ProductInheritedAnnotation extends ProductMixedAnnotation {
                 create(7, "Uncle Bob's Organic Dried Pears", "Produce", 30.0, 15, mappedField),
                 create(8, "Northwoods Cranberry Sauce", "Condiments", 40.0, 6, mappedField),
                 create(9, "Mishi Kobe Niku", "Meat/Poultry", 97.0, 29, mappedField),
-                create(10, "Ikura", "Seafood", 31.0, 31, mappedField), };
+                create(10, "Ikura", "Seafood", 31.0, 31, mappedField),};
         return Arrays.asList(list);
     }
 

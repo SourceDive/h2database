@@ -6,13 +6,6 @@
  */
 package org.h2.store;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.zip.CRC32;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
 import org.h2.command.ddl.CreateTableData;
@@ -20,19 +13,7 @@ import org.h2.engine.Constants;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
 import org.h2.engine.SysProperties;
-import org.h2.index.Cursor;
-import org.h2.index.Index;
-import org.h2.index.IndexType;
-import org.h2.index.MultiVersionIndex;
-import org.h2.index.PageBtreeIndex;
-import org.h2.index.PageBtreeLeaf;
-import org.h2.index.PageBtreeNode;
-import org.h2.index.PageDataIndex;
-import org.h2.index.PageDataLeaf;
-import org.h2.index.PageDataNode;
-import org.h2.index.PageDataOverflow;
-import org.h2.index.PageDelegateIndex;
-import org.h2.index.PageIndex;
+import org.h2.index.*;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.result.Row;
@@ -42,20 +23,18 @@ import org.h2.table.Column;
 import org.h2.table.IndexColumn;
 import org.h2.table.RegularTable;
 import org.h2.table.Table;
-import org.h2.util.BitField;
-import org.h2.util.Cache;
-import org.h2.util.CacheLRU;
-import org.h2.util.CacheObject;
-import org.h2.util.CacheWriter;
-import org.h2.util.IntArray;
-import org.h2.util.IntIntHashMap;
-import org.h2.util.New;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
+import org.h2.util.*;
 import org.h2.value.CompareMode;
 import org.h2.value.Value;
 import org.h2.value.ValueInt;
 import org.h2.value.ValueString;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.zip.CRC32;
 
 /**
  * This class represents a file that is organized as a number of pages. Page 0
@@ -207,13 +186,13 @@ public class PageStore implements CacheWriter {
     /**
      * Create a new page store object.
      *
-     * @param database the database
-     * @param fileName the file name
-     * @param accessMode the access mode
+     * @param database         the database
+     * @param fileName         the file name
+     * @param accessMode       the access mode
      * @param cacheSizeDefault the default cache size
      */
     public PageStore(Database database, String fileName, String accessMode,
-            int cacheSizeDefault) {
+                     int cacheSizeDefault) {
         this.fileName = fileName;
         this.accessMode = accessMode;
         this.database = database;
@@ -254,7 +233,7 @@ public class PageStore implements CacheWriter {
      * Copy the next page to the output stream.
      *
      * @param pageId the page to copy
-     * @param out the output stream
+     * @param out    the output stream
      * @return the new position, or -1 if there is no more data to copy
      */
     public synchronized int copyDirect(int pageId, OutputStream out)
@@ -393,7 +372,7 @@ public class PageStore implements CacheWriter {
     private void removeOldTempIndexes() {
         if (tempObjects != null) {
             metaObjects.putAll(tempObjects);
-            for (PageIndex index: tempObjects.values()) {
+            for (PageIndex index : tempObjects.values()) {
                 if (index.getTable().isTemporary()) {
                     index.truncate(pageStoreSession);
                     index.remove(pageStoreSession);
@@ -407,7 +386,7 @@ public class PageStore implements CacheWriter {
     }
 
     private void writeIndexRowCounts() {
-        for (PageIndex index: metaObjects.values()) {
+        for (PageIndex index : metaObjects.values()) {
             index.writeRowCount();
         }
     }
@@ -474,7 +453,7 @@ public class PageStore implements CacheWriter {
      * Shrink the file so there are no empty pages at the end.
      *
      * @param compactMode 0 if no compacting should happen, otherwise
-     * TransactionCommand.SHUTDOWN_COMPACT or TransactionCommand.SHUTDOWN_DEFRAG
+     *                    TransactionCommand.SHUTDOWN_COMPACT or TransactionCommand.SHUTDOWN_DEFRAG
      */
     public synchronized void compact(int compactMode) {
         if (!database.getSettings().pageStoreTrim) {
@@ -759,101 +738,101 @@ public class PageStore implements CacheWriter {
                     "wrong checksum");
         }
         switch (type & ~Page.FLAG_LAST) {
-        case Page.TYPE_FREE_LIST:
-            p = PageFreeList.read(this, data, pageId);
-            break;
-        case Page.TYPE_DATA_LEAF: {
-            int indexId = data.readVarInt();
-            PageIndex idx = metaObjects.get(indexId);
-            if (idx == null) {
+            case Page.TYPE_FREE_LIST:
+                p = PageFreeList.read(this, data, pageId);
+                break;
+            case Page.TYPE_DATA_LEAF: {
+                int indexId = data.readVarInt();
+                PageIndex idx = metaObjects.get(indexId);
+                if (idx == null) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "index not found " + indexId);
+                }
+                if (!(idx instanceof PageDataIndex)) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "not a data index " + indexId + " " + idx);
+                }
+                PageDataIndex index = (PageDataIndex) idx;
+                if (statistics != null) {
+                    statisticsIncrement(index.getTable().getName() + "." +
+                            index.getName() + " read");
+                }
+                p = PageDataLeaf.read(index, data, pageId);
+                break;
+            }
+            case Page.TYPE_DATA_NODE: {
+                int indexId = data.readVarInt();
+                PageIndex idx = metaObjects.get(indexId);
+                if (idx == null) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "index not found " + indexId);
+                }
+                if (!(idx instanceof PageDataIndex)) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "not a data index " + indexId + " " + idx);
+                }
+                PageDataIndex index = (PageDataIndex) idx;
+                if (statistics != null) {
+                    statisticsIncrement(index.getTable().getName() + "." +
+                            index.getName() + " read");
+                }
+                p = PageDataNode.read(index, data, pageId);
+                break;
+            }
+            case Page.TYPE_DATA_OVERFLOW: {
+                p = PageDataOverflow.read(this, data, pageId);
+                if (statistics != null) {
+                    statisticsIncrement("overflow read");
+                }
+                break;
+            }
+            case Page.TYPE_BTREE_LEAF: {
+                int indexId = data.readVarInt();
+                PageIndex idx = metaObjects.get(indexId);
+                if (idx == null) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "index not found " + indexId);
+                }
+                if (!(idx instanceof PageBtreeIndex)) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "not a btree index " + indexId + " " + idx);
+                }
+                PageBtreeIndex index = (PageBtreeIndex) idx;
+                if (statistics != null) {
+                    statisticsIncrement(index.getTable().getName() + "." +
+                            index.getName() + " read");
+                }
+                p = PageBtreeLeaf.read(index, data, pageId);
+                break;
+            }
+            case Page.TYPE_BTREE_NODE: {
+                int indexId = data.readVarInt();
+                PageIndex idx = metaObjects.get(indexId);
+                if (idx == null) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "index not found " + indexId);
+                }
+                if (!(idx instanceof PageBtreeIndex)) {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "not a btree index " + indexId + " " + idx);
+                }
+                PageBtreeIndex index = (PageBtreeIndex) idx;
+                if (statistics != null) {
+                    statisticsIncrement(index.getTable().getName() +
+                            "." + index.getName() + " read");
+                }
+                p = PageBtreeNode.read(index, data, pageId);
+                break;
+            }
+            case Page.TYPE_STREAM_TRUNK:
+                p = PageStreamTrunk.read(this, data, pageId);
+                break;
+            case Page.TYPE_STREAM_DATA:
+                p = PageStreamData.read(this, data, pageId);
+                break;
+            default:
                 throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "index not found " + indexId);
-            }
-            if (!(idx instanceof PageDataIndex)) {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "not a data index " + indexId + " " + idx);
-            }
-            PageDataIndex index = (PageDataIndex) idx;
-            if (statistics != null) {
-                statisticsIncrement(index.getTable().getName() + "." +
-                        index.getName() + " read");
-            }
-            p = PageDataLeaf.read(index, data, pageId);
-            break;
-        }
-        case Page.TYPE_DATA_NODE: {
-            int indexId = data.readVarInt();
-            PageIndex idx = metaObjects.get(indexId);
-            if (idx == null) {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "index not found " + indexId);
-            }
-            if (!(idx instanceof PageDataIndex)) {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "not a data index " + indexId + " " + idx);
-            }
-            PageDataIndex index = (PageDataIndex) idx;
-            if (statistics != null) {
-                statisticsIncrement(index.getTable().getName() + "." +
-                        index.getName() + " read");
-            }
-            p = PageDataNode.read(index, data, pageId);
-            break;
-        }
-        case Page.TYPE_DATA_OVERFLOW: {
-            p = PageDataOverflow.read(this, data, pageId);
-            if (statistics != null) {
-                statisticsIncrement("overflow read");
-            }
-            break;
-        }
-        case Page.TYPE_BTREE_LEAF: {
-            int indexId = data.readVarInt();
-            PageIndex idx = metaObjects.get(indexId);
-            if (idx == null) {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "index not found " + indexId);
-            }
-            if (!(idx instanceof PageBtreeIndex)) {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "not a btree index " + indexId + " " + idx);
-            }
-            PageBtreeIndex index = (PageBtreeIndex) idx;
-            if (statistics != null) {
-                statisticsIncrement(index.getTable().getName() + "." +
-                        index.getName() + " read");
-            }
-            p = PageBtreeLeaf.read(index, data, pageId);
-            break;
-        }
-        case Page.TYPE_BTREE_NODE: {
-            int indexId = data.readVarInt();
-            PageIndex idx = metaObjects.get(indexId);
-            if (idx == null) {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "index not found " + indexId);
-            }
-            if (!(idx instanceof PageBtreeIndex)) {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "not a btree index " + indexId + " " + idx);
-            }
-            PageBtreeIndex index = (PageBtreeIndex) idx;
-            if (statistics != null) {
-                statisticsIncrement(index.getTable().getName() +
-                        "." + index.getName() + " read");
-            }
-            p = PageBtreeNode.read(index, data, pageId);
-            break;
-        }
-        case Page.TYPE_STREAM_TRUNK:
-            p = PageStreamTrunk.read(this, data, pageId);
-            break;
-        case Page.TYPE_STREAM_DATA:
-            p = PageStreamData.read(this, data, pageId);
-            break;
-        default:
-            throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                    "page=" + pageId + " type=" + type);
+                        "page=" + pageId + " type=" + type);
         }
         cache.put(p);
         return p;
@@ -898,7 +877,7 @@ public class PageStore implements CacheWriter {
 
     private void readVariableHeader() {
         Data page = createData();
-        for (int i = 1;; i++) {
+        for (int i = 1; ; i++) {
             if (i == 3) {
                 throw DbException.get(
                         ErrorCode.FILE_CORRUPTED_1, fileName);
@@ -932,7 +911,7 @@ public class PageStore implements CacheWriter {
         }
         boolean good = false;
         int shift = 0;
-        for (int i = 1; i <= size;) {
+        for (int i = 1; i <= size; ) {
             if (size == i) {
                 good = true;
                 break;
@@ -961,14 +940,14 @@ public class PageStore implements CacheWriter {
     /**
      * Set the trunk page and data page id of the log.
      *
-     * @param logKey the log key of the trunk page
+     * @param logKey      the log key of the trunk page
      * @param trunkPageId the trunk page id
-     * @param dataPageId the data page id
+     * @param dataPageId  the data page id
      */
     void setLogFirstPage(int logKey, int trunkPageId, int dataPageId) {
         if (trace.isDebugEnabled()) {
             trace.debug("setLogFirstPage key: " + logKey +
-                    " trunk: "+ trunkPageId +" data: " + dataPageId);
+                    " trunk: " + trunkPageId + " data: " + dataPageId);
         }
         this.logKey = logKey;
         this.logFirstTrunkPage = trunkPageId;
@@ -1052,7 +1031,7 @@ public class PageStore implements CacheWriter {
      * Write an undo log entry if required.
      *
      * @param page the page
-     * @param old the old data (if known) or null
+     * @param old  the old data (if known) or null
      */
     public synchronized void logUndo(Page page, Data old) {
         if (logMode == LOG_MODE_OFF) {
@@ -1155,13 +1134,13 @@ public class PageStore implements CacheWriter {
     /**
      * Allocate a number of pages.
      *
-     * @param list the list where to add the allocated pages
+     * @param list            the list where to add the allocated pages
      * @param pagesToAllocate the number of pages to allocate
-     * @param exclude the exclude list
-     * @param after all allocated pages are higher than this page
+     * @param exclude         the exclude list
+     * @param after           all allocated pages are higher than this page
      */
     void allocatePages(IntArray list, int pagesToAllocate, BitField exclude,
-            int after) {
+                       int after) {
         list.ensureCapacity(list.size() + pagesToAllocate);
         for (int i = 0; i < pagesToAllocate; i++) {
             int page = allocatePage(exclude, after);
@@ -1188,7 +1167,7 @@ public class PageStore implements CacheWriter {
 
     private int allocatePage(BitField exclude, int first) {
         int page;
-        for (int i = firstFreeListIndex;; i++) {
+        for (int i = firstFreeListIndex; ; i++) {
             PageFreeList list = getFreeList(i);
             page = list.allocate(exclude, first);
             if (page >= 0) {
@@ -1242,7 +1221,7 @@ public class PageStore implements CacheWriter {
      * Add a page to the free list.
      *
      * @param pageId the page id
-     * @param undo if the undo record must have been written
+     * @param undo   if the undo record must have been written
      */
     void free(int pageId, boolean undo) {
         if (trace.isDebugEnabled()) {
@@ -1307,7 +1286,7 @@ public class PageStore implements CacheWriter {
     /**
      * Read a page.
      *
-     * @param pos the page id
+     * @param pos  the page id
      * @param page the page
      */
     void readPage(int pos, Data page) {
@@ -1349,7 +1328,7 @@ public class PageStore implements CacheWriter {
      * Write a page.
      *
      * @param pageId the page id
-     * @param data the data
+     * @param data   the data
      */
     public synchronized void writePage(int pageId, Data data) {
         if (pageId <= 0) {
@@ -1454,11 +1433,11 @@ public class PageStore implements CacheWriter {
      *
      * @param session the session
      * @param tableId the table id
-     * @param row the row to add
-     * @param add true if the row is added, false if it is removed
+     * @param row     the row to add
+     * @param add     true if the row is added, false if it is removed
      */
     public synchronized void logAddOrRemoveRow(Session session, int tableId,
-            Row row, boolean add) {
+                                               Row row, boolean add) {
         if (logMode != LOG_MODE_OFF) {
             if (!recoveryRunning) {
                 log.logAddOrRemoveRow(session, tableId, row, add);
@@ -1496,7 +1475,7 @@ public class PageStore implements CacheWriter {
             ignoreBigLog = true;
             trace.error(null,
                     "Transaction log could not be truncated; size: " +
-                    (newSize / 1024 / 1024) + " MB");
+                            (newSize / 1024 / 1024) + " MB");
             logSizeBase = log.getSize();
         }
     }
@@ -1504,7 +1483,7 @@ public class PageStore implements CacheWriter {
     /**
      * Prepare a transaction.
      *
-     * @param session the session
+     * @param session     the session
      * @param transaction the name of the transaction
      */
     public synchronized void prepareCommit(Session session, String transaction) {
@@ -1523,9 +1502,9 @@ public class PageStore implements CacheWriter {
     /**
      * Reserve the page if this is a index root page entry.
      *
-     * @param logPos the redo log position
+     * @param logPos  the redo log position
      * @param tableId the table id
-     * @param row the row
+     * @param row     the row
      */
     void allocateIfIndexRoot(int logPos, int tableId, Row row) {
         if (tableId == META_TABLE_ID) {
@@ -1541,7 +1520,7 @@ public class PageStore implements CacheWriter {
      * Redo a delete in a table.
      *
      * @param tableId the object id of the table
-     * @param key the key of the row to delete
+     * @param key     the key of the row to delete
      */
     void redoDelete(int tableId, long key) {
         Index index = metaObjects.get(tableId);
@@ -1554,8 +1533,8 @@ public class PageStore implements CacheWriter {
      * Redo a change in a table.
      *
      * @param tableId the object id of the table
-     * @param row the row
-     * @param add true if the record is added, false if deleted
+     * @param row     the row
+     * @param add     true if the record is added, false if deleted
      */
     void redo(int tableId, Row row, boolean add) {
         if (tableId == META_TABLE_ID) {
@@ -1662,7 +1641,7 @@ public class PageStore implements CacheWriter {
         String[] columns = StringUtils.arraySplit(columnList, ',', false);
         Index meta;
         if (trace.isDebugEnabled()) {
-            trace.debug("addMeta id="+ id +" type=" + type +
+            trace.debug("addMeta id=" + id + " type=" + type +
                     " root=" + rootPageId + " parent=" + parent + " columns=" + columnList);
         }
         if (redo && rootPageId != 0) {
@@ -1755,7 +1734,7 @@ public class PageStore implements CacheWriter {
     /**
      * Add the meta data of an index.
      *
-     * @param index the index to add
+     * @param index   the index to add
      * @param session the session
      */
     public void addMeta(PageIndex index, Session session) {
@@ -1788,7 +1767,7 @@ public class PageStore implements CacheWriter {
             }
             String columnList = buff.toString();
             CompareMode mode = table.getCompareMode();
-            String options = mode.getName()+ "," + mode.getStrength() + ",";
+            String options = mode.getName() + "," + mode.getStrength() + ",";
             if (table.isTemporary()) {
                 options += "temp";
             }
@@ -1812,7 +1791,7 @@ public class PageStore implements CacheWriter {
     /**
      * Remove the meta data of an index.
      *
-     * @param index the index to remove
+     * @param index   the index to remove
      * @param session the session
      */
     public void removeMeta(Index index, Session session) {
@@ -1841,7 +1820,7 @@ public class PageStore implements CacheWriter {
         if (row.getKey() != key) {
             throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
                     "key: " + key + " index: " + index +
-                    " table: " + index.getTable() + " row: " + row);
+                            " table: " + index.getTable() + " row: " + row);
         }
         metaIndex.remove(session, row);
     }
@@ -1860,11 +1839,11 @@ public class PageStore implements CacheWriter {
      * in-doubt transactions.
      *
      * @param sessionId the session id
-     * @param pageId the page where the transaction was prepared
-     * @param commit if the transaction should be committed
+     * @param pageId    the page where the transaction was prepared
+     * @param commit    if the transaction should be committed
      */
     public synchronized void setInDoubtTransactionState(int sessionId,
-            int pageId, boolean commit) {
+                                                        int pageId, boolean commit) {
         boolean old = database.isReadOnly();
         try {
             database.setReadOnly(false);
@@ -1970,8 +1949,9 @@ public class PageStore implements CacheWriter {
 
     /**
      * Check if the stored checksum is correct
-     * @param d the data
-     * @param pageId the page id
+     *
+     * @param d        the data
+     * @param pageId   the page id
      * @param pageSize the page size
      * @return true if it is correct
      */

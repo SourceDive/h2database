@@ -6,32 +6,18 @@
  */
 package org.h2.tools;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Properties;
 import org.h2.engine.Constants;
 import org.h2.server.web.ConnectionInfo;
-import org.h2.util.JdbcUtils;
-import org.h2.util.New;
-import org.h2.util.ScriptReader;
-import org.h2.util.SortedProperties;
-import org.h2.util.StringUtils;
-import org.h2.util.Tool;
-import org.h2.util.Utils;
+import org.h2.util.*;
+
+import java.io.*;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * Interactive command line tool to access a database using JDBC.
+ *
  * @h2.resource
  */
 public class Shell extends Tool implements Runnable {
@@ -72,9 +58,9 @@ public class Shell extends Tool implements Runnable {
      * </table>
      * If special characters don't work as expected, you may need to use
      * -Dfile.encoding=UTF-8 (Mac OS X) or CP850 (Windows).
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new Shell().runTool(args);
@@ -332,7 +318,7 @@ public class Shell extends Tool implements Runnable {
             }
             String data = null;
             boolean found = false;
-            for (int i = 0;; i++) {
+            for (int i = 0; ; i++) {
                 String d = prop.getProperty(String.valueOf(i));
                 if (d == null) {
                     break;

@@ -8,59 +8,59 @@ package org.h2.jmx;
 
 /**
  * Information and management operations for the given database.
- * @h2.resource
  *
  * @author Eric Dong
  * @author Thomas Mueller
+ * @h2.resource
  */
 public interface DatabaseInfoMBean {
 
     /**
      * Is the database open in exclusive mode?
-     * @h2.resource
      *
      * @return true if the database is open in exclusive mode, false otherwise
+     * @h2.resource
      */
     boolean isExclusive();
 
     /**
      * Is the database read-only?
-     * @h2.resource
      *
      * @return true if the database is read-only, false otherwise
+     * @h2.resource
      */
     boolean isReadOnly();
 
     /**
      * The database compatibility mode (REGULAR if no compatibility mode is
      * used).
-     * @h2.resource
      *
      * @return the database mode
+     * @h2.resource
      */
     String getMode();
 
     /**
      * Is multi-threading enabled?
-     * @h2.resource
      *
      * @return true if multi-threading is enabled, false otherwise
+     * @h2.resource
      */
     boolean isMultiThreaded();
 
     /**
      * Is MVCC (multi version concurrency) enabled?
-     * @h2.resource
      *
      * @return true if MVCC is enabled, false otherwise
+     * @h2.resource
      */
     boolean isMvcc();
 
     /**
      * The transaction log mode (0 disabled, 1 without sync, 2 enabled).
-     * @h2.resource
      *
      * @return the transaction log mode
+     * @h2.resource
      */
     int getLogMode();
 
@@ -73,41 +73,41 @@ public interface DatabaseInfoMBean {
 
     /**
      * The number of write operations since the database was created.
-     * @h2.resource
      *
      * @return the total write count
+     * @h2.resource
      */
     long getFileWriteCountTotal();
 
     /**
      * The number of write operations since the database was opened.
-     * @h2.resource
      *
      * @return the write count
+     * @h2.resource
      */
     long getFileWriteCount();
 
     /**
      * The file read count since the database was opened.
-     * @h2.resource
      *
      * @return the read count
+     * @h2.resource
      */
     long getFileReadCount();
 
     /**
      * The database file size in KB.
-     * @h2.resource
      *
      * @return the number of pages
+     * @h2.resource
      */
     long getFileSize();
 
     /**
      * The maximum cache size in KB.
-     * @h2.resource
      *
      * @return the maximum size
+     * @h2.resource
      */
     int getCacheSizeMax();
 
@@ -120,25 +120,25 @@ public interface DatabaseInfoMBean {
 
     /**
      * The current cache size in KB.
-     * @h2.resource
      *
      * @return the current size
+     * @h2.resource
      */
     int getCacheSize();
 
     /**
      * The database version.
-     * @h2.resource
      *
      * @return the version
+     * @h2.resource
      */
     String getVersion();
 
     /**
      * The trace level (0 disabled, 1 error, 2 info, 3 debug).
-     * @h2.resource
      *
      * @return the level
+     * @h2.resource
      */
     int getTraceLevel();
 
@@ -151,18 +151,18 @@ public interface DatabaseInfoMBean {
 
     /**
      * List the database settings.
-     * @h2.resource
      *
      * @return the database settings
+     * @h2.resource
      */
     String listSettings();
 
     /**
      * List sessions, including the queries that are in
      * progress, and locked tables.
-     * @h2.resource
      *
      * @return information about the sessions
+     * @h2.resource
      */
     String listSessions();
 

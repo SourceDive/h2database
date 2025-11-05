@@ -22,6 +22,7 @@ public interface Expr {
     String asString();
 
     Type getType();
+
     void setType(Type type);
 
 }
@@ -496,44 +497,44 @@ class StringExpr extends ExprBase {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             switch (c) {
-            case '\t':
-                // HT horizontal tab
-                buff.append("\\t");
-                break;
-            case '\n':
-                // LF linefeed
-                buff.append("\\n");
-                break;
-            case '\f':
-                // FF form feed
-                buff.append("\\f");
-                break;
-            case '\r':
-                // CR carriage return
-                buff.append("\\r");
-                break;
-            case '"':
-                // double quote
-                buff.append("\\\"");
-                break;
-            case '\\':
-                // backslash
-                buff.append("\\\\");
-                break;
-            default:
-                int ch = c & 0xffff;
-                if (ch >= ' ' && (ch < 0x80)) {
-                    buff.append(c);
-                // not supported in properties files
-                // } else if(ch < 0xff) {
-                // buff.append("\\");
-                // // make sure it's three characters (0x200 is octal 1000)
-                // buff.append(Integer.toOctalString(0x200 | ch).substring(1));
-                } else {
-                    buff.append("\\u");
-                    // make sure it's four characters
-                    buff.append(Integer.toHexString(0x10000 | ch).substring(1));
-                }
+                case '\t':
+                    // HT horizontal tab
+                    buff.append("\\t");
+                    break;
+                case '\n':
+                    // LF linefeed
+                    buff.append("\\n");
+                    break;
+                case '\f':
+                    // FF form feed
+                    buff.append("\\f");
+                    break;
+                case '\r':
+                    // CR carriage return
+                    buff.append("\\r");
+                    break;
+                case '"':
+                    // double quote
+                    buff.append("\\\"");
+                    break;
+                case '\\':
+                    // backslash
+                    buff.append("\\\\");
+                    break;
+                default:
+                    int ch = c & 0xffff;
+                    if (ch >= ' ' && (ch < 0x80)) {
+                        buff.append(c);
+                        // not supported in properties files
+                        // } else if(ch < 0xff) {
+                        // buff.append("\\");
+                        // // make sure it's three characters (0x200 is octal 1000)
+                        // buff.append(Integer.toOctalString(0x200 | ch).substring(1));
+                    } else {
+                        buff.append("\\u");
+                        // make sure it's four characters
+                        buff.append(Integer.toHexString(0x10000 | ch).substring(1));
+                    }
             }
         }
         return buff.toString();

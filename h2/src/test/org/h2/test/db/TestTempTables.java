@@ -6,15 +6,15 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Temporary table tests.
@@ -176,7 +176,7 @@ public class TestTempTables extends TestBase {
         Statement stat = conn.createStatement();
         stat.execute("create global temporary table test(id int, data varchar)");
         stat.execute("insert into test " +
-                    "select x, space(1000) from system_range(1, 1000)");
+                "select x, space(1000) from system_range(1, 1000)");
         stat.execute("shutdown compact");
         try {
             conn.close();

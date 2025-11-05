@@ -107,19 +107,19 @@ public class RandomGen {
      */
     public int getRandomInt() {
         switch (random.nextInt(10)) {
-        case 0:
-            return Integer.MAX_VALUE;
-        case 1:
-            return Integer.MIN_VALUE;
-        case 2:
-            return random.nextInt();
-        case 3:
-        case 4:
-            return 0;
-        case 5:
-            return (int) (random.nextGaussian() * 2000) - 200;
-        default:
-            return (int) (random.nextGaussian() * 20) - 5;
+            case 0:
+                return Integer.MAX_VALUE;
+            case 1:
+                return Integer.MIN_VALUE;
+            case 2:
+                return random.nextInt();
+            case 3:
+            case 4:
+                return 0;
+            case 5:
+                return (int) (random.nextGaussian() * 2000) - 200;
+            default:
+                return (int) (random.nextGaussian() * 20) - 5;
         }
     }
 
@@ -130,19 +130,19 @@ public class RandomGen {
      */
     public long getRandomLong() {
         switch (random.nextInt(10)) {
-        case 0:
-            return Long.MAX_VALUE;
-        case 1:
-            return Long.MIN_VALUE;
-        case 2:
-            return random.nextLong();
-        case 3:
-        case 4:
-            return 0;
-        case 5:
-            return (int) (random.nextGaussian() * 20000) - 2000;
-        default:
-            return (int) (random.nextGaussian() * 200) - 50;
+            case 0:
+                return Long.MAX_VALUE;
+            case 1:
+                return Long.MIN_VALUE;
+            case 2:
+                return random.nextLong();
+            case 3:
+            case 4:
+                return 0;
+            case 5:
+                return (int) (random.nextGaussian() * 20000) - 2000;
+            default:
+                return (int) (random.nextGaussian() * 200) - 50;
         }
     }
 
@@ -153,23 +153,23 @@ public class RandomGen {
      */
     public double getRandomDouble() {
         switch (random.nextInt(10)) {
-        case 0:
-            return Double.MIN_VALUE;
-        case 1:
-            return Double.MAX_VALUE;
-        case 2:
-            return Float.MIN_VALUE;
-        case 3:
-            return Float.MAX_VALUE;
-        case 4:
-            return random.nextDouble();
-        case 5:
-        case 6:
-            return 0;
-        case 7:
-            return random.nextGaussian() * 20000. - 2000.;
-        default:
-            return random.nextGaussian() * 200. - 50.;
+            case 0:
+                return Double.MIN_VALUE;
+            case 1:
+                return Double.MAX_VALUE;
+            case 2:
+                return Float.MIN_VALUE;
+            case 3:
+                return Float.MAX_VALUE;
+            case 4:
+                return random.nextDouble();
+            case 5:
+            case 6:
+                return 0;
+            case 7:
+                return random.nextGaussian() * 20000. - 2000.;
+            default:
+                return random.nextGaussian() * 200. - 50.;
         }
     }
 
@@ -189,15 +189,15 @@ public class RandomGen {
      */
     public int[] getIntArray() {
         switch (random.nextInt(10)) {
-        case 0:
-            return null;
-        default:
-            int len = getInt(100);
-            int[] list = new int[len];
-            for (int i = 0; i < len; i++) {
-                list[i] = getRandomInt();
-            }
-            return list;
+            case 0:
+                return null;
+            default:
+                int len = getInt(100);
+                int[] list = new int[len];
+                for (int i = 0; i < len; i++) {
+                    list[i] = getRandomInt();
+                }
+                return list;
         }
     }
 
@@ -208,13 +208,13 @@ public class RandomGen {
      */
     public byte[] getByteArray() {
         switch (random.nextInt(10)) {
-        case 0:
-            return null;
-        default:
-            int len = getInt(100);
-            byte[] list = new byte[len];
-            random.nextBytes(list);
-            return list;
+            case 0:
+                return null;
+            default:
+                int len = getInt(100);
+                byte[] list = new byte[len];
+                random.nextBytes(list);
+                return list;
         }
     }
 

@@ -6,6 +6,8 @@
  */
 package org.h2.test.server;
 
+import org.h2.util.IOUtils;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +15,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.UUID;
-import org.h2.util.IOUtils;
 
 /**
  * A simple web browser simulator.
@@ -52,9 +53,9 @@ public class WebClient {
     /**
      * Upload a file.
      *
-     * @param url the target URL
+     * @param url      the target URL
      * @param fileName the file name to post
-     * @param in the input stream
+     * @param in       the input stream
      * @return the result
      */
     String upload(String url, String fileName, InputStream in) throws IOException {
@@ -66,12 +67,12 @@ public class WebClient {
         conn.setRequestProperty("Connection", "Keep-Alive");
         String boundary = UUID.randomUUID().toString();
         conn.setRequestProperty("Content-Type",
-                "multipart/form-data;boundary="+boundary);
+                "multipart/form-data;boundary=" + boundary);
         conn.connect();
         DataOutputStream out = new DataOutputStream(conn.getOutputStream());
         out.writeBytes("--" + boundary + "--\r\n");
         out.writeBytes("Content-Disposition: form-data; name=\"upload\";"
-                + " filename=\"" + fileName +"\"\r\n\r\n");
+                + " filename=\"" + fileName + "\"\r\n\r\n");
         IOUtils.copyAndCloseInput(in, out);
         out.writeBytes("\r\n--" + boundary + "--\r\n");
         out.close();
@@ -116,7 +117,7 @@ public class WebClient {
     /**
      * Read the specified HTML page.
      *
-     * @param url the base URL
+     * @param url  the base URL
      * @param page the page to read
      * @return the HTML page
      */

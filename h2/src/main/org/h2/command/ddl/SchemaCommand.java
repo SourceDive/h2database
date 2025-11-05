@@ -20,7 +20,7 @@ public abstract class SchemaCommand extends DefineCommand {
      * Create a new command.
      *
      * @param session the session
-     * @param schema the schema
+     * @param schema  the schema
      */
     public SchemaCommand(Session session, Schema schema) {
         super(session);

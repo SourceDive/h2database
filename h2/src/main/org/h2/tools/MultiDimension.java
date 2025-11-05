@@ -6,14 +6,15 @@
  */
 package org.h2.tools;
 
+import org.h2.util.New;
+import org.h2.util.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import org.h2.util.New;
-import org.h2.util.StringUtils;
 
 /**
  * A tool to help an application execute multi-dimensional range queries.
@@ -42,9 +43,9 @@ public class MultiDimension implements Comparator<long[]> {
      * given number of dimensions.
      *
      * @param dimensions the number of dimensions
-     * @param value the value (must be in the range min..max)
-     * @param min the minimum value
-     * @param max the maximum value (must be larger than min)
+     * @param value      the value (must be in the range min..max)
+     * @param min        the minimum value
+     * @param max        the maximum value (must be larger than min)
      * @return the normalized value in the range 0..getMaxValue(dimensions)
      */
     public int normalize(int dimensions, double value, double min, double max) {
@@ -132,8 +133,8 @@ public class MultiDimension implements Comparator<long[]> {
      * Gets one of the original multi-dimensional values from a scalar value.
      *
      * @param dimensions the number of dimensions
-     * @param scalar the scalar value
-     * @param dim the dimension of the returned value (starting from 0)
+     * @param scalar     the scalar value
+     * @param dim        the dimension of the returned value (starting from 0)
      * @return the value
      */
     public int deinterleave(int dimensions, long scalar, int dim) {
@@ -149,21 +150,21 @@ public class MultiDimension implements Comparator<long[]> {
      * Generates an optimized multi-dimensional range query. The query contains
      * parameters. It can only be used with the H2 database.
      *
-     * @param table the table name
-     * @param columns the list of columns
+     * @param table        the table name
+     * @param columns      the list of columns
      * @param scalarColumn the column name of the computed scalar column
      * @return the query
      */
     public String generatePreparedQuery(String table, String scalarColumn,
-            String[] columns) {
+                                        String[] columns) {
         StringBuilder buff = new StringBuilder("SELECT D.* FROM ");
         buff.append(StringUtils.quoteIdentifier(table)).
-            append(" D, TABLE(_FROM_ BIGINT=?, _TO_ BIGINT=?) WHERE ").
-            append(StringUtils.quoteIdentifier(scalarColumn)).
-            append(" BETWEEN _FROM_ AND _TO_");
+                append(" D, TABLE(_FROM_ BIGINT=?, _TO_ BIGINT=?) WHERE ").
+                append(StringUtils.quoteIdentifier(scalarColumn)).
+                append(" BETWEEN _FROM_ AND _TO_");
         for (String col : columns) {
             buff.append(" AND ").append(StringUtils.quoteIdentifier(col)).
-                append("+1 BETWEEN ?+1 AND ?+1");
+                    append("+1 BETWEEN ?+1 AND ?+1");
         }
         return buff.toString();
     }
@@ -172,8 +173,8 @@ public class MultiDimension implements Comparator<long[]> {
      * Executes a prepared query that was generated using generatePreparedQuery.
      *
      * @param prep the prepared statement
-     * @param min the lower values
-     * @param max the upper values
+     * @param min  the lower values
+     * @param max  the upper values
      * @return the result set
      */
     public ResultSet getResult(PreparedStatement prep, int[] min, int[] max)
@@ -239,7 +240,7 @@ public class MultiDimension implements Comparator<long[]> {
     /**
      * Combine entries if the size of the list is too large.
      *
-     * @param list list of pairs(low, high)
+     * @param list  list of pairs(low, high)
      * @param total product of the gap lengths
      */
     private void combineEntries(ArrayList<long[]> list, int total) {
@@ -270,7 +271,7 @@ public class MultiDimension implements Comparator<long[]> {
     }
 
     private void addMortonRanges(ArrayList<long[]> list, int[] min, int[] max,
-            int len, int level) {
+                                 int len, int level) {
         if (level > 100) {
             throw new IllegalArgumentException("" + level);
         }
@@ -279,7 +280,7 @@ public class MultiDimension implements Comparator<long[]> {
         for (int i = 0; i < len; i++) {
             int diff = max[i] - min[i];
             if (diff < 0) {
-                throw new IllegalArgumentException(""+ diff);
+                throw new IllegalArgumentException("" + diff);
             }
             size *= diff + 1;
             if (size < 0) {
@@ -296,7 +297,7 @@ public class MultiDimension implements Comparator<long[]> {
         }
         long range = high - low + 1;
         if (range == size) {
-            long[] item = { low, high };
+            long[] item = {low, high};
             list.add(item);
         } else {
             int middle = findMiddle(min[largest], max[largest]);

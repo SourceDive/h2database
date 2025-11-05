@@ -6,11 +6,12 @@
  */
 package org.h2.test.db;
 
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.h2.test.TestBase;
 
 /**
  * Test recursive queries using WITH.
@@ -43,18 +44,18 @@ public class TestRecursiveQueries extends TestBase {
 
         ResultSet rs = stat.executeQuery(
                 "with recursive rec_test(depth, parent, child) as (" +
-                "select 0, parent, child from test where parent = '/' " +
-                "union all " +
-                "select depth+1, r.parent, r.child from test i join rec_test r " +
-                "on (i.parent = r.child) where depth<9 " +
-                ") select count(*) from rec_test");
+                        "select 0, parent, child from test where parent = '/' " +
+                        "union all " +
+                        "select depth+1, r.parent, r.child from test i join rec_test r " +
+                        "on (i.parent = r.child) where depth<9 " +
+                        ") select count(*) from rec_test");
         rs.next();
         assertEquals(29524, rs.getInt(1));
-        stat.execute("with recursive rec_test(depth, parent, child) as ( "+
-                "select 0, parent, child from test where parent = '/' "+
-                "union all "+
-                "select depth+1, i.parent, i.child from test i join rec_test r "+
-                "on (r.child = i.parent) where depth<10 "+
+        stat.execute("with recursive rec_test(depth, parent, child) as ( " +
+                "select 0, parent, child from test where parent = '/' " +
+                "union all " +
+                "select depth+1, i.parent, i.child from test i join rec_test r " +
+                "on (r.child = i.parent) where depth<10 " +
                 ") select * from rec_test");
         conn.close();
         deleteDb("recursiveQueries");

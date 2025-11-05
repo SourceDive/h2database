@@ -6,9 +6,10 @@
  */
 package org.h2.command;
 
-import java.util.ArrayList;
 import org.h2.expression.ParameterInterface;
 import org.h2.result.ResultInterface;
+
+import java.util.ArrayList;
 
 /**
  * <p>代表一条sql语句。</p>
@@ -478,7 +479,7 @@ public interface CommandInterface {
     /**
      * Execute the query.
      *
-     * @param maxRows the maximum number of rows returned
+     * @param maxRows    the maximum number of rows returned
      * @param scrollable if the result set must be scrollable
      * @return the result
      */

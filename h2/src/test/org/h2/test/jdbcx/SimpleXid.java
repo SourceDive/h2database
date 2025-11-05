@@ -6,10 +6,11 @@
  */
 package org.h2.test.jdbcx;
 
+import org.h2.util.MathUtils;
+
+import javax.transaction.xa.Xid;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.transaction.xa.Xid;
-import org.h2.util.MathUtils;
 
 /**
  * A simple Xid implementation.
@@ -23,7 +24,7 @@ public class SimpleXid implements Xid {
     private final byte[] globalTransactionId;
 
     private SimpleXid(int formatId, byte[] branchQualifier,
-            byte[] globalTransactionId) {
+                      byte[] globalTransactionId) {
         this.formatId = formatId;
         this.branchQualifier = branchQualifier;
         this.globalTransactionId = globalTransactionId;

@@ -6,15 +6,12 @@
  */
 package org.h2.samples;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.h2.api.Trigger;
+
+import java.sql.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.h2.api.Trigger;
 
 /**
  * This sample application shows how to pass data to a trigger. Trigger data can
@@ -23,7 +20,7 @@ import org.h2.api.Trigger;
 public class TriggerPassData implements Trigger {
 
     private static final Map<String, TriggerPassData> TRIGGERS =
-        Collections.synchronizedMap(new HashMap<String, TriggerPassData>());
+            Collections.synchronizedMap(new HashMap<String, TriggerPassData>());
     private String triggerData;
 
     /**
@@ -55,8 +52,8 @@ public class TriggerPassData implements Trigger {
 
     @Override
     public void init(Connection conn, String schemaName,
-            String triggerName, String tableName, boolean before,
-            int type) throws SQLException {
+                     String triggerName, String tableName, boolean before,
+                     int type) throws SQLException {
         TRIGGERS.put(getPrefix(conn) + triggerName, this);
     }
 
@@ -78,12 +75,12 @@ public class TriggerPassData implements Trigger {
     /**
      * Call this method to change a specific trigger.
      *
-     * @param conn the connection
+     * @param conn    the connection
      * @param trigger the trigger name
-     * @param data the data
+     * @param data    the data
      */
     public static void setTriggerData(Connection conn, String trigger,
-            String data) throws SQLException {
+                                      String data) throws SQLException {
         TRIGGERS.get(getPrefix(conn) + trigger).triggerData = data;
     }
 

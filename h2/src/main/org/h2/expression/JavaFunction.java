@@ -13,11 +13,7 @@ import org.h2.engine.Session;
 import org.h2.table.ColumnResolver;
 import org.h2.table.TableFilter;
 import org.h2.util.StatementBuilder;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueResultSet;
+import org.h2.value.*;
 
 /**
  * This class wraps a user-defined function.
@@ -96,7 +92,7 @@ public class JavaFunction extends Expression implements FunctionCall {
         if (functionAlias.getDatabase().getSettings().functionsInSchema ||
                 !functionAlias.getSchema().getName().equals(Constants.SCHEMA_MAIN)) {
             buff.append(
-                    Parser.quoteIdentifier(functionAlias.getSchema().getName()))
+                            Parser.quoteIdentifier(functionAlias.getSchema().getName()))
                     .append('.');
         }
         buff.append(Parser.quoteIdentifier(functionAlias.getName())).append('(');
@@ -128,7 +124,7 @@ public class JavaFunction extends Expression implements FunctionCall {
 
     @Override
     public ValueResultSet getValueForColumnList(Session session,
-            Expression[] argList) {
+                                                Expression[] argList) {
         Value v = javaMethod.getValue(session, argList, true);
         return v == ValueNull.INSTANCE ? null : (ValueResultSet) v;
     }
@@ -140,17 +136,17 @@ public class JavaFunction extends Expression implements FunctionCall {
 
     @Override
     public boolean isEverything(ExpressionVisitor visitor) {
-        switch(visitor.getType()) {
-        case ExpressionVisitor.DETERMINISTIC:
-            if (!isDeterministic()) {
-                return false;
-            }
-            // only if all parameters are deterministic as well
-            break;
-        case ExpressionVisitor.GET_DEPENDENCIES:
-            visitor.addDependency(functionAlias);
-            break;
-        default:
+        switch (visitor.getType()) {
+            case ExpressionVisitor.DETERMINISTIC:
+                if (!isDeterministic()) {
+                    return false;
+                }
+                // only if all parameters are deterministic as well
+                break;
+            case ExpressionVisitor.GET_DEPENDENCIES:
+                visitor.addDependency(functionAlias);
+                break;
+            default:
         }
         for (Expression e : args) {
             if (e != null && !e.isEverything(visitor)) {
@@ -177,11 +173,11 @@ public class JavaFunction extends Expression implements FunctionCall {
     @Override
     public Expression[] getExpressionColumns(Session session) {
         switch (getType()) {
-        case Value.RESULT_SET:
-            ValueResultSet rs = getValueForColumnList(session, getArgs());
-            return getExpressionColumns(session, rs.getResultSet());
-        case Value.ARRAY:
-            return getExpressionColumns(session, (ValueArray) getValue(session));
+            case Value.RESULT_SET:
+                ValueResultSet rs = getValueForColumnList(session, getArgs());
+                return getExpressionColumns(session, rs.getResultSet());
+            case Value.ARRAY:
+                return getExpressionColumns(session, (ValueArray) getValue(session));
         }
         return super.getExpressionColumns(session);
     }

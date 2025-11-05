@@ -17,8 +17,8 @@ public interface BnfVisitor {
      * Visit a rule element.
      *
      * @param keyword whether this is a keyword
-     * @param name the element name
-     * @param link the linked rule if it's not a keyword
+     * @param name    the element name
+     * @param link    the linked rule if it's not a keyword
      */
     void visitRuleElement(boolean keyword, String name, Rule link);
 
@@ -26,7 +26,7 @@ public interface BnfVisitor {
      * Visit a repeat rule.
      *
      * @param comma whether the comma is repeated as well
-     * @param rule the element to repeat
+     * @param rule  the element to repeat
      */
     void visitRuleRepeat(boolean comma, Rule rule);
 
@@ -40,7 +40,7 @@ public interface BnfVisitor {
     /**
      * Visit a rule list.
      *
-     * @param or true for OR, false for AND
+     * @param or   true for OR, false for AND
      * @param list the rules
      */
     void visitRuleList(boolean or, ArrayList<Rule> list);

@@ -6,15 +6,9 @@
  */
 package org.h2.samples;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-
 import org.h2.tools.SimpleResultSet;
+
+import java.sql.*;
 
 /**
  * User defined functions can return a result set,
@@ -45,7 +39,7 @@ public class FunctionMultiReturn {
         while (rs.next()) {
             double x = rs.getDouble(1);
             double y = rs.getDouble(2);
-            System.out.println("result: (x=" + x + ", y="+y+")");
+            System.out.println("result: (x=" + x + ", y=" + y + ")");
         }
 
         stat.execute("CREATE TABLE TEST(ID IDENTITY, R DOUBLE, A DOUBLE)");
@@ -59,8 +53,8 @@ public class FunctionMultiReturn {
             double a = rs.getDouble("A");
             double x = rs.getDouble("X");
             double y = rs.getDouble("Y");
-            System.out.println("(r="+r+" a="+a+") :" +
-                    " (x=" + x + ", y="+y+")");
+            System.out.println("(r=" + r + " a=" + a + ") :" +
+                    " (x=" + x + ", y=" + y + ")");
         }
 
         stat.execute("CREATE ALIAS P2C_A " +
@@ -80,14 +74,14 @@ public class FunctionMultiReturn {
 
         rs = stat.executeQuery(
                 "SELECT R, A, ARRAY_GET(E, 1), ARRAY_GET(E, 2) " +
-                "FROM (SELECT R, A, P2C_A(R, A) E FROM TEST)");
+                        "FROM (SELECT R, A, P2C_A(R, A) E FROM TEST)");
         while (rs.next()) {
             double r = rs.getDouble(1);
             double a = rs.getDouble(2);
             double x = rs.getDouble(3);
             double y = rs.getDouble(4);
-            System.out.println("(r="+r+" a="+a+") :" +
-                    " (x=" + x + ", y="+y+")");
+            System.out.println("(r=" + r + " a=" + a + ") :" +
+                    " (x=" + x + ", y=" + y + ")");
         }
         rs.close();
 
@@ -100,7 +94,7 @@ public class FunctionMultiReturn {
      * called twice, once to retrieve the result columns (with null parameters),
      * and the second time to return the data.
      *
-     * @param r the distance from the point 0/0
+     * @param r     the distance from the point 0/0
      * @param alpha the angle
      * @return a result set with two columns: x and y
      */
@@ -121,7 +115,7 @@ public class FunctionMultiReturn {
      * called twice, once to retrieve the result columns (with null parameters),
      * and the second time to return the data.
      *
-     * @param r the distance from the point 0/0
+     * @param r     the distance from the point 0/0
      * @param alpha the angle
      * @return an array two values: x and y
      */
@@ -136,7 +130,7 @@ public class FunctionMultiReturn {
      * may be called twice, once to retrieve the result columns (with null
      * parameters), and the second time to return the data.
      *
-     * @param conn the connection
+     * @param conn  the connection
      * @param query the query
      * @return a result set with the coordinates
      */

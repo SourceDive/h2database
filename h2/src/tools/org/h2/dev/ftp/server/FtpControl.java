@@ -6,17 +6,14 @@
  */
 package org.h2.dev.ftp.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import org.h2.engine.Constants;
 import org.h2.store.fs.FileUtils;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * The implementation of the control channel of the FTP server.
@@ -145,214 +142,214 @@ public class FtpControl extends Thread {
 
     private void processConnected(String command, String param) throws IOException {
         switch (command.charAt(0)) {
-        case 'C':
-            if ("CWD".equals(command)) {
-                String path = getPath(param);
-                String fileName = getFileName(path);
-                if (FileUtils.exists(fileName) && FileUtils.isDirectory(fileName)) {
-                    if (!path.endsWith("/")) {
-                        path += "/";
-                    }
-                    currentDir = path;
-                    reply(250, "Ok");
-                } else {
-                    reply(550, "Failed");
-                }
-            } else if ("CDUP".equals(command)) {
-                if (currentDir.length() > 1) {
-                    int idx = currentDir.lastIndexOf("/", currentDir.length() - 2);
-                    currentDir = currentDir.substring(0, idx + 1);
-                    reply(250, "Ok");
-                } else {
-                    reply(550, "Failed");
-                }
-            }
-            break;
-        case 'D':
-            if ("DELE".equals(command)) {
-                String fileName = getFileName(param);
-                if (!readonly && FileUtils.exists(fileName)
-                        && !FileUtils.isDirectory(fileName)
-                        && FileUtils.tryDelete(fileName)) {
-                    if (server.getAllowTask() && fileName.endsWith(FtpServer.TASK_SUFFIX)) {
-                        server.stopTask(fileName);
-                    }
-                    reply(250, "Ok");
-                } else {
-                    reply(500, "Delete failed");
-                }
-            }
-            break;
-        case 'L':
-            if ("LIST".equals(command)) {
-                processList(param, true);
-            }
-            break;
-        case 'M':
-            if ("MKD".equals(command)) {
-                processMakeDir(param);
-            } else if ("MODE".equals(command)) {
-                if ("S".equals(StringUtils.toUpperEnglish(param))) {
-                    reply(200, "Ok");
-                } else {
-                    reply(504, "Invalid");
-                }
-            } else if ("MDTM".equals(command)) {
-                String fileName = getFileName(param);
-                if (FileUtils.exists(fileName) && !FileUtils.isDirectory(fileName)) {
-                    reply(213, server.formatLastModified(fileName));
-                } else {
-                    reply(550, "Failed");
-                }
-            }
-            break;
-        case 'N':
-            if ("NLST".equals(command)) {
-                processList(param, false);
-            } else if ("NOOP".equals(command)) {
-                reply(200, "Ok");
-            }
-            break;
-        case 'P':
-            if ("PWD".equals(command)) {
-                reply(257, StringUtils.quoteIdentifier(currentDir) + " directory");
-            } else if ("PASV".equals(command)) {
-                ServerSocket dataSocket = FtpServer.createDataSocket();
-                data = new FtpData(server, control.getInetAddress(), dataSocket);
-                data.start();
-                int port = dataSocket.getLocalPort();
-                reply(227, "Passive Mode (" + serverIpAddress + ","
-                        + (port >> 8) + "," + (port & 255) + ")");
-            } else if ("PORT".equals(command)) {
-                String[] list = StringUtils.arraySplit(param, ',', true);
-                String host = list[0] + "." + list[1] + "." + list[2] + "." + list[3];
-                int port = (Integer.parseInt(list[4]) << 8) | Integer.parseInt(list[5]);
-                InetAddress address = InetAddress.getByName(host);
-                if (address.equals(control.getInetAddress())) {
-                    data = new FtpData(server, address, port);
-                    reply(200, "Ok");
-                } else {
-                    server.trace("Port REJECTED:" + address + " expected:"
-                            + control.getInetAddress());
-                    reply(550, "Failed");
-                }
-            }
-            break;
-        case 'R':
-            if ("RNFR".equals(command)) {
-                String fileName = getFileName(param);
-                if (FileUtils.exists(fileName)) {
-                    renameFrom = fileName;
-                    reply(350, "Ok");
-                } else {
-                    reply(450, "Not found");
-                }
-            } else if ("RNTO".equals(command)) {
-                if (renameFrom == null) {
-                    reply(503, "RNFR required");
-                } else {
-                    String fileOld = renameFrom;
-                    String fileNew = getFileName(param);
-                    boolean ok = false;
-                    if (!readonly) {
-                        try {
-                            FileUtils.moveTo(fileOld, fileNew);
-                            reply(250, "Ok");
-                            ok = true;
-                        } catch (Exception e) {
-                            server.traceError(e);
+            case 'C':
+                if ("CWD".equals(command)) {
+                    String path = getPath(param);
+                    String fileName = getFileName(path);
+                    if (FileUtils.exists(fileName) && FileUtils.isDirectory(fileName)) {
+                        if (!path.endsWith("/")) {
+                            path += "/";
                         }
+                        currentDir = path;
+                        reply(250, "Ok");
+                    } else {
+                        reply(550, "Failed");
                     }
-                    if (!ok) {
+                } else if ("CDUP".equals(command)) {
+                    if (currentDir.length() > 1) {
+                        int idx = currentDir.lastIndexOf("/", currentDir.length() - 2);
+                        currentDir = currentDir.substring(0, idx + 1);
+                        reply(250, "Ok");
+                    } else {
                         reply(550, "Failed");
                     }
                 }
-            } else if ("RETR".equals(command)) {
-                String fileName = getFileName(param);
-                if (FileUtils.exists(fileName) && !FileUtils.isDirectory(fileName)) {
-                    reply(150, "Starting transfer");
-                    try {
-                        data.send(fileName, restart);
-                        reply(226, "Ok");
-                    } catch (IOException e) {
-                        server.traceError(e);
-                        reply(426, "Failed");
-                    }
-                    restart = 0;
-                } else {
-                    // Firefox compatibility
-                    // (still not good)
-                    processList(param, true);
-                    // reply(426, "Not a file");
-                }
-            } else if ("RMD".equals(command)) {
-                processRemoveDir(param);
-            } else if ("REST".equals(command)) {
-                try {
-                    restart = Integer.parseInt(param);
-                    reply(350, "Ok");
-                } catch (NumberFormatException e) {
-                    reply(500, "Invalid");
-                }
-            }
-            break;
-        case 'S':
-            if ("SYST".equals(command)) {
-                reply(215, "UNIX Type: L8");
-            } else if ("SITE".equals(command)) {
-                reply(500, "Not understood");
-            } else if ("SIZE".equals(command)) {
-                param = getFileName(param);
-                if (FileUtils.exists(param) && !FileUtils.isDirectory(param)) {
-                    reply(250, String.valueOf(FileUtils.size(param)));
-                } else {
-                    reply(500, "Failed");
-                }
-            } else if ("STOR".equals(command)) {
-                String fileName = getFileName(param);
-                if (!readonly && !FileUtils.exists(fileName)
-                        || !FileUtils.isDirectory(fileName)) {
-                    reply(150, "Starting transfer");
-                    try {
-                        data.receive(fileName);
-                        if (server.getAllowTask() && param.endsWith(FtpServer.TASK_SUFFIX)) {
-                            server.startTask(fileName);
+                break;
+            case 'D':
+                if ("DELE".equals(command)) {
+                    String fileName = getFileName(param);
+                    if (!readonly && FileUtils.exists(fileName)
+                            && !FileUtils.isDirectory(fileName)
+                            && FileUtils.tryDelete(fileName)) {
+                        if (server.getAllowTask() && fileName.endsWith(FtpServer.TASK_SUFFIX)) {
+                            server.stopTask(fileName);
                         }
-                        reply(226, "Ok");
-                    } catch (Exception e) {
-                        server.traceError(e);
-                        reply(426, "Failed");
+                        reply(250, "Ok");
+                    } else {
+                        reply(500, "Delete failed");
                     }
-                } else {
-                    reply(550, "Failed");
                 }
-            } else if ("STRU".equals(command)) {
-                if ("F".equals(StringUtils.toUpperEnglish(param))) {
-                    reply(200, "Ok");
-                } else {
-                    reply(504, "Invalid");
+                break;
+            case 'L':
+                if ("LIST".equals(command)) {
+                    processList(param, true);
                 }
-            }
-            break;
-        case 'T':
-            if ("TYPE".equals(command)) {
-                param = StringUtils.toUpperEnglish(param);
-                if ("A".equals(param) || "A N".equals(param)) {
-                    reply(200, "Ok");
-                } else if ("I".equals(param) || "L 8".equals(param)) {
-                    reply(200, "Ok");
-                } else {
-                    reply(500, "Invalid");
+                break;
+            case 'M':
+                if ("MKD".equals(command)) {
+                    processMakeDir(param);
+                } else if ("MODE".equals(command)) {
+                    if ("S".equals(StringUtils.toUpperEnglish(param))) {
+                        reply(200, "Ok");
+                    } else {
+                        reply(504, "Invalid");
+                    }
+                } else if ("MDTM".equals(command)) {
+                    String fileName = getFileName(param);
+                    if (FileUtils.exists(fileName) && !FileUtils.isDirectory(fileName)) {
+                        reply(213, server.formatLastModified(fileName));
+                    } else {
+                        reply(550, "Failed");
+                    }
                 }
-            }
-            break;
-        case 'X':
-            if ("XMKD".equals(command)) {
-                processMakeDir(param);
-            } else if ("XRMD".equals(command)) {
-                processRemoveDir(param);
-            }
-            break;
+                break;
+            case 'N':
+                if ("NLST".equals(command)) {
+                    processList(param, false);
+                } else if ("NOOP".equals(command)) {
+                    reply(200, "Ok");
+                }
+                break;
+            case 'P':
+                if ("PWD".equals(command)) {
+                    reply(257, StringUtils.quoteIdentifier(currentDir) + " directory");
+                } else if ("PASV".equals(command)) {
+                    ServerSocket dataSocket = FtpServer.createDataSocket();
+                    data = new FtpData(server, control.getInetAddress(), dataSocket);
+                    data.start();
+                    int port = dataSocket.getLocalPort();
+                    reply(227, "Passive Mode (" + serverIpAddress + ","
+                            + (port >> 8) + "," + (port & 255) + ")");
+                } else if ("PORT".equals(command)) {
+                    String[] list = StringUtils.arraySplit(param, ',', true);
+                    String host = list[0] + "." + list[1] + "." + list[2] + "." + list[3];
+                    int port = (Integer.parseInt(list[4]) << 8) | Integer.parseInt(list[5]);
+                    InetAddress address = InetAddress.getByName(host);
+                    if (address.equals(control.getInetAddress())) {
+                        data = new FtpData(server, address, port);
+                        reply(200, "Ok");
+                    } else {
+                        server.trace("Port REJECTED:" + address + " expected:"
+                                + control.getInetAddress());
+                        reply(550, "Failed");
+                    }
+                }
+                break;
+            case 'R':
+                if ("RNFR".equals(command)) {
+                    String fileName = getFileName(param);
+                    if (FileUtils.exists(fileName)) {
+                        renameFrom = fileName;
+                        reply(350, "Ok");
+                    } else {
+                        reply(450, "Not found");
+                    }
+                } else if ("RNTO".equals(command)) {
+                    if (renameFrom == null) {
+                        reply(503, "RNFR required");
+                    } else {
+                        String fileOld = renameFrom;
+                        String fileNew = getFileName(param);
+                        boolean ok = false;
+                        if (!readonly) {
+                            try {
+                                FileUtils.moveTo(fileOld, fileNew);
+                                reply(250, "Ok");
+                                ok = true;
+                            } catch (Exception e) {
+                                server.traceError(e);
+                            }
+                        }
+                        if (!ok) {
+                            reply(550, "Failed");
+                        }
+                    }
+                } else if ("RETR".equals(command)) {
+                    String fileName = getFileName(param);
+                    if (FileUtils.exists(fileName) && !FileUtils.isDirectory(fileName)) {
+                        reply(150, "Starting transfer");
+                        try {
+                            data.send(fileName, restart);
+                            reply(226, "Ok");
+                        } catch (IOException e) {
+                            server.traceError(e);
+                            reply(426, "Failed");
+                        }
+                        restart = 0;
+                    } else {
+                        // Firefox compatibility
+                        // (still not good)
+                        processList(param, true);
+                        // reply(426, "Not a file");
+                    }
+                } else if ("RMD".equals(command)) {
+                    processRemoveDir(param);
+                } else if ("REST".equals(command)) {
+                    try {
+                        restart = Integer.parseInt(param);
+                        reply(350, "Ok");
+                    } catch (NumberFormatException e) {
+                        reply(500, "Invalid");
+                    }
+                }
+                break;
+            case 'S':
+                if ("SYST".equals(command)) {
+                    reply(215, "UNIX Type: L8");
+                } else if ("SITE".equals(command)) {
+                    reply(500, "Not understood");
+                } else if ("SIZE".equals(command)) {
+                    param = getFileName(param);
+                    if (FileUtils.exists(param) && !FileUtils.isDirectory(param)) {
+                        reply(250, String.valueOf(FileUtils.size(param)));
+                    } else {
+                        reply(500, "Failed");
+                    }
+                } else if ("STOR".equals(command)) {
+                    String fileName = getFileName(param);
+                    if (!readonly && !FileUtils.exists(fileName)
+                            || !FileUtils.isDirectory(fileName)) {
+                        reply(150, "Starting transfer");
+                        try {
+                            data.receive(fileName);
+                            if (server.getAllowTask() && param.endsWith(FtpServer.TASK_SUFFIX)) {
+                                server.startTask(fileName);
+                            }
+                            reply(226, "Ok");
+                        } catch (Exception e) {
+                            server.traceError(e);
+                            reply(426, "Failed");
+                        }
+                    } else {
+                        reply(550, "Failed");
+                    }
+                } else if ("STRU".equals(command)) {
+                    if ("F".equals(StringUtils.toUpperEnglish(param))) {
+                        reply(200, "Ok");
+                    } else {
+                        reply(504, "Invalid");
+                    }
+                }
+                break;
+            case 'T':
+                if ("TYPE".equals(command)) {
+                    param = StringUtils.toUpperEnglish(param);
+                    if ("A".equals(param) || "A N".equals(param)) {
+                        reply(200, "Ok");
+                    } else if ("I".equals(param) || "L 8".equals(param)) {
+                        reply(200, "Ok");
+                    } else {
+                        reply(500, "Invalid");
+                    }
+                }
+                break;
+            case 'X':
+                if ("XMKD".equals(command)) {
+                    processMakeDir(param);
+                } else if ("XRMD".equals(command)) {
+                    processRemoveDir(param);
+                }
+                break;
         }
     }
 

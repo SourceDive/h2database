@@ -46,7 +46,7 @@ public interface Cache {
      * Update an element in the cache.
      * This will move the item to the front of the list.
      *
-     * @param pos the unique key of the element
+     * @param pos    the unique key of the element
      * @param record the element
      * @return the element
      */

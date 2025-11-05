@@ -6,18 +6,11 @@
  */
 package org.h2.command.dml;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
 import org.h2.engine.Session;
 import org.h2.engine.SysProperties;
-import org.h2.expression.Expression;
-import org.h2.expression.ExpressionColumn;
-import org.h2.expression.ExpressionVisitor;
-import org.h2.expression.Parameter;
-import org.h2.expression.ValueExpression;
+import org.h2.expression.*;
 import org.h2.message.DbException;
 import org.h2.result.LocalResult;
 import org.h2.result.ResultInterface;
@@ -32,6 +25,9 @@ import org.h2.util.StringUtils;
 import org.h2.value.Value;
 import org.h2.value.ValueInt;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Represents a union SELECT statement.
@@ -176,62 +172,62 @@ public class SelectUnion extends Query {
             result.setRandomAccess();
         }
         switch (unionType) {
-        case UNION:
-        case EXCEPT:
-            left.setDistinct(true);
-            right.setDistinct(true);
-            result.setDistinct();
-            break;
-        case UNION_ALL:
-            break;
-        case INTERSECT:
-            left.setDistinct(true);
-            right.setDistinct(true);
-            break;
-        default:
-            DbException.throwInternalError("type=" + unionType);
+            case UNION:
+            case EXCEPT:
+                left.setDistinct(true);
+                right.setDistinct(true);
+                result.setDistinct();
+                break;
+            case UNION_ALL:
+                break;
+            case INTERSECT:
+                left.setDistinct(true);
+                right.setDistinct(true);
+                break;
+            default:
+                DbException.throwInternalError("type=" + unionType);
         }
         ResultInterface l = left.query(0);
         ResultInterface r = right.query(0);
         l.reset();
         r.reset();
         switch (unionType) {
-        case UNION_ALL:
-        case UNION: {
-            while (l.next()) {
-                result.addRow(convert(l.currentRow(), columnCount));
-            }
-            while (r.next()) {
-                result.addRow(convert(r.currentRow(), columnCount));
-            }
-            break;
-        }
-        case EXCEPT: {
-            while (l.next()) {
-                result.addRow(convert(l.currentRow(), columnCount));
-            }
-            while (r.next()) {
-                result.removeDistinct(convert(r.currentRow(), columnCount));
-            }
-            break;
-        }
-        case INTERSECT: {
-            LocalResult temp = new LocalResult(session, expressionArray, columnCount);
-            temp.setDistinct();
-            temp.setRandomAccess();
-            while (l.next()) {
-                temp.addRow(convert(l.currentRow(), columnCount));
-            }
-            while (r.next()) {
-                Value[] values = convert(r.currentRow(), columnCount);
-                if (temp.containsDistinct(values)) {
-                    result.addRow(values);
+            case UNION_ALL:
+            case UNION: {
+                while (l.next()) {
+                    result.addRow(convert(l.currentRow(), columnCount));
                 }
+                while (r.next()) {
+                    result.addRow(convert(r.currentRow(), columnCount));
+                }
+                break;
             }
-            break;
-        }
-        default:
-            DbException.throwInternalError("type=" + unionType);
+            case EXCEPT: {
+                while (l.next()) {
+                    result.addRow(convert(l.currentRow(), columnCount));
+                }
+                while (r.next()) {
+                    result.removeDistinct(convert(r.currentRow(), columnCount));
+                }
+                break;
+            }
+            case INTERSECT: {
+                LocalResult temp = new LocalResult(session, expressionArray, columnCount);
+                temp.setDistinct();
+                temp.setRandomAccess();
+                while (l.next()) {
+                    temp.addRow(convert(l.currentRow(), columnCount));
+                }
+                while (r.next()) {
+                    Value[] values = convert(r.currentRow(), columnCount);
+                    if (temp.containsDistinct(values)) {
+                        result.addRow(values);
+                    }
+                }
+                break;
+            }
+            default:
+                DbException.throwInternalError("type=" + unionType);
         }
         if (offsetExpr != null) {
             result.setOffset(offsetExpr.getValue(session).getInt());
@@ -355,22 +351,22 @@ public class SelectUnion extends Query {
 
     @Override
     public void addGlobalCondition(Parameter param, int columnId,
-            int comparisonType) {
+                                   int comparisonType) {
         addParameter(param);
         switch (unionType) {
-        case UNION_ALL:
-        case UNION:
-        case INTERSECT: {
-            left.addGlobalCondition(param, columnId, comparisonType);
-            right.addGlobalCondition(param, columnId, comparisonType);
-            break;
-        }
-        case EXCEPT: {
-            left.addGlobalCondition(param, columnId, comparisonType);
-            break;
-        }
-        default:
-            DbException.throwInternalError("type=" + unionType);
+            case UNION_ALL:
+            case UNION:
+            case INTERSECT: {
+                left.addGlobalCondition(param, columnId, comparisonType);
+                right.addGlobalCondition(param, columnId, comparisonType);
+                break;
+            }
+            case EXCEPT: {
+                left.addGlobalCondition(param, columnId, comparisonType);
+                break;
+            }
+            default:
+                DbException.throwInternalError("type=" + unionType);
         }
     }
 
@@ -379,20 +375,20 @@ public class SelectUnion extends Query {
         StringBuilder buff = new StringBuilder();
         buff.append('(').append(left.getPlanSQL()).append(')');
         switch (unionType) {
-        case UNION_ALL:
-            buff.append("\nUNION ALL\n");
-            break;
-        case UNION:
-            buff.append("\nUNION\n");
-            break;
-        case INTERSECT:
-            buff.append("\nINTERSECT\n");
-            break;
-        case EXCEPT:
-            buff.append("\nEXCEPT\n");
-            break;
-        default:
-            DbException.throwInternalError("type=" + unionType);
+            case UNION_ALL:
+                buff.append("\nUNION ALL\n");
+                break;
+            case UNION:
+                buff.append("\nUNION\n");
+                break;
+            case INTERSECT:
+                buff.append("\nINTERSECT\n");
+                break;
+            case EXCEPT:
+                buff.append("\nEXCEPT\n");
+                break;
+            default:
+                DbException.throwInternalError("type=" + unionType);
         }
         buff.append('(').append(right.getPlanSQL()).append(')');
         Expression[] exprList = expressions.toArray(new Expression[expressions.size()]);

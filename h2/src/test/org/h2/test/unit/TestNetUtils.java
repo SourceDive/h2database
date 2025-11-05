@@ -6,15 +6,16 @@
  */
 package org.h2.test.unit;
 
+import org.h2.test.TestBase;
+import org.h2.util.NetUtils;
+import org.h2.util.Task;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.h2.test.TestBase;
-import org.h2.util.NetUtils;
-import org.h2.util.Task;
 
 /**
  * Test the network utilities.

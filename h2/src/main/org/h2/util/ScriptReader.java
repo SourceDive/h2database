@@ -6,12 +6,13 @@
  */
 package org.h2.util;
 
+import org.h2.engine.Constants;
+import org.h2.message.DbException;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
-import org.h2.engine.Constants;
-import org.h2.message.DbException;
 
 /**
  * This class can split SQL scripts to single SQL statements.
@@ -117,117 +118,117 @@ public class ScriptReader implements Closeable {
                 break;
             }
             switch (c) {
-            case '$': {
-                c = read();
-                if (c == '$' && (bufferPos - bufferStart < 3 || buffer[bufferPos - 3] <= ' ')) {
-                    // dollar quoted string
-                    while (true) {
-                        c = read();
-                        if (c < 0) {
-                            break;
-                        }
-                        if (c == '$') {
+                case '$': {
+                    c = read();
+                    if (c == '$' && (bufferPos - bufferStart < 3 || buffer[bufferPos - 3] <= ' ')) {
+                        // dollar quoted string
+                        while (true) {
                             c = read();
                             if (c < 0) {
                                 break;
                             }
                             if (c == '$') {
-                                break;
+                                c = read();
+                                if (c < 0) {
+                                    break;
+                                }
+                                if (c == '$') {
+                                    break;
+                                }
                             }
                         }
+                        c = read();
                     }
-                    c = read();
+                    break;
                 }
-                break;
-            }
-            case '\'':
-                while (true) {
-                    c = read();
-                    if (c < 0) {
-                        break;
-                    }
-                    if (c == '\'') {
-                        break;
-                    }
-                }
-                c = read();
-                break;
-            case '"':
-                while (true) {
-                    c = read();
-                    if (c < 0) {
-                        break;
-                    }
-                    if (c == '\"') {
-                        break;
-                    }
-                }
-                c = read();
-                break;
-            case '/': {
-                c = read();
-                if (c == '*') {
-                    // block comment
-                    startRemark(true);
+                case '\'':
                     while (true) {
                         c = read();
                         if (c < 0) {
                             break;
                         }
-                        if (c == '*') {
+                        if (c == '\'') {
+                            break;
+                        }
+                    }
+                    c = read();
+                    break;
+                case '"':
+                    while (true) {
+                        c = read();
+                        if (c < 0) {
+                            break;
+                        }
+                        if (c == '\"') {
+                            break;
+                        }
+                    }
+                    c = read();
+                    break;
+                case '/': {
+                    c = read();
+                    if (c == '*') {
+                        // block comment
+                        startRemark(true);
+                        while (true) {
+                            c = read();
+                            if (c < 0) {
+                                break;
+                            }
+                            if (c == '*') {
+                                c = read();
+                                if (c < 0) {
+                                    clearRemark();
+                                    break;
+                                }
+                                if (c == '/') {
+                                    endRemark();
+                                    break;
+                                }
+                            }
+                        }
+                        c = read();
+                    } else if (c == '/') {
+                        // single line comment
+                        startRemark(false);
+                        while (true) {
                             c = read();
                             if (c < 0) {
                                 clearRemark();
                                 break;
                             }
-                            if (c == '/') {
+                            if (c == '\r' || c == '\n') {
                                 endRemark();
                                 break;
                             }
                         }
-                    }
-                    c = read();
-                } else if (c == '/') {
-                    // single line comment
-                    startRemark(false);
-                    while (true) {
                         c = read();
-                        if (c < 0) {
-                            clearRemark();
-                            break;
-                        }
-                        if (c == '\r' || c == '\n') {
-                            endRemark();
-                            break;
-                        }
                     }
+                    break;
+                }
+                case '-': {
+                    c = read();
+                    if (c == '-') {
+                        // single line comment
+                        startRemark(false);
+                        while (true) {
+                            c = read();
+                            if (c < 0) {
+                                clearRemark();
+                                break;
+                            }
+                            if (c == '\r' || c == '\n') {
+                                endRemark();
+                                break;
+                            }
+                        }
+                        c = read();
+                    }
+                    break;
+                }
+                default: {
                     c = read();
                 }
-                break;
-            }
-            case '-': {
-                c = read();
-                if (c == '-') {
-                    // single line comment
-                    startRemark(false);
-                    while (true) {
-                        c = read();
-                        if (c < 0) {
-                            clearRemark();
-                            break;
-                        }
-                        if (c == '\r' || c == '\n') {
-                            endRemark();
-                            break;
-                        }
-                    }
-                    c = read();
-                }
-                break;
-            }
-            default: {
-                c = read();
-            }
             }
         }
         return new String(buffer, bufferStart, bufferPos - 1 - bufferStart);

@@ -86,7 +86,7 @@ public class BenchB implements Bench, Runnable {
                         "BID INT, ABALANCE INT, FILLER VARCHAR(84))",
                 "CREATE TABLE HISTORY(" +
                         "TID INT, BID INT, AID INT, " +
-                        "DELTA INT, TIME DATETIME, FILLER VARCHAR(22))" };
+                        "DELTA INT, TIME DATETIME, FILLER VARCHAR(22))"};
         for (String sql : create) {
             db.update(sql);
         }

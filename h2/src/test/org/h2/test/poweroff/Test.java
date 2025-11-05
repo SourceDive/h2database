@@ -6,18 +6,9 @@
  */
 package org.h2.test.poweroff;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * This application tests the durability / non-durability of file systems and
@@ -37,7 +28,7 @@ public class Test {
     }
 
     private Test(String driver, String url, String user, String password,
-            boolean writeDelay0) {
+                 boolean writeDelay0) {
         this.url = url;
         try {
             Class.forName(driver);
@@ -157,8 +148,8 @@ public class Test {
                 new Test("org.h2.Driver",
                         "jdbc:h2:test5", "sa", "", true),
                 new Test("org.h2.Driver",
-                        "jdbc:h2:test6", "sa", "", false), };
-        for (int i = 0;; i++) {
+                        "jdbc:h2:test6", "sa", "", false),};
+        for (int i = 0; ; i++) {
             for (Test t : dbs) {
                 t.insert(i);
             }

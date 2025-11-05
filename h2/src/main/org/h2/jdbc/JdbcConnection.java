@@ -6,48 +6,23 @@
  */
 package org.h2.jdbc;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.NClob;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLClientInfoException;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.sql.Struct;
-import java.util.Map;
-import java.util.Properties;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
-import org.h2.engine.ConnectionInfo;
-import org.h2.engine.Constants;
-import org.h2.engine.SessionInterface;
-import org.h2.engine.SessionRemote;
-import org.h2.engine.SysProperties;
+import org.h2.engine.*;
 import org.h2.message.DbException;
 import org.h2.message.TraceObject;
 import org.h2.result.ResultInterface;
 import org.h2.util.CloseWatcher;
 import org.h2.util.Utils;
-import org.h2.value.CompareMode;
-import org.h2.value.Value;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueString;
+import org.h2.value.*;
 
-//## Java 1.7 ##
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.sql.*;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Executor;
 //*/
 
@@ -200,12 +175,11 @@ public class JdbcConnection extends TraceObject implements Connection {
     /**
      * Creates a statement with the specified result set type and concurrency.
      *
-     * @param resultSetType the result set type (ResultSet.TYPE_*)
+     * @param resultSetType        the result set type (ResultSet.TYPE_*)
      * @param resultSetConcurrency the concurrency (ResultSet.CONCUR_*)
      * @return the statement
-     * @throws SQLException
-     *             if the connection is closed or the result set type or
-     *             concurrency are not supported
+     * @throws SQLException if the connection is closed or the result set type or
+     *                      concurrency are not supported
      */
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency)
@@ -228,23 +202,23 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Creates a statement with the specified result set type, concurrency, and
      * holdability.
      *
-     * @param resultSetType the result set type (ResultSet.TYPE_*)
+     * @param resultSetType        the result set type (ResultSet.TYPE_*)
      * @param resultSetConcurrency the concurrency (ResultSet.CONCUR_*)
      * @param resultSetHoldability the holdability (ResultSet.HOLD* / CLOSE*)
      * @return the statement
      * @throws SQLException if the connection is closed or the result set type,
-     *             concurrency, or holdability are not supported
+     *                      concurrency, or holdability are not supported
      */
     @Override
     public Statement createStatement(int resultSetType,
-            int resultSetConcurrency, int resultSetHoldability)
+                                     int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
         try {
             int id = getNextId(TraceObject.STATEMENT);
             if (isDebugEnabled()) {
                 debugCodeAssign("Statement", TraceObject.STATEMENT, id,
                         "createStatement(" + resultSetType + ", " +
-                        resultSetConcurrency + ", " + resultSetHoldability + ")");
+                                resultSetConcurrency + ", " + resultSetHoldability + ")");
             }
             checkTypeConcurrency(resultSetType, resultSetConcurrency);
             checkHoldability(resultSetHoldability);
@@ -640,17 +614,16 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Creates a prepared statement with the specified result set type and
      * concurrency.
      *
-     * @param sql the SQL statement
-     * @param resultSetType the result set type (ResultSet.TYPE_*)
+     * @param sql                  the SQL statement
+     * @param resultSetType        the result set type (ResultSet.TYPE_*)
      * @param resultSetConcurrency the concurrency (ResultSet.CONCUR_*)
      * @return the prepared statement
-     * @throws SQLException
-     *             if the connection is closed or the result set type or
-     *             concurrency are not supported
+     * @throws SQLException if the connection is closed or the result set type or
+     *                      concurrency are not supported
      */
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType,
-            int resultSetConcurrency) throws SQLException {
+                                              int resultSetConcurrency) throws SQLException {
         try {
             int id = getNextId(TraceObject.PREPARED_STATEMENT);
             if (isDebugEnabled()) {
@@ -687,11 +660,11 @@ public class JdbcConnection extends TraceObject implements Connection {
      * connections may result in inconsistent transactions.
      *
      * @param level the new transaction isolation level:
-     *            Connection.TRANSACTION_READ_UNCOMMITTED,
-     *            Connection.TRANSACTION_READ_COMMITTED, or
-     *            Connection.TRANSACTION_SERIALIZABLE
+     *              Connection.TRANSACTION_READ_UNCOMMITTED,
+     *              Connection.TRANSACTION_READ_COMMITTED, or
+     *              Connection.TRANSACTION_SERIALIZABLE
      * @throws SQLException if the connection is closed or the isolation level
-     *             is not supported
+     *                      is not supported
      */
     @Override
     public void setTransactionIsolation(int level) throws SQLException {
@@ -699,19 +672,19 @@ public class JdbcConnection extends TraceObject implements Connection {
             debugCodeCall("setTransactionIsolation", level);
             checkClosed();
             int lockMode;
-            switch(level) {
-            case Connection.TRANSACTION_READ_UNCOMMITTED:
-                lockMode = Constants.LOCK_MODE_OFF;
-                break;
-            case Connection.TRANSACTION_READ_COMMITTED:
-                lockMode = Constants.LOCK_MODE_READ_COMMITTED;
-                break;
-            case Connection.TRANSACTION_REPEATABLE_READ:
-            case Connection.TRANSACTION_SERIALIZABLE:
-                lockMode = Constants.LOCK_MODE_TABLE;
-                break;
-            default:
-                throw DbException.getInvalidValueException("level", level);
+            switch (level) {
+                case Connection.TRANSACTION_READ_UNCOMMITTED:
+                    lockMode = Constants.LOCK_MODE_OFF;
+                    break;
+                case Connection.TRANSACTION_READ_COMMITTED:
+                    lockMode = Constants.LOCK_MODE_READ_COMMITTED;
+                    break;
+                case Connection.TRANSACTION_REPEATABLE_READ:
+                case Connection.TRANSACTION_SERIALIZABLE:
+                    lockMode = Constants.LOCK_MODE_TABLE;
+                    break;
+                default:
+                    throw DbException.getInvalidValueException("level", level);
             }
             commit();
             setLockMode = prepareCommand("SET LOCK_MODE ?", setLockMode);
@@ -749,7 +722,7 @@ public class JdbcConnection extends TraceObject implements Connection {
                 checkClosed();
                 getQueryTimeout = prepareCommand(
                         "SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS " +
-                        "WHERE NAME=?", getQueryTimeout);
+                                "WHERE NAME=?", getQueryTimeout);
                 getQueryTimeout.getParameters().get(0).
                         setValue(ValueString.get("QUERY_TIMEOUT"), false);
                 ResultInterface result = getQueryTimeout.executeQuery(0, false);
@@ -786,19 +759,19 @@ public class JdbcConnection extends TraceObject implements Connection {
             int lockMode = result.currentRow()[0].getInt();
             result.close();
             int transactionIsolationLevel;
-            switch(lockMode) {
-            case Constants.LOCK_MODE_OFF:
-                transactionIsolationLevel = Connection.TRANSACTION_READ_UNCOMMITTED;
-                break;
-            case Constants.LOCK_MODE_READ_COMMITTED:
-                transactionIsolationLevel = Connection.TRANSACTION_READ_COMMITTED;
-                break;
-            case Constants.LOCK_MODE_TABLE:
-            case Constants.LOCK_MODE_TABLE_GC:
-                transactionIsolationLevel = Connection.TRANSACTION_SERIALIZABLE;
-                break;
-            default:
-                throw DbException.throwInternalError("lockMode:" + lockMode);
+            switch (lockMode) {
+                case Constants.LOCK_MODE_OFF:
+                    transactionIsolationLevel = Connection.TRANSACTION_READ_UNCOMMITTED;
+                    break;
+                case Constants.LOCK_MODE_READ_COMMITTED:
+                    transactionIsolationLevel = Connection.TRANSACTION_READ_COMMITTED;
+                    break;
+                case Constants.LOCK_MODE_TABLE:
+                case Constants.LOCK_MODE_TABLE_GC:
+                    transactionIsolationLevel = Connection.TRANSACTION_SERIALIZABLE;
+                    break;
+                default:
+                    throw DbException.throwInternalError("lockMode:" + lockMode);
             }
             return transactionIsolationLevel;
         } catch (Exception e) {
@@ -809,12 +782,10 @@ public class JdbcConnection extends TraceObject implements Connection {
     /**
      * Changes the current result set holdability.
      *
-     * @param holdability
-     *            ResultSet.HOLD_CURSORS_OVER_COMMIT or
-     *            ResultSet.CLOSE_CURSORS_AT_COMMIT;
-     * @throws SQLException
-     *            if the connection is closed or the holdability is not
-     *            supported
+     * @param holdability ResultSet.HOLD_CURSORS_OVER_COMMIT or
+     *                    ResultSet.CLOSE_CURSORS_AT_COMMIT;
+     * @throws SQLException if the connection is closed or the holdability is not
+     *                      supported
      */
     @Override
     public void setHoldability(int holdability) throws SQLException {
@@ -881,8 +852,7 @@ public class JdbcConnection extends TraceObject implements Connection {
      *
      * @param sql the SQL statement
      * @return the callable statement
-     * @throws SQLException
-     *             if the connection is closed or the statement is not valid
+     * @throws SQLException if the connection is closed or the statement is not valid
      */
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
@@ -907,17 +877,16 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Creates a callable statement with the specified result set type and
      * concurrency.
      *
-     * @param sql the SQL statement
-     * @param resultSetType the result set type (ResultSet.TYPE_*)
+     * @param sql                  the SQL statement
+     * @param resultSetType        the result set type (ResultSet.TYPE_*)
      * @param resultSetConcurrency the concurrency (ResultSet.CONCUR_*)
      * @return the callable statement
-     * @throws SQLException
-     *             if the connection is closed or the result set type or
-     *             concurrency are not supported
+     * @throws SQLException if the connection is closed or the result set type or
+     *                      concurrency are not supported
      */
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType,
-            int resultSetConcurrency) throws SQLException {
+                                         int resultSetConcurrency) throws SQLException {
         try {
             int id = getNextId(TraceObject.CALLABLE_STATEMENT);
             if (isDebugEnabled()) {
@@ -940,18 +909,17 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Creates a callable statement with the specified result set type,
      * concurrency, and holdability.
      *
-     * @param sql the SQL statement
-     * @param resultSetType the result set type (ResultSet.TYPE_*)
+     * @param sql                  the SQL statement
+     * @param resultSetType        the result set type (ResultSet.TYPE_*)
      * @param resultSetConcurrency the concurrency (ResultSet.CONCUR_*)
      * @param resultSetHoldability the holdability (ResultSet.HOLD* / CLOSE*)
      * @return the callable statement
-     * @throws SQLException
-     *             if the connection is closed or the result set type,
-     *             concurrency, or holdability are not supported
+     * @throws SQLException if the connection is closed or the result set type,
+     *                      concurrency, or holdability are not supported
      */
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType,
-            int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+                                         int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         try {
             int id = getNextId(TraceObject.CALLABLE_STATEMENT);
             if (isDebugEnabled()) {
@@ -1070,25 +1038,25 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Creates a prepared statement with the specified result set type,
      * concurrency, and holdability.
      *
-     * @param sql the SQL statement
-     * @param resultSetType the result set type (ResultSet.TYPE_*)
+     * @param sql                  the SQL statement
+     * @param resultSetType        the result set type (ResultSet.TYPE_*)
      * @param resultSetConcurrency the concurrency (ResultSet.CONCUR_*)
      * @param resultSetHoldability the holdability (ResultSet.HOLD* / CLOSE*)
      * @return the prepared statement
      * @throws SQLException if the connection is closed or the result set type,
-     *             concurrency, or holdability are not supported
+     *                      concurrency, or holdability are not supported
      */
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType,
-            int resultSetConcurrency, int resultSetHoldability)
+                                              int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
         try {
             int id = getNextId(TraceObject.PREPARED_STATEMENT);
             if (isDebugEnabled()) {
                 debugCodeAssign("PreparedStatement", TraceObject.PREPARED_STATEMENT, id,
                         "prepareStatement(" + quote(sql) + ", " +
-                        resultSetType + ", " + resultSetConcurrency + ", " +
-                        resultSetHoldability + ")");
+                                resultSetType + ", " + resultSetConcurrency + ", " +
+                                resultSetHoldability + ")");
             }
             checkTypeConcurrency(resultSetType, resultSetConcurrency);
             checkHoldability(resultSetHoldability);
@@ -1106,11 +1074,10 @@ public class JdbcConnection extends TraceObject implements Connection {
      * This method just calls prepareStatement(String sql) internally.
      * The method getGeneratedKeys only supports one column.
      *
-     * @param sql the SQL statement
+     * @param sql               the SQL statement
      * @param autoGeneratedKeys ignored
      * @return the prepared statement
-     * @throws SQLException
-     *             if the connection is closed
+     * @throws SQLException if the connection is closed
      */
     @Override
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
@@ -1130,11 +1097,10 @@ public class JdbcConnection extends TraceObject implements Connection {
      * This method just calls prepareStatement(String sql) internally.
      * The method getGeneratedKeys only supports one column.
      *
-     * @param sql the SQL statement
+     * @param sql           the SQL statement
      * @param columnIndexes ignored
      * @return the prepared statement
-     * @throws SQLException
-     *             if the connection is closed
+     * @throws SQLException if the connection is closed
      */
     @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes)
@@ -1155,11 +1121,10 @@ public class JdbcConnection extends TraceObject implements Connection {
      * This method just calls prepareStatement(String sql) internally.
      * The method getGeneratedKeys only supports one column.
      *
-     * @param sql the SQL statement
+     * @param sql         the SQL statement
      * @param columnNames ignored
      * @return the prepared statement
-     * @throws SQLException
-     *             if the connection is closed
+     * @throws SQLException if the connection is closed
      */
     @Override
     public PreparedStatement prepareStatement(String sql, String[] columnNames)
@@ -1180,7 +1145,7 @@ public class JdbcConnection extends TraceObject implements Connection {
     /**
      * Prepare an command. This will parse the SQL statement.
      *
-     * @param sql the SQL statement
+     * @param sql       the SQL statement
      * @param fetchSize the fetch size (used in remote connections)
      * @return the command
      */
@@ -1194,63 +1159,63 @@ public class JdbcConnection extends TraceObject implements Connection {
 
     private static int translateGetEnd(String sql, int i, char c) {
         int len = sql.length();
-        switch(c) {
-        case '$': {
-            if (i < len - 1 && sql.charAt(i + 1) == '$' &&
-                    (i == 0 || sql.charAt(i - 1) <= ' ')) {
-                int j = sql.indexOf("$$", i + 2);
+        switch (c) {
+            case '$': {
+                if (i < len - 1 && sql.charAt(i + 1) == '$' &&
+                        (i == 0 || sql.charAt(i - 1) <= ' ')) {
+                    int j = sql.indexOf("$$", i + 2);
+                    if (j < 0) {
+                        throw DbException.getSyntaxError(sql, i);
+                    }
+                    return j + 1;
+                }
+                return i;
+            }
+            case '\'': {
+                int j = sql.indexOf('\'', i + 1);
                 if (j < 0) {
                     throw DbException.getSyntaxError(sql, i);
                 }
-                return j + 1;
+                return j;
             }
-            return i;
-        }
-        case '\'': {
-            int j = sql.indexOf('\'', i + 1);
-            if (j < 0) {
-                throw DbException.getSyntaxError(sql, i);
-            }
-            return j;
-        }
-        case '"': {
-            int j = sql.indexOf('"', i + 1);
-            if (j < 0) {
-                throw DbException.getSyntaxError(sql, i);
-            }
-            return j;
-        }
-        case '/': {
-            checkRunOver(i+1, len, sql);
-            if (sql.charAt(i + 1) == '*') {
-                // block comment
-                int j = sql.indexOf("*/", i + 2);
+            case '"': {
+                int j = sql.indexOf('"', i + 1);
                 if (j < 0) {
                     throw DbException.getSyntaxError(sql, i);
                 }
-                i = j + 1;
-            } else if (sql.charAt(i + 1) == '/') {
-                // single line comment
-                i += 2;
-                while (i < len && (c = sql.charAt(i)) != '\r' && c != '\n') {
-                    i++;
-                }
+                return j;
             }
-            return i;
-        }
-        case '-': {
-            checkRunOver(i+1, len, sql);
-            if (sql.charAt(i + 1) == '-') {
-                // single line comment
-                i += 2;
-                while (i < len && (c = sql.charAt(i)) != '\r' && c != '\n') {
-                    i++;
+            case '/': {
+                checkRunOver(i + 1, len, sql);
+                if (sql.charAt(i + 1) == '*') {
+                    // block comment
+                    int j = sql.indexOf("*/", i + 2);
+                    if (j < 0) {
+                        throw DbException.getSyntaxError(sql, i);
+                    }
+                    i = j + 1;
+                } else if (sql.charAt(i + 1) == '/') {
+                    // single line comment
+                    i += 2;
+                    while (i < len && (c = sql.charAt(i)) != '\r' && c != '\n') {
+                        i++;
+                    }
                 }
+                return i;
             }
-            return i;
-        }
-        default:
-            throw DbException.throwInternalError("c=" + c);
+            case '-': {
+                checkRunOver(i + 1, len, sql);
+                if (sql.charAt(i + 1) == '-') {
+                    // single line comment
+                    i += 2;
+                    while (i < len && (c = sql.charAt(i)) != '\r' && c != '\n') {
+                        i++;
+                    }
+                }
+                return i;
+            }
+            default:
+                throw DbException.throwInternalError("c=" + c);
         }
     }
 
@@ -1269,7 +1234,7 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Convert JDBC escape sequences in the SQL statement if required. This
      * method throws an exception if the SQL statement is null.
      *
-     * @param sql the SQL statement with or without JDBC escape sequences
+     * @param sql              the SQL statement with or without JDBC escape sequences
      * @param escapeProcessing whether escape sequences should be replaced
      * @return the SQL statement without JDBC escape sequences
      */
@@ -1289,97 +1254,97 @@ public class JdbcConnection extends TraceObject implements Connection {
         for (int i = 0; i < len; i++) {
             char c = sql.charAt(i);
             switch (c) {
-            case '\'':
-            case '"':
-            case '/':
-            case '-':
-                i = translateGetEnd(sql, i, c);
-                break;
-            case '{':
-                level++;
-                if (chars == null) {
-                    chars = sql.toCharArray();
-                }
-                chars[i] = ' ';
-                while (Character.isSpaceChar(chars[i])) {
-                    i++;
-                    checkRunOver(i, len, sql);
-                }
-                int start = i;
-                if (chars[i] >= '0' && chars[i] <= '9') {
-                    chars[i - 1] = '{';
-                    while (true) {
-                        checkRunOver(i, len, sql);
-                        c = chars[i];
-                        if (c == '}') {
-                            break;
-                        }
-                        switch (c) {
-                        case '\'':
-                        case '"':
-                        case '/':
-                        case '-':
-                            i = translateGetEnd(sql, i, c);
-                            break;
-                        default:
-                        }
-                        i++;
-                    }
-                    level--;
+                case '\'':
+                case '"':
+                case '/':
+                case '-':
+                    i = translateGetEnd(sql, i, c);
                     break;
-                } else if (chars[i] == '?') {
-                    i++;
-                    checkRunOver(i, len, sql);
-                    while (Character.isSpaceChar(chars[i])) {
-                        i++;
-                        checkRunOver(i, len, sql);
+                case '{':
+                    level++;
+                    if (chars == null) {
+                        chars = sql.toCharArray();
                     }
-                    if (sql.charAt(i) != '=') {
-                        throw DbException.getSyntaxError(sql, i, "=");
-                    }
-                    i++;
-                    checkRunOver(i, len, sql);
-                    while (Character.isSpaceChar(chars[i])) {
-                        i++;
-                        checkRunOver(i, len, sql);
-                    }
-                }
-                while (!Character.isSpaceChar(chars[i])) {
-                    i++;
-                    checkRunOver(i, len, sql);
-                }
-                int remove = 0;
-                if (found(sql, start, "fn")) {
-                    remove = 2;
-                } else if (found(sql, start, "escape")) {
-                    break;
-                } else if (found(sql, start, "call")) {
-                    break;
-                } else if (found(sql, start, "oj")) {
-                    remove = 2;
-                } else if (found(sql, start, "ts")) {
-                    remove = 2;
-                } else if (found(sql, start, "t")) {
-                    remove = 1;
-                } else if (found(sql, start, "d")) {
-                    remove = 1;
-                } else if (found(sql, start, "params")) {
-                    remove = "params".length();
-                }
-                for (i = start; remove > 0; i++, remove--) {
                     chars[i] = ' ';
-                }
-                break;
-            case '}':
-                if (--level < 0) {
-                    throw DbException.getSyntaxError(sql, i);
-                }
-                chars[i] = ' ';
-                break;
-            case '$':
-                i = translateGetEnd(sql, i, c);
-                break;
-            default:
+                    while (Character.isSpaceChar(chars[i])) {
+                        i++;
+                        checkRunOver(i, len, sql);
+                    }
+                    int start = i;
+                    if (chars[i] >= '0' && chars[i] <= '9') {
+                        chars[i - 1] = '{';
+                        while (true) {
+                            checkRunOver(i, len, sql);
+                            c = chars[i];
+                            if (c == '}') {
+                                break;
+                            }
+                            switch (c) {
+                                case '\'':
+                                case '"':
+                                case '/':
+                                case '-':
+                                    i = translateGetEnd(sql, i, c);
+                                    break;
+                                default:
+                            }
+                            i++;
+                        }
+                        level--;
+                        break;
+                    } else if (chars[i] == '?') {
+                        i++;
+                        checkRunOver(i, len, sql);
+                        while (Character.isSpaceChar(chars[i])) {
+                            i++;
+                            checkRunOver(i, len, sql);
+                        }
+                        if (sql.charAt(i) != '=') {
+                            throw DbException.getSyntaxError(sql, i, "=");
+                        }
+                        i++;
+                        checkRunOver(i, len, sql);
+                        while (Character.isSpaceChar(chars[i])) {
+                            i++;
+                            checkRunOver(i, len, sql);
+                        }
+                    }
+                    while (!Character.isSpaceChar(chars[i])) {
+                        i++;
+                        checkRunOver(i, len, sql);
+                    }
+                    int remove = 0;
+                    if (found(sql, start, "fn")) {
+                        remove = 2;
+                    } else if (found(sql, start, "escape")) {
+                        break;
+                    } else if (found(sql, start, "call")) {
+                        break;
+                    } else if (found(sql, start, "oj")) {
+                        remove = 2;
+                    } else if (found(sql, start, "ts")) {
+                        remove = 2;
+                    } else if (found(sql, start, "t")) {
+                        remove = 1;
+                    } else if (found(sql, start, "d")) {
+                        remove = 1;
+                    } else if (found(sql, start, "params")) {
+                        remove = "params".length();
+                    }
+                    for (i = start; remove > 0; i++, remove--) {
+                        chars[i] = ' ';
+                    }
+                    break;
+                case '}':
+                    if (--level < 0) {
+                        throw DbException.getSyntaxError(sql, i);
+                    }
+                    chars[i] = ' ';
+                    break;
+                case '$':
+                    i = translateGetEnd(sql, i, c);
+                    break;
+                default:
             }
         }
         if (level != 0) {
@@ -1402,23 +1367,23 @@ public class JdbcConnection extends TraceObject implements Connection {
     }
 
     private static void checkTypeConcurrency(int resultSetType,
-            int resultSetConcurrency) {
+                                             int resultSetConcurrency) {
         switch (resultSetType) {
-        case ResultSet.TYPE_FORWARD_ONLY:
-        case ResultSet.TYPE_SCROLL_INSENSITIVE:
-        case ResultSet.TYPE_SCROLL_SENSITIVE:
-            break;
-        default:
-            throw DbException.getInvalidValueException("resultSetType",
-                    resultSetType);
+            case ResultSet.TYPE_FORWARD_ONLY:
+            case ResultSet.TYPE_SCROLL_INSENSITIVE:
+            case ResultSet.TYPE_SCROLL_SENSITIVE:
+                break;
+            default:
+                throw DbException.getInvalidValueException("resultSetType",
+                        resultSetType);
         }
         switch (resultSetConcurrency) {
-        case ResultSet.CONCUR_READ_ONLY:
-        case ResultSet.CONCUR_UPDATABLE:
-            break;
-        default:
-            throw DbException.getInvalidValueException("resultSetConcurrency",
-                    resultSetConcurrency);
+            case ResultSet.CONCUR_READ_ONLY:
+            case ResultSet.CONCUR_UPDATABLE:
+                break;
+            default:
+                throw DbException.getInvalidValueException("resultSetConcurrency",
+                        resultSetConcurrency);
         }
     }
 
@@ -1530,7 +1495,7 @@ public class JdbcConnection extends TraceObject implements Connection {
     ResultSet getGeneratedKeys(JdbcStatement stat, int id) {
         getGeneratedKeys = prepareCommand(
                 "SELECT SCOPE_IDENTITY() " +
-                "WHERE SCOPE_IDENTITY() IS NOT NULL", getGeneratedKeys);
+                        "WHERE SCOPE_IDENTITY() IS NOT NULL", getGeneratedKeys);
         ResultInterface result = getGeneratedKeys.executeQuery(0, false);
         ResultSet rs = new JdbcResultSet(this, stat, result, id, false, true, false);
         return rs;
@@ -1550,7 +1515,7 @@ public class JdbcConnection extends TraceObject implements Connection {
             try {
                 Value v = session.getDataHandler().getLobStorage().createClob(
                         new InputStreamReader(
-                        new ByteArrayInputStream(Utils.EMPTY_BYTES)), 0);
+                                new ByteArrayInputStream(Utils.EMPTY_BYTES)), 0);
                 session.addTemporaryLob(v);
                 return new JdbcClob(this, v, id);
             } finally {
@@ -1599,7 +1564,7 @@ public class JdbcConnection extends TraceObject implements Connection {
             try {
                 Value v = session.getDataHandler().getLobStorage().createClob(
                         new InputStreamReader(
-                        new ByteArrayInputStream(Utils.EMPTY_BYTES)), 0);
+                                new ByteArrayInputStream(Utils.EMPTY_BYTES)), 0);
                 session.addTemporaryLob(v);
                 return new JdbcClob(this, v, id);
             } finally {
@@ -1640,7 +1605,7 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Returns true if this connection is still valid.
      *
      * @param timeout the number of seconds to wait for the database to respond
-     *            (ignored)
+     *                (ignored)
      * @return true if the connection is valid.
      */
     @Override
@@ -1664,7 +1629,7 @@ public class JdbcConnection extends TraceObject implements Connection {
      * Set a client property.
      * This method always throws a SQLClientInfoException.
      *
-     * @param name the name of the property (ignored)
+     * @param name  the name of the property (ignored)
      * @param value the value (ignored)
      */
     @Override
@@ -1673,8 +1638,8 @@ public class JdbcConnection extends TraceObject implements Connection {
         try {
             if (isDebugEnabled()) {
                 debugCode("setClientInfo("
-                        +quote(name)+", "
-                        +quote(value)+");");
+                        + quote(name) + ", "
+                        + quote(value) + ");");
             }
             checkClosed();
             // we don't have any client properties, so just throw
@@ -1772,9 +1737,9 @@ public class JdbcConnection extends TraceObject implements Connection {
     /**
      * Create a Clob value from this reader.
      *
-     * @param x the reader
+     * @param x      the reader
      * @param length the length (if smaller or equal than 0, all data until the
-     *            end of file is read)
+     *               end of file is read)
      * @return the value
      */
     public Value createClob(Reader x, long length) {
@@ -1792,9 +1757,9 @@ public class JdbcConnection extends TraceObject implements Connection {
     /**
      * Create a Blob value from this input stream.
      *
-     * @param x the input stream
+     * @param x      the input stream
      * @param length the length (if smaller or equal than 0, all data until the
-     *            end of file is read)
+     *               end of file is read)
      * @return the value
      */
     public Value createBlob(InputStream x, long length) {
@@ -1846,7 +1811,7 @@ public class JdbcConnection extends TraceObject implements Connection {
     /**
      * [Not supported]
      *
-     * @param executor the executor used by this method
+     * @param executor     the executor used by this method
      * @param milliseconds the TCP connection timeout
      */
 //## Java 1.7 ##
@@ -1896,23 +1861,23 @@ public class JdbcConnection extends TraceObject implements Connection {
     Object convertToDefaultObject(Value v) {
         Object o;
         switch (v.getType()) {
-        case Value.CLOB: {
-            int id = getNextId(TraceObject.CLOB);
-            o = new JdbcClob(this, v, id);
-            break;
-        }
-        case Value.BLOB: {
-            int id = getNextId(TraceObject.BLOB);
-            o = new JdbcBlob(this, v, id);
-            break;
-        }
-        case Value.JAVA_OBJECT:
-            if (SysProperties.serializeJavaObject) {
-                o = Utils.deserialize(v.getBytesNoCopy(), session.getDataHandler());
+            case Value.CLOB: {
+                int id = getNextId(TraceObject.CLOB);
+                o = new JdbcClob(this, v, id);
                 break;
             }
-        default:
-            o = v.getObject();
+            case Value.BLOB: {
+                int id = getNextId(TraceObject.BLOB);
+                o = new JdbcBlob(this, v, id);
+                break;
+            }
+            case Value.JAVA_OBJECT:
+                if (SysProperties.serializeJavaObject) {
+                    o = Utils.deserialize(v.getBytesNoCopy(), session.getDataHandler());
+                    break;
+                }
+            default:
+                o = v.getObject();
         }
         return o;
     }

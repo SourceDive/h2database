@@ -6,18 +6,14 @@
  */
 package org.h2.build.indexer;
 
+import org.h2.util.IOUtils;
+import org.h2.util.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.StringTokenizer;
-import org.h2.util.IOUtils;
-import org.h2.util.StringUtils;
+import java.util.*;
 
 /**
  * The indexer creates the fulltext index of the HTML documentation.
@@ -28,13 +24,13 @@ public class Indexer {
     private static final int MIN_WORD_SIZE = 3;
     private static final int MAX_RELATIONS = 30;
     private static final String VERY_COMMON =
-        ";the;be;to;of;and;a;in;that;have;i;it;for;not;on;with;he;as;you;do;at;" +
-        "this;but;his;by;from;they;we;say;her;she;or;an;will;my;one;all;would;" +
-        "there;their;what;so;up;out;if;about;who;get;which;go;me;when;make;" +
-        "can;like;no;just;him;know;take;into;your;good;some;" +
-        "could;them;see;other;than;then;now;look;only;come;its;over;think;" +
-        "also;back;after;use;two;how;our;work;first;well;way;even;new;want;" +
-        "because;any;these;give;most;us;";
+            ";the;be;to;of;and;a;in;that;have;i;it;for;not;on;with;he;as;you;do;at;" +
+                    "this;but;his;by;from;they;we;say;her;she;or;an;will;my;one;all;would;" +
+                    "there;their;what;so;up;out;if;about;who;get;which;go;me;when;make;" +
+                    "can;like;no;just;him;know;take;into;your;good;some;" +
+                    "could;them;see;other;than;then;now;look;only;come;its;over;think;" +
+                    "also;back;after;use;two;how;our;work;first;well;way;even;new;want;" +
+                    "because;any;these;give;most;us;";
 
     private final ArrayList<Page> pages = new ArrayList<Page>();
 
@@ -43,7 +39,7 @@ public class Indexer {
      */
     private final HashMap<String, Word> words = new HashMap<String, Word>();
     private final HashSet<String> noIndex = new HashSet<String>();
-    private ArrayList <Word>wordList;
+    private ArrayList<Word> wordList;
     private PrintWriter output;
     private Page page;
     private boolean title;
@@ -179,7 +175,7 @@ public class Indexer {
     private void listPages() {
         for (Page p : pages) {
             output.println("pages[" + p.id + "]=new Page('"
-                    + convertUTF(p.title) + "', '" + p.fileName                    + "');");
+                    + convertUTF(p.title) + "', '" + p.fileName + "');");
         }
     }
 
@@ -267,42 +263,42 @@ public class Indexer {
             if (token.length() == 1) {
                 char c = token.charAt(0);
                 switch (c) {
-                case '<': {
-                    if (inTag) {
-                        process("???");
-                    }
-                    inTag = true;
-                    if (!t.hasMoreTokens()) {
+                    case '<': {
+                        if (inTag) {
+                            process("???");
+                        }
+                        inTag = true;
+                        if (!t.hasMoreTokens()) {
+                            break;
+                        }
+                        token = t.nextToken();
+                        if (token.startsWith("/")) {
+                            title = false;
+                            heading = false;
+                        } else if (token.equalsIgnoreCase("title")) {
+                            title = true;
+                        } else if (token.length() == 2 && Character.toLowerCase(token.charAt(0)) == 'h'
+                                && Character.isDigit(token.charAt(1))) {
+                            heading = true;
+                        }
+                        // TODO maybe skip script tags?
                         break;
                     }
-                    token = t.nextToken();
-                    if (token.startsWith("/")) {
-                        title = false;
-                        heading = false;
-                    } else if (token.equalsIgnoreCase("title")) {
-                        title = true;
-                    } else if (token.length() == 2 && Character.toLowerCase(token.charAt(0)) == 'h'
-                            && Character.isDigit(token.charAt(1))) {
-                        heading = true;
+                    case '>': {
+                        if (!inTag) {
+                            process("???");
+                        }
+                        inTag = false;
+                        break;
                     }
-                    // TODO maybe skip script tags?
-                    break;
-                }
-                case '>': {
-                    if (!inTag) {
-                        process("???");
-                    }
-                    inTag = false;
-                    break;
-                }
-                case '\r':
-                case '\n':
-                case ' ':
-                    break;
-                default:
-                    if (!inTag) {
-                        process(token);
-                    }
+                    case '\r':
+                    case '\n':
+                    case ' ':
+                        break;
+                    default:
+                        if (!inTag) {
+                            process(token);
+                        }
                 }
             } else {
                 if (!inTag) {

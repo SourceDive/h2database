@@ -6,21 +6,6 @@
  */
 package org.h2.dev.fs;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.nio.channels.FileChannel;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 import org.h2.command.dml.BackupCommand;
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
@@ -30,6 +15,15 @@ import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
 import org.h2.util.Tool;
+
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * A shell tool that allows to list and manipulate files.
@@ -53,9 +47,9 @@ public class FileShell extends Tool {
      * <td>Execute the given commands and exit</td></tr>
      * </table>
      * Multiple commands may be executed if separated by ;
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new FileShell().runTool(args);
@@ -335,7 +329,7 @@ public class FileShell extends Tool {
     }
 
     private static void zip(String zipFileName, String base,
-            ArrayList<String> source) {
+                            ArrayList<String> source) {
         FileUtils.delete(zipFileName);
         OutputStream fileOut = null;
         try {
@@ -417,7 +411,7 @@ public class FileShell extends Tool {
     }
 
     private int readFileList(String[] list, int i, ArrayList<String> target,
-            boolean recursive) throws IOException {
+                             boolean recursive) throws IOException {
         while (i < list.length) {
             String c = list[i++];
             if (";".equals(c)) {

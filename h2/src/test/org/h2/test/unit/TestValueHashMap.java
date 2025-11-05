@@ -6,12 +6,6 @@
  */
 package org.h2.test.unit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Random;
-
 import org.h2.api.JavaObjectSerializer;
 import org.h2.store.DataHandler;
 import org.h2.store.FileStore;
@@ -25,6 +19,8 @@ import org.h2.value.CompareMode;
 import org.h2.value.Value;
 import org.h2.value.ValueDouble;
 import org.h2.value.ValueInt;
+
+import java.util.*;
 
 /**
  * Tests the value hash map.
@@ -73,41 +69,41 @@ public class TestValueHashMap extends TestBase implements DataHandler {
             Value key = ValueInt.get(random.nextInt(100));
             Value value = ValueInt.get(random.nextInt(100));
             switch (op) {
-            case 0:
-                map.put(key, value);
-                hash.put(key, value);
-                break;
-            case 1:
-                map.remove(key);
-                hash.remove(key);
-                break;
-            case 2:
-                Value v1 = map.get(key);
-                Value v2 = hash.get(key);
-                assertTrue(v1 == null ? v2 == null : v1.equals(v2));
-                break;
-            case 3: {
-                ArrayList<Value> a1 = map.keys();
-                ArrayList<Value> a2 = New.arrayList(hash.keySet());
-                assertEquals(a1.size(), a2.size());
-                Collections.sort(a1, vc);
-                Collections.sort(a2, vc);
-                for (int j = 0; j < a1.size(); j++) {
-                    assertTrue(a1.get(j).equals(a2.get(j)));
+                case 0:
+                    map.put(key, value);
+                    hash.put(key, value);
+                    break;
+                case 1:
+                    map.remove(key);
+                    hash.remove(key);
+                    break;
+                case 2:
+                    Value v1 = map.get(key);
+                    Value v2 = hash.get(key);
+                    assertTrue(v1 == null ? v2 == null : v1.equals(v2));
+                    break;
+                case 3: {
+                    ArrayList<Value> a1 = map.keys();
+                    ArrayList<Value> a2 = New.arrayList(hash.keySet());
+                    assertEquals(a1.size(), a2.size());
+                    Collections.sort(a1, vc);
+                    Collections.sort(a2, vc);
+                    for (int j = 0; j < a1.size(); j++) {
+                        assertTrue(a1.get(j).equals(a2.get(j)));
+                    }
+                    break;
                 }
-                break;
-            }
-            case 4:
-                ArrayList<Value> a1 = map.values();
-                ArrayList<Value> a2 = New.arrayList(hash.values());
-                assertEquals(a1.size(), a2.size());
-                Collections.sort(a1, vc);
-                Collections.sort(a2, vc);
-                for (int j = 0; j < a1.size(); j++) {
-                    assertTrue(a1.get(j).equals(a2.get(j)));
-                }
-                break;
-            default:
+                case 4:
+                    ArrayList<Value> a1 = map.values();
+                    ArrayList<Value> a2 = New.arrayList(hash.values());
+                    assertEquals(a1.size(), a2.size());
+                    Collections.sort(a1, vc);
+                    Collections.sort(a2, vc);
+                    for (int j = 0; j < a1.size(); j++) {
+                        assertTrue(a1.get(j).equals(a2.get(j)));
+                    }
+                    break;
+                default:
             }
         }
     }
@@ -164,7 +160,7 @@ public class TestValueHashMap extends TestBase implements DataHandler {
 
     @Override
     public int readLob(long lobId, byte[] hmac, long offset, byte[] buff,
-            int off, int length) {
+                       int off, int length) {
         return -1;
     }
 

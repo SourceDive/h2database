@@ -6,13 +6,13 @@
  */
 package org.h2.test.synth;
 
+import org.h2.test.TestBase;
+import org.h2.test.synth.sql.RandomGen;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.test.TestBase;
-import org.h2.test.synth.sql.RandomGen;
 
 /**
  * A test that runs random operations against a table to test the various index
@@ -107,35 +107,35 @@ public class TestSimpleIndex extends TestBase {
             buff.append(" AND ");
             buff.append('A' + random.getInt(3));
             switch (random.getInt(10)) {
-            case 0:
-                buff.append("<");
-                buff.append(random.getInt(100) - 50);
-                break;
-            case 1:
-                buff.append("<=");
-                buff.append(random.getInt(100) - 50);
-                break;
-            case 2:
-                buff.append(">");
-                buff.append(random.getInt(100) - 50);
-                break;
-            case 3:
-                buff.append(">=");
-                buff.append(random.getInt(100) - 50);
-                break;
-            case 4:
-                buff.append("<>");
-                buff.append(random.getInt(100) - 50);
-                break;
-            case 5:
-                buff.append(" IS NULL");
-                break;
-            case 6:
-                buff.append(" IS NOT NULL");
-                break;
-            default:
-                buff.append("=");
-                buff.append(random.getInt(100) - 50);
+                case 0:
+                    buff.append("<");
+                    buff.append(random.getInt(100) - 50);
+                    break;
+                case 1:
+                    buff.append("<=");
+                    buff.append(random.getInt(100) - 50);
+                    break;
+                case 2:
+                    buff.append(">");
+                    buff.append(random.getInt(100) - 50);
+                    break;
+                case 3:
+                    buff.append(">=");
+                    buff.append(random.getInt(100) - 50);
+                    break;
+                case 4:
+                    buff.append("<>");
+                    buff.append(random.getInt(100) - 50);
+                    break;
+                case 5:
+                    buff.append(" IS NULL");
+                    break;
+                case 6:
+                    buff.append(" IS NOT NULL");
+                    break;
+                default:
+                    buff.append("=");
+                    buff.append(random.getInt(100) - 50);
             }
         }
         String where = buff.toString();

@@ -6,16 +6,12 @@
  */
 package org.h2.bnf.context;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.h2.command.Parser;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Keeps meta data information about a database.
@@ -115,7 +111,7 @@ public class DbContents {
     /**
      * Read the contents of this database from the database meta data.
      *
-     * @param url the database URL
+     * @param url  the database URL
      * @param conn the connection
      */
     public synchronized void readContents(String url, Connection conn)
@@ -124,7 +120,7 @@ public class DbContents {
         if (isH2) {
             PreparedStatement prep = conn.prepareStatement(
                     "SELECT UPPER(VALUE) FROM INFORMATION_SCHEMA.SETTINGS " +
-                    "WHERE NAME=?");
+                            "WHERE NAME=?");
             prep.setString(1, "MODE");
             ResultSet rs = prep.executeQuery();
             rs.next();
@@ -156,8 +152,8 @@ public class DbContents {
                 defaultSchema = schema;
             }
             schemas[i] = schema;
-            String[] tableTypes = { "TABLE", "SYSTEM TABLE", "VIEW",
-                    "SYSTEM VIEW", "TABLE LINK", "SYNONYM", "EXTERNAL" };
+            String[] tableTypes = {"TABLE", "SYSTEM TABLE", "VIEW",
+                    "SYSTEM VIEW", "TABLE LINK", "SYNONYM", "EXTERNAL"};
             schema.readTables(meta, tableTypes);
             if (!isPostgreSQL) {
                 schema.readProcedures(meta);
@@ -183,9 +179,9 @@ public class DbContents {
 
     private String[] getSchemaNames(DatabaseMetaData meta) throws SQLException {
         if (isMySQL || isSQLite) {
-            return new String[] { "" };
+            return new String[]{""};
         } else if (isFirebird) {
-            return new String[] { null };
+            return new String[]{null};
         }
         ResultSet rs = meta.getSchemas();
         ArrayList<String> schemaList = New.arrayList();
@@ -193,16 +189,16 @@ public class DbContents {
             String schema = rs.getString("TABLE_SCHEM");
             String[] ignoreNames = null;
             if (isOracle) {
-                ignoreNames = new String[] { "CTXSYS", "DIP", "DBSNMP",
+                ignoreNames = new String[]{"CTXSYS", "DIP", "DBSNMP",
                         "DMSYS", "EXFSYS", "FLOWS_020100", "FLOWS_FILES",
                         "MDDATA", "MDSYS", "MGMT_VIEW", "OLAPSYS", "ORDSYS",
                         "ORDPLUGINS", "OUTLN", "SI_INFORMTN_SCHEMA", "SYS",
-                        "SYSMAN", "SYSTEM", "TSMSYS", "WMSYS", "XDB" };
+                        "SYSMAN", "SYSTEM", "TSMSYS", "WMSYS", "XDB"};
             } else if (isMSSQLServer) {
-                ignoreNames = new String[] { "sys", "db_accessadmin",
+                ignoreNames = new String[]{"sys", "db_accessadmin",
                         "db_backupoperator", "db_datareader", "db_datawriter",
                         "db_ddladmin", "db_denydatareader",
-                        "db_denydatawriter", "db_owner", "db_securityadmin" };
+                        "db_denydatawriter", "db_owner", "db_securityadmin"};
             }
             if (ignoreNames != null) {
                 for (String ignore : ignoreNames) {

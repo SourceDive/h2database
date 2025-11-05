@@ -6,14 +6,14 @@
  */
 package org.h2.test.jdbc;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Random;
-
-import org.h2.api.ErrorCode;
-import org.h2.test.TestBase;
 
 /**
  * Tests the Connection.nativeSQL method.
@@ -60,7 +60,7 @@ public class TestNativeSQL extends TestBase {
 
             "{? = call TEST('}')}", " ? = call TEST('}') ",
 
-            "{{{{this is a bug}", null, };
+            "{{{{this is a bug}", null,};
 
     private Connection conn;
 
@@ -145,62 +145,62 @@ public class TestNativeSQL extends TestBase {
             StringBuilder buff = new StringBuilder("{oj }");
             for (int j = random.nextInt(10); j > 0; j--) {
                 String s;
-                switch(random.nextInt(7)) {
-                case 0:
-                    buff.append(" $$");
-                    s = "{}\'\"-/* a\n";
-                    for (int k = random.nextInt(5); k > 0; k--) {
-                        buff.append(s.charAt(random.nextInt(s.length())));
-                    }
-                    buff.append("$$");
-                    break;
-                case 1:
-                    buff.append("'");
-                    s = "{}\"-/*$ a\n";
-                    for (int k = random.nextInt(5); k > 0; k--) {
-                        buff.append(s.charAt(random.nextInt(s.length())));
-                    }
-                    buff.append("'");
-                    break;
-                case 2:
-                    buff.append("\"");
-                    s = "{}'-/*$ a\n";
-                    for (int k = random.nextInt(5); k > 0; k--) {
-                        buff.append(s.charAt(random.nextInt(s.length())));
-                    }
-                    buff.append("\"");
-                    break;
-                case 3:
-                    buff.append("/*");
-                    s = "{}'\"-/$ a\n";
-                    for (int k = random.nextInt(5); k > 0; k--) {
-                        buff.append(s.charAt(random.nextInt(s.length())));
-                    }
-                    buff.append("*/");
-                    break;
-                case 4:
-                    buff.append("--");
-                    s = "{}'\"-/$ a";
-                    for (int k = random.nextInt(5); k > 0; k--) {
-                        buff.append(s.charAt(random.nextInt(s.length())));
-                    }
-                    buff.append("\n");
-                    break;
-                case 5:
-                    buff.append("//");
-                    s = "{}'\"-/$ a";
-                    for (int k = random.nextInt(5); k > 0; k--) {
-                        buff.append(s.charAt(random.nextInt(s.length())));
-                    }
-                    buff.append("\n");
-                    break;
-                case 6:
-                    s = " a\n";
-                    for (int k = random.nextInt(5); k > 0; k--) {
-                        buff.append(s.charAt(random.nextInt(s.length())));
-                    }
-                    break;
-                default:
+                switch (random.nextInt(7)) {
+                    case 0:
+                        buff.append(" $$");
+                        s = "{}\'\"-/* a\n";
+                        for (int k = random.nextInt(5); k > 0; k--) {
+                            buff.append(s.charAt(random.nextInt(s.length())));
+                        }
+                        buff.append("$$");
+                        break;
+                    case 1:
+                        buff.append("'");
+                        s = "{}\"-/*$ a\n";
+                        for (int k = random.nextInt(5); k > 0; k--) {
+                            buff.append(s.charAt(random.nextInt(s.length())));
+                        }
+                        buff.append("'");
+                        break;
+                    case 2:
+                        buff.append("\"");
+                        s = "{}'-/*$ a\n";
+                        for (int k = random.nextInt(5); k > 0; k--) {
+                            buff.append(s.charAt(random.nextInt(s.length())));
+                        }
+                        buff.append("\"");
+                        break;
+                    case 3:
+                        buff.append("/*");
+                        s = "{}'\"-/$ a\n";
+                        for (int k = random.nextInt(5); k > 0; k--) {
+                            buff.append(s.charAt(random.nextInt(s.length())));
+                        }
+                        buff.append("*/");
+                        break;
+                    case 4:
+                        buff.append("--");
+                        s = "{}'\"-/$ a";
+                        for (int k = random.nextInt(5); k > 0; k--) {
+                            buff.append(s.charAt(random.nextInt(s.length())));
+                        }
+                        buff.append("\n");
+                        break;
+                    case 5:
+                        buff.append("//");
+                        s = "{}'\"-/$ a";
+                        for (int k = random.nextInt(5); k > 0; k--) {
+                            buff.append(s.charAt(random.nextInt(s.length())));
+                        }
+                        buff.append("\n");
+                        break;
+                    case 6:
+                        s = " a\n";
+                        for (int k = random.nextInt(5); k > 0; k--) {
+                            buff.append(s.charAt(random.nextInt(s.length())));
+                        }
+                        break;
+                    default:
                 }
             }
             String sql = buff.toString();

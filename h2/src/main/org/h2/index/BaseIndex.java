@@ -42,15 +42,15 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
     /**
      * Initialize the base index.
      *
-     * @param newTable the table
-     * @param id the object id
-     * @param name the index name
+     * @param newTable        the table
+     * @param id              the object id
+     * @param name            the index name
      * @param newIndexColumns the columns that are indexed or null if this is
-     *            not yet known
-     * @param newIndexType the index type
+     *                        not yet known
+     * @param newIndexType    the index type
      */
     protected void initBaseIndex(Table newTable, int id, String name,
-            IndexColumn[] newIndexColumns, IndexType newIndexType) {
+                                 IndexColumn[] newIndexColumns, IndexType newIndexType) {
         initSchemaObjectBase(newTable.getSchema(), id, name, Trace.INDEX);
         this.indexType = newIndexType;
         this.table = newTable;
@@ -133,9 +133,9 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
      * iterate over the result. The base implementation doesn't support this
      * feature.
      *
-     * @param session the session
+     * @param session    the session
      * @param higherThan the lower limit (excluding)
-     * @param last the last row, or null for no limit
+     * @param last       the last row, or null for no limit
      * @return the cursor
      * @throws DbException always
      */
@@ -149,14 +149,14 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
      * b-tree range index. This is the estimated cost required to search one
      * row, and then iterate over the given number of rows.
      *
-     * @param masks the search mask
-     * @param rowCount the number of rows in the index
-     * @param filter the table filter
+     * @param masks     the search mask
+     * @param rowCount  the number of rows in the index
+     * @param filter    the table filter
      * @param sortOrder the sort order
      * @return the estimated cost
      */
     protected long getCostRangeIndex(int[] masks, long rowCount,
-            TableFilter filter, SortOrder sortOrder) {
+                                     TableFilter filter, SortOrder sortOrder) {
         rowCount += Constants.COST_ROW_OFFSET;
         long cost = rowCount;
         long rows = rowCount;
@@ -262,7 +262,7 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
      *
      * @param newRow the row to check
      * @return true if one of the columns is null and multiple nulls in unique
-     *         indexes are allowed
+     * indexes are allowed
      */
     protected boolean containsNullAndAllowMultipleNull(SearchRow newRow) {
         Mode mode = database.getMode();
@@ -292,7 +292,7 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
      * @param rowData the first row
      * @param compare the second row
      * @return 0 if both rows are equal, -1 if the first row is smaller,
-     *         otherwise 1
+     * otherwise 1
      */
     int compareKeys(SearchRow rowData, SearchRow compare) {
         long k1 = rowData.getKey();

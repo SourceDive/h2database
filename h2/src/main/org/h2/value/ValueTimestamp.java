@@ -6,6 +6,11 @@
  */
 package org.h2.value;
 
+import org.h2.api.ErrorCode;
+import org.h2.message.DbException;
+import org.h2.util.DateTimeUtils;
+import org.h2.util.MathUtils;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -13,11 +18,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.TimeZone;
-
-import org.h2.api.ErrorCode;
-import org.h2.message.DbException;
-import org.h2.util.DateTimeUtils;
-import org.h2.util.MathUtils;
 
 /**
  * Implementation of the TIMESTAMP data type.
@@ -52,7 +52,7 @@ public class ValueTimestamp extends Value {
      * Get or create a date value for the given date.
      *
      * @param dateValue the date value
-     * @param nanos the nanoseconds
+     * @param nanos     the nanoseconds
      * @return the value
      */
     public static ValueTimestamp fromDateValueAndNanos(long dateValue, long nanos) {

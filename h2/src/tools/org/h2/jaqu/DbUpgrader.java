@@ -21,27 +21,27 @@ public interface DbUpgrader {
      * called if your <i>DbUpgrader</i> implementation is annotated with
      * JQDatabase.
      *
-     * @param db the database
+     * @param db          the database
      * @param fromVersion the old version
-     * @param toVersion the new version
+     * @param toVersion   the new version
      * @return true for successful upgrade. If the upgrade is successful, the
-     *         version registry is automatically updated.
+     * version registry is automatically updated.
      */
     boolean upgradeDatabase(Db db, int fromVersion, int toVersion);
 
     /**
      * Defines method interface to handle table upgrades.
      *
-     * @param db the database
-     * @param schema the schema
-     * @param table the table
+     * @param db          the database
+     * @param schema      the schema
+     * @param table       the table
      * @param fromVersion the old version
-     * @param toVersion the new version
+     * @param toVersion   the new version
      * @return true for successful upgrade. If the upgrade is successful, the
-     *         version registry is automatically updated.
+     * version registry is automatically updated.
      */
     boolean upgradeTable(Db db, String schema, String table, int fromVersion,
-            int toVersion);
+                         int toVersion);
 
     /**
      * The default database upgrader. It throws runtime exception instead of
@@ -58,7 +58,7 @@ public interface DbUpgrader {
 
         @Override
         public boolean upgradeTable(Db db, String schema, String table,
-                int fromVersion, int toVersion) {
+                                    int fromVersion, int toVersion) {
             throw new RuntimeException(
                     "Please provide your own DbUpgrader implementation.");
         }

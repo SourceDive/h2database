@@ -6,22 +6,15 @@
  */
 package org.h2.test.unit;
 
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.Properties;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.tools.Server;
+
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.sql.*;
+import java.util.Properties;
 
 /**
  * Tests the compatibility with older versions
@@ -124,8 +117,8 @@ public class TestOldVersion extends TestBase {
         Class<?> serverClass = cl.loadClass("org.h2.tools.Server");
         Method m;
         m = serverClass.getMethod("createTcpServer", String[].class);
-        Object serverOld = m.invoke(null, new Object[] { new String[] {
-                "-tcpPort", "9001" } });
+        Object serverOld = m.invoke(null, new Object[]{new String[]{
+                "-tcpPort", "9001"}});
         m = serverOld.getClass().getMethod("start");
         m.invoke(serverOld);
         Connection conn;
@@ -140,7 +133,7 @@ public class TestOldVersion extends TestBase {
     }
 
     private static ClassLoader getClassLoader(String jarFile) throws Exception {
-        URL[] urls = { new URL(jarFile) };
+        URL[] urls = {new URL(jarFile)};
         return new URLClassLoader(urls, null);
     }
 

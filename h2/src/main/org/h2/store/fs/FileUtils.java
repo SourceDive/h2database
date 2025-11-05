@@ -6,6 +6,8 @@
  */
 package org.h2.store.fs;
 
+import org.h2.util.New;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +15,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
-import org.h2.util.New;
 
 /**
  * This utility class contains utility functions that use the file system
@@ -186,7 +187,7 @@ public class FileUtils {
      * <code>java.nio.channels.FileChannel.open</code>.
      *
      * @param fileName the file name
-     * @param mode the access mode. Supported are r, rw, rws, rwd
+     * @param mode     the access mode. Supported are r, rw, rws, rwd
      * @return the file object
      */
     public static FileChannel open(String fileName, String mode)
@@ -213,8 +214,8 @@ public class FileUtils {
      * <code>java.nio.file.Path.newOutputStream</code>.
      *
      * @param fileName the file name
-     * @param append if true, the file will grow, if false, the file will be
-     *            truncated first
+     * @param append   if true, the file will grow, if false, the file will be
+     *                 truncated first
      * @return the output stream
      */
     public static OutputStream newOutputStream(String fileName, boolean append)
@@ -262,7 +263,7 @@ public class FileUtils {
     /**
      * Delete a directory or file and all subdirectories and files.
      *
-     * @param path the path
+     * @param path    the path
      * @param tryOnly whether errors should  be ignored
      */
     public static void deleteRecursive(String path, boolean tryOnly) {
@@ -318,16 +319,16 @@ public class FileUtils {
     /**
      * Create a new temporary file.
      *
-     * @param prefix the prefix of the file name (including directory name if
-     *            required)
-     * @param suffix the suffix
+     * @param prefix       the prefix of the file name (including directory name if
+     *                     required)
+     * @param suffix       the suffix
      * @param deleteOnExit if the file should be deleted when the virtual
-     *            machine exists
-     * @param inTempDir if the file should be stored in the temporary directory
+     *                     machine exists
+     * @param inTempDir    if the file should be stored in the temporary directory
      * @return the name of the created file
      */
     public static String createTempFile(String prefix, String suffix,
-            boolean deleteOnExit, boolean inTempDir) throws IOException {
+                                        boolean deleteOnExit, boolean inTempDir) throws IOException {
         return FilePath.get(prefix).createTempFile(
                 suffix, deleteOnExit, inTempDir).toString();
     }
@@ -337,7 +338,7 @@ public class FileUtils {
      * or throw an EOFException if not successful.
      *
      * @param channel the file channel
-     * @param dst the byte buffer
+     * @param dst     the byte buffer
      */
     public static void readFully(FileChannel channel, ByteBuffer dst)
             throws IOException {
@@ -353,7 +354,7 @@ public class FileUtils {
      * Fully write to the file. This will write all remaining bytes.
      *
      * @param channel the file channel
-     * @param src the byte buffer
+     * @param src     the byte buffer
      */
     public static void writeFully(FileChannel channel, ByteBuffer src)
             throws IOException {

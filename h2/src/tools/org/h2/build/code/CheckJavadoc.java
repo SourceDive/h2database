@@ -46,7 +46,7 @@ public class CheckJavadoc {
                 return 0;
             }
             boolean foundPackageHtml = false, foundJava = false;
-            for (File f  : file.listFiles()) {
+            for (File f : file.listFiles()) {
                 int type = check(f);
                 if (type == 1) {
                     foundJava = true;
@@ -57,7 +57,7 @@ public class CheckJavadoc {
             if (foundJava && !foundPackageHtml) {
                 System.out.println(
                         "No package.html file, but a Java file found at: "
-                        + file.getAbsolutePath());
+                                + file.getAbsolutePath());
                 errorCount++;
             }
         } else {

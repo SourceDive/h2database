@@ -6,22 +6,6 @@
  */
 package org.h2.value;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.SessionInterface;
@@ -32,12 +16,13 @@ import org.h2.security.SHA256;
 import org.h2.store.Data;
 import org.h2.store.DataReader;
 import org.h2.tools.SimpleResultSet;
-import org.h2.util.DateTimeUtils;
-import org.h2.util.IOUtils;
-import org.h2.util.MathUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.StringUtils;
-import org.h2.util.Utils;
+import org.h2.util.*;
+
+import java.io.*;
+import java.math.BigDecimal;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.sql.*;
 
 /**
  * The transfer class is used to send and receive Value objects.
@@ -275,8 +260,8 @@ public class Transfer {
      * Write a number of bytes.
      *
      * @param buff the value
-     * @param off the offset
-     * @param len the length
+     * @param off  the offset
+     * @param len  the length
      * @return itself
      */
     public Transfer writeBytes(byte[] buff, int off, int len) throws IOException {
@@ -303,8 +288,8 @@ public class Transfer {
      * Read a number of bytes.
      *
      * @param buff the target buffer
-     * @param off the offset
-     * @param len the number of bytes to read
+     * @param off  the offset
+     * @param len  the number of bytes to read
      */
     public void readBytes(byte[] buff, int off, int len) throws IOException {
         in.readFully(buff, off, len);
@@ -339,191 +324,191 @@ public class Transfer {
         int type = v.getType();
         writeInt(type);
         switch (type) {
-        case Value.NULL:
-            break;
-        case Value.BYTES:
-        case Value.JAVA_OBJECT:
-            writeBytes(v.getBytesNoCopy());
-            break;
-        case Value.UUID: {
-            ValueUuid uuid = (ValueUuid) v;
-            writeLong(uuid.getHigh());
-            writeLong(uuid.getLow());
-            break;
-        }
-        case Value.BOOLEAN:
-            writeBoolean(v.getBoolean().booleanValue());
-            break;
-        case Value.BYTE:
-            writeByte(v.getByte());
-            break;
-        case Value.TIME:
-            if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
-                writeLong(((ValueTime) v).getNanos());
-            } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
-                writeLong(DateTimeUtils.getTimeLocalWithoutDst(v.getTime()));
-            } else {
-                writeLong(v.getTime().getTime());
-            }
-            break;
-        case Value.DATE:
-            if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
-                writeLong(((ValueDate) v).getDateValue());
-            } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
-                writeLong(DateTimeUtils.getTimeLocalWithoutDst(v.getDate()));
-            } else {
-                writeLong(v.getDate().getTime());
-            }
-            break;
-        case Value.TIMESTAMP: {
-            if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
-                ValueTimestamp ts = (ValueTimestamp) v;
-                writeLong(ts.getDateValue());
-                writeLong(ts.getNanos());
-            } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
-                Timestamp ts = v.getTimestamp();
-                writeLong(DateTimeUtils.getTimeLocalWithoutDst(ts));
-                writeInt(ts.getNanos());
-            } else {
-                Timestamp ts = v.getTimestamp();
-                writeLong(ts.getTime());
-                writeInt(ts.getNanos());
-            }
-            break;
-        }
-        case Value.DECIMAL:
-            writeString(v.getString());
-            break;
-        case Value.DOUBLE:
-            writeDouble(v.getDouble());
-            break;
-        case Value.FLOAT:
-            writeFloat(v.getFloat());
-            break;
-        case Value.INT:
-            writeInt(v.getInt());
-            break;
-        case Value.LONG:
-            writeLong(v.getLong());
-            break;
-        case Value.SHORT:
-            writeInt(v.getShort());
-            break;
-        case Value.STRING:
-        case Value.STRING_IGNORECASE:
-        case Value.STRING_FIXED:
-            writeString(v.getString());
-            break;
-        case Value.BLOB: {
-            if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
-                if (v instanceof ValueLobDb) {
-                    ValueLobDb lob = (ValueLobDb) v;
-                    if (lob.isStored()) {
-                        writeLong(-1);
-                        writeInt(lob.getTableId());
-                        writeLong(lob.getLobId());
-                        if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
-                            writeBytes(calculateLobMac(lob.getLobId()));
-                        }
-                        writeLong(lob.getPrecision());
-                        break;
-                    }
-                }
-            }
-            long length = v.getPrecision();
-            if (length < 0) {
-                throw DbException.get(
-                        ErrorCode.CONNECTION_BROKEN_1, "length=" + length);
-            }
-            writeLong(length);
-            long written = IOUtils.copyAndCloseInput(v.getInputStream(), out);
-            if (written != length) {
-                throw DbException.get(
-                        ErrorCode.CONNECTION_BROKEN_1, "length:" + length + " written:" + written);
-            }
-            writeInt(LOB_MAGIC);
-            break;
-        }
-        case Value.CLOB: {
-            if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
-                if (v instanceof ValueLobDb) {
-                    ValueLobDb lob = (ValueLobDb) v;
-                    if (lob.isStored()) {
-                        writeLong(-1);
-                        writeInt(lob.getTableId());
-                        writeLong(lob.getLobId());
-                        if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
-                            writeBytes(calculateLobMac(lob.getLobId()));
-                        }
-                        writeLong(lob.getPrecision());
-                        break;
-                    }
-                }
-            }
-            long length = v.getPrecision();
-            if (length < 0) {
-                throw DbException.get(
-                        ErrorCode.CONNECTION_BROKEN_1, "length=" + length);
-            }
-            writeLong(length);
-            Reader reader = v.getReader();
-            Data.copyString(reader, out);
-            writeInt(LOB_MAGIC);
-            break;
-        }
-        case Value.ARRAY: {
-            ValueArray va = (ValueArray) v;
-            Value[] list = va.getList();
-            int len = list.length;
-            Class<?> componentType = va.getComponentType();
-            if (componentType == Object.class) {
-                writeInt(len);
-            } else {
-                writeInt(-(len + 1));
-                writeString(componentType.getName());
-            }
-            for (Value value : list) {
-                writeValue(value);
-            }
-            break;
-        }
-        case Value.RESULT_SET: {
-            try {
-                ResultSet rs = ((ValueResultSet) v).getResultSet();
-                rs.beforeFirst();
-                ResultSetMetaData meta = rs.getMetaData();
-                int columnCount = meta.getColumnCount();
-                writeInt(columnCount);
-                for (int i = 0; i < columnCount; i++) {
-                    writeString(meta.getColumnName(i + 1));
-                    writeInt(meta.getColumnType(i + 1));
-                    writeInt(meta.getPrecision(i + 1));
-                    writeInt(meta.getScale(i + 1));
-                }
-                while (rs.next()) {
-                    writeBoolean(true);
-                    for (int i = 0; i < columnCount; i++) {
-                        int t = DataType.getValueTypeFromResultSet(meta, i + 1);
-                        Value val = DataType.readValue(session, rs, i + 1, t);
-                        writeValue(val);
-                    }
-                }
-                writeBoolean(false);
-                rs.beforeFirst();
-            } catch (SQLException e) {
-                throw DbException.convertToIOException(e);
-            }
-            break;
-        }
-        case Value.GEOMETRY:
-            if (version >= Constants.TCP_PROTOCOL_VERSION_14) {
+            case Value.NULL:
+                break;
+            case Value.BYTES:
+            case Value.JAVA_OBJECT:
                 writeBytes(v.getBytesNoCopy());
-            } else {
-                writeString(v.getString());
+                break;
+            case Value.UUID: {
+                ValueUuid uuid = (ValueUuid) v;
+                writeLong(uuid.getHigh());
+                writeLong(uuid.getLow());
+                break;
             }
-            break;
-        default:
-            throw DbException.get(ErrorCode.CONNECTION_BROKEN_1, "type=" + type);
+            case Value.BOOLEAN:
+                writeBoolean(v.getBoolean().booleanValue());
+                break;
+            case Value.BYTE:
+                writeByte(v.getByte());
+                break;
+            case Value.TIME:
+                if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
+                    writeLong(((ValueTime) v).getNanos());
+                } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
+                    writeLong(DateTimeUtils.getTimeLocalWithoutDst(v.getTime()));
+                } else {
+                    writeLong(v.getTime().getTime());
+                }
+                break;
+            case Value.DATE:
+                if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
+                    writeLong(((ValueDate) v).getDateValue());
+                } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
+                    writeLong(DateTimeUtils.getTimeLocalWithoutDst(v.getDate()));
+                } else {
+                    writeLong(v.getDate().getTime());
+                }
+                break;
+            case Value.TIMESTAMP: {
+                if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
+                    ValueTimestamp ts = (ValueTimestamp) v;
+                    writeLong(ts.getDateValue());
+                    writeLong(ts.getNanos());
+                } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
+                    Timestamp ts = v.getTimestamp();
+                    writeLong(DateTimeUtils.getTimeLocalWithoutDst(ts));
+                    writeInt(ts.getNanos());
+                } else {
+                    Timestamp ts = v.getTimestamp();
+                    writeLong(ts.getTime());
+                    writeInt(ts.getNanos());
+                }
+                break;
+            }
+            case Value.DECIMAL:
+                writeString(v.getString());
+                break;
+            case Value.DOUBLE:
+                writeDouble(v.getDouble());
+                break;
+            case Value.FLOAT:
+                writeFloat(v.getFloat());
+                break;
+            case Value.INT:
+                writeInt(v.getInt());
+                break;
+            case Value.LONG:
+                writeLong(v.getLong());
+                break;
+            case Value.SHORT:
+                writeInt(v.getShort());
+                break;
+            case Value.STRING:
+            case Value.STRING_IGNORECASE:
+            case Value.STRING_FIXED:
+                writeString(v.getString());
+                break;
+            case Value.BLOB: {
+                if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
+                    if (v instanceof ValueLobDb) {
+                        ValueLobDb lob = (ValueLobDb) v;
+                        if (lob.isStored()) {
+                            writeLong(-1);
+                            writeInt(lob.getTableId());
+                            writeLong(lob.getLobId());
+                            if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
+                                writeBytes(calculateLobMac(lob.getLobId()));
+                            }
+                            writeLong(lob.getPrecision());
+                            break;
+                        }
+                    }
+                }
+                long length = v.getPrecision();
+                if (length < 0) {
+                    throw DbException.get(
+                            ErrorCode.CONNECTION_BROKEN_1, "length=" + length);
+                }
+                writeLong(length);
+                long written = IOUtils.copyAndCloseInput(v.getInputStream(), out);
+                if (written != length) {
+                    throw DbException.get(
+                            ErrorCode.CONNECTION_BROKEN_1, "length:" + length + " written:" + written);
+                }
+                writeInt(LOB_MAGIC);
+                break;
+            }
+            case Value.CLOB: {
+                if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
+                    if (v instanceof ValueLobDb) {
+                        ValueLobDb lob = (ValueLobDb) v;
+                        if (lob.isStored()) {
+                            writeLong(-1);
+                            writeInt(lob.getTableId());
+                            writeLong(lob.getLobId());
+                            if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
+                                writeBytes(calculateLobMac(lob.getLobId()));
+                            }
+                            writeLong(lob.getPrecision());
+                            break;
+                        }
+                    }
+                }
+                long length = v.getPrecision();
+                if (length < 0) {
+                    throw DbException.get(
+                            ErrorCode.CONNECTION_BROKEN_1, "length=" + length);
+                }
+                writeLong(length);
+                Reader reader = v.getReader();
+                Data.copyString(reader, out);
+                writeInt(LOB_MAGIC);
+                break;
+            }
+            case Value.ARRAY: {
+                ValueArray va = (ValueArray) v;
+                Value[] list = va.getList();
+                int len = list.length;
+                Class<?> componentType = va.getComponentType();
+                if (componentType == Object.class) {
+                    writeInt(len);
+                } else {
+                    writeInt(-(len + 1));
+                    writeString(componentType.getName());
+                }
+                for (Value value : list) {
+                    writeValue(value);
+                }
+                break;
+            }
+            case Value.RESULT_SET: {
+                try {
+                    ResultSet rs = ((ValueResultSet) v).getResultSet();
+                    rs.beforeFirst();
+                    ResultSetMetaData meta = rs.getMetaData();
+                    int columnCount = meta.getColumnCount();
+                    writeInt(columnCount);
+                    for (int i = 0; i < columnCount; i++) {
+                        writeString(meta.getColumnName(i + 1));
+                        writeInt(meta.getColumnType(i + 1));
+                        writeInt(meta.getPrecision(i + 1));
+                        writeInt(meta.getScale(i + 1));
+                    }
+                    while (rs.next()) {
+                        writeBoolean(true);
+                        for (int i = 0; i < columnCount; i++) {
+                            int t = DataType.getValueTypeFromResultSet(meta, i + 1);
+                            Value val = DataType.readValue(session, rs, i + 1, t);
+                            writeValue(val);
+                        }
+                    }
+                    writeBoolean(false);
+                    rs.beforeFirst();
+                } catch (SQLException e) {
+                    throw DbException.convertToIOException(e);
+                }
+                break;
+            }
+            case Value.GEOMETRY:
+                if (version >= Constants.TCP_PROTOCOL_VERSION_14) {
+                    writeBytes(v.getBytesNoCopy());
+                } else {
+                    writeString(v.getString());
+                }
+                break;
+            default:
+                throw DbException.get(ErrorCode.CONNECTION_BROKEN_1, "type=" + type);
         }
     }
 
@@ -534,173 +519,173 @@ public class Transfer {
      */
     public Value readValue() throws IOException {
         int type = readInt();
-        switch(type) {
-        case Value.NULL:
-            return ValueNull.INSTANCE;
-        case Value.BYTES:
-            return ValueBytes.getNoCopy(readBytes());
-        case Value.UUID:
-            return ValueUuid.get(readLong(), readLong());
-        case Value.JAVA_OBJECT:
-            return ValueJavaObject.getNoCopy(null, readBytes(), session.getDataHandler());
-        case Value.BOOLEAN:
-            return ValueBoolean.get(readBoolean());
-        case Value.BYTE:
-            return ValueByte.get(readByte());
-        case Value.DATE:
-            if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
-                return ValueDate.fromDateValue(readLong());
-            } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
-                return ValueDate.get(new Date(DateTimeUtils.getTimeUTCWithoutDst(readLong())));
-            }
-            return ValueDate.get(new Date(readLong()));
-        case Value.TIME:
-            if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
-                return ValueTime.fromNanos(readLong());
-            } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
-                return ValueTime.get(new Time(DateTimeUtils.getTimeUTCWithoutDst(readLong())));
-            }
-            return ValueTime.get(new Time(readLong()));
-        case Value.TIMESTAMP: {
-            if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
-                return ValueTimestamp.fromDateValueAndNanos(readLong(), readLong());
-            } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
-                Timestamp ts = new Timestamp(DateTimeUtils.getTimeUTCWithoutDst(readLong()));
+        switch (type) {
+            case Value.NULL:
+                return ValueNull.INSTANCE;
+            case Value.BYTES:
+                return ValueBytes.getNoCopy(readBytes());
+            case Value.UUID:
+                return ValueUuid.get(readLong(), readLong());
+            case Value.JAVA_OBJECT:
+                return ValueJavaObject.getNoCopy(null, readBytes(), session.getDataHandler());
+            case Value.BOOLEAN:
+                return ValueBoolean.get(readBoolean());
+            case Value.BYTE:
+                return ValueByte.get(readByte());
+            case Value.DATE:
+                if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
+                    return ValueDate.fromDateValue(readLong());
+                } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
+                    return ValueDate.get(new Date(DateTimeUtils.getTimeUTCWithoutDst(readLong())));
+                }
+                return ValueDate.get(new Date(readLong()));
+            case Value.TIME:
+                if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
+                    return ValueTime.fromNanos(readLong());
+                } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
+                    return ValueTime.get(new Time(DateTimeUtils.getTimeUTCWithoutDst(readLong())));
+                }
+                return ValueTime.get(new Time(readLong()));
+            case Value.TIMESTAMP: {
+                if (version >= Constants.TCP_PROTOCOL_VERSION_9) {
+                    return ValueTimestamp.fromDateValueAndNanos(readLong(), readLong());
+                } else if (version >= Constants.TCP_PROTOCOL_VERSION_7) {
+                    Timestamp ts = new Timestamp(DateTimeUtils.getTimeUTCWithoutDst(readLong()));
+                    ts.setNanos(readInt());
+                    return ValueTimestamp.get(ts);
+                }
+                Timestamp ts = new Timestamp(readLong());
                 ts.setNanos(readInt());
                 return ValueTimestamp.get(ts);
             }
-            Timestamp ts = new Timestamp(readLong());
-            ts.setNanos(readInt());
-            return ValueTimestamp.get(ts);
-        }
-        case Value.DECIMAL:
-            return ValueDecimal.get(new BigDecimal(readString()));
-        case Value.DOUBLE:
-            return ValueDouble.get(readDouble());
-        case Value.FLOAT:
-            return ValueFloat.get(readFloat());
-        case Value.INT:
-            return ValueInt.get(readInt());
-        case Value.LONG:
-            return ValueLong.get(readLong());
-        case Value.SHORT:
-            return ValueShort.get((short) readInt());
-        case Value.STRING:
-            return ValueString.get(readString());
-        case Value.STRING_IGNORECASE:
-            return ValueStringIgnoreCase.get(readString());
-        case Value.STRING_FIXED:
-            return ValueStringFixed.get(readString());
-        case Value.BLOB: {
-            long length = readLong();
-            if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
-                if (length == -1) {
-                    int tableId = readInt();
-                    long id = readLong();
-                    byte[] hmac;
-                    if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
-                        hmac = readBytes();
-                    } else {
-                        hmac = null;
+            case Value.DECIMAL:
+                return ValueDecimal.get(new BigDecimal(readString()));
+            case Value.DOUBLE:
+                return ValueDouble.get(readDouble());
+            case Value.FLOAT:
+                return ValueFloat.get(readFloat());
+            case Value.INT:
+                return ValueInt.get(readInt());
+            case Value.LONG:
+                return ValueLong.get(readLong());
+            case Value.SHORT:
+                return ValueShort.get((short) readInt());
+            case Value.STRING:
+                return ValueString.get(readString());
+            case Value.STRING_IGNORECASE:
+                return ValueStringIgnoreCase.get(readString());
+            case Value.STRING_FIXED:
+                return ValueStringFixed.get(readString());
+            case Value.BLOB: {
+                long length = readLong();
+                if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
+                    if (length == -1) {
+                        int tableId = readInt();
+                        long id = readLong();
+                        byte[] hmac;
+                        if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
+                            hmac = readBytes();
+                        } else {
+                            hmac = null;
+                        }
+                        long precision = readLong();
+                        return ValueLobDb.create(
+                                Value.BLOB, session.getDataHandler(), tableId, id, hmac, precision);
                     }
-                    long precision = readLong();
-                    return ValueLobDb.create(
-                            Value.BLOB, session.getDataHandler(), tableId, id, hmac, precision);
+                    int len = (int) length;
+                    byte[] small = new byte[len];
+                    IOUtils.readFully(in, small, len);
+                    int magic = readInt();
+                    if (magic != LOB_MAGIC) {
+                        throw DbException.get(
+                                ErrorCode.CONNECTION_BROKEN_1, "magic=" + magic);
+                    }
+                    return ValueLobDb.createSmallLob(Value.BLOB, small, length);
                 }
-                int len = (int) length;
-                byte[] small = new byte[len];
-                IOUtils.readFully(in, small, len);
+                Value v = session.getDataHandler().getLobStorage().createBlob(in, length);
                 int magic = readInt();
                 if (magic != LOB_MAGIC) {
                     throw DbException.get(
                             ErrorCode.CONNECTION_BROKEN_1, "magic=" + magic);
                 }
-                return ValueLobDb.createSmallLob(Value.BLOB, small, length);
+                return v;
             }
-            Value v = session.getDataHandler().getLobStorage().createBlob(in, length);
-            int magic = readInt();
-            if (magic != LOB_MAGIC) {
-                throw DbException.get(
-                        ErrorCode.CONNECTION_BROKEN_1, "magic=" + magic);
-            }
-            return v;
-        }
-        case Value.CLOB: {
-            long length = readLong();
-            if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
-                if (length == -1) {
-                    int tableId = readInt();
-                    long id = readLong();
-                    byte[] hmac;
-                    if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
-                        hmac = readBytes();
-                    } else {
-                        hmac = null;
+            case Value.CLOB: {
+                long length = readLong();
+                if (version >= Constants.TCP_PROTOCOL_VERSION_11) {
+                    if (length == -1) {
+                        int tableId = readInt();
+                        long id = readLong();
+                        byte[] hmac;
+                        if (version >= Constants.TCP_PROTOCOL_VERSION_12) {
+                            hmac = readBytes();
+                        } else {
+                            hmac = null;
+                        }
+                        long precision = readLong();
+                        return ValueLobDb.create(
+                                Value.CLOB, session.getDataHandler(), tableId, id, hmac, precision);
                     }
-                    long precision = readLong();
-                    return ValueLobDb.create(
-                            Value.CLOB, session.getDataHandler(), tableId, id, hmac, precision);
+                    DataReader reader = new DataReader(in);
+                    int len = (int) length;
+                    char[] buff = new char[len];
+                    IOUtils.readFully(reader, buff, len);
+                    int magic = readInt();
+                    if (magic != LOB_MAGIC) {
+                        throw DbException.get(
+                                ErrorCode.CONNECTION_BROKEN_1, "magic=" + magic);
+                    }
+                    byte[] small = new String(buff).getBytes(Constants.UTF8);
+                    return ValueLobDb.createSmallLob(Value.CLOB, small, length);
                 }
-                DataReader reader = new DataReader(in);
-                int len = (int) length;
-                char[] buff = new char[len];
-                IOUtils.readFully(reader, buff, len);
+                Value v = session.getDataHandler().getLobStorage().
+                        createClob(new DataReader(in), length);
                 int magic = readInt();
                 if (magic != LOB_MAGIC) {
                     throw DbException.get(
                             ErrorCode.CONNECTION_BROKEN_1, "magic=" + magic);
                 }
-                byte[] small = new String(buff).getBytes(Constants.UTF8);
-                return ValueLobDb.createSmallLob(Value.CLOB, small, length);
+                return v;
             }
-            Value v = session.getDataHandler().getLobStorage().
-                    createClob(new DataReader(in), length);
-            int magic = readInt();
-            if (magic != LOB_MAGIC) {
-                throw DbException.get(
-                        ErrorCode.CONNECTION_BROKEN_1, "magic=" + magic);
-            }
-            return v;
-        }
-        case Value.ARRAY: {
-            int len = readInt();
-            Class<?> componentType = Object.class;
-            if (len < 0) {
-                len = -(len + 1);
-                componentType = Utils.loadUserClass(readString());
-            }
-            Value[] list = new Value[len];
-            for (int i = 0; i < len; i++) {
-                list[i] = readValue();
-            }
-            return ValueArray.get(componentType, list);
-        }
-        case Value.RESULT_SET: {
-            SimpleResultSet rs = new SimpleResultSet();
-            rs.setAutoClose(false);
-            int columns = readInt();
-            for (int i = 0; i < columns; i++) {
-                rs.addColumn(readString(), readInt(), readInt(), readInt());
-            }
-            while (true) {
-                if (!readBoolean()) {
-                    break;
+            case Value.ARRAY: {
+                int len = readInt();
+                Class<?> componentType = Object.class;
+                if (len < 0) {
+                    len = -(len + 1);
+                    componentType = Utils.loadUserClass(readString());
                 }
-                Object[] o = new Object[columns];
+                Value[] list = new Value[len];
+                for (int i = 0; i < len; i++) {
+                    list[i] = readValue();
+                }
+                return ValueArray.get(componentType, list);
+            }
+            case Value.RESULT_SET: {
+                SimpleResultSet rs = new SimpleResultSet();
+                rs.setAutoClose(false);
+                int columns = readInt();
                 for (int i = 0; i < columns; i++) {
-                    o[i] = readValue().getObject();
+                    rs.addColumn(readString(), readInt(), readInt(), readInt());
                 }
-                rs.addRow(o);
+                while (true) {
+                    if (!readBoolean()) {
+                        break;
+                    }
+                    Object[] o = new Object[columns];
+                    for (int i = 0; i < columns; i++) {
+                        o[i] = readValue().getObject();
+                    }
+                    rs.addRow(o);
+                }
+                return ValueResultSet.get(rs);
             }
-            return ValueResultSet.get(rs);
-        }
-        case Value.GEOMETRY:
-            if (version >= Constants.TCP_PROTOCOL_VERSION_14) {
-                return ValueGeometry.get(readBytes());
-            }
-            return ValueGeometry.get(readString());
-        default:
-            throw DbException.get(ErrorCode.CONNECTION_BROKEN_1, "type=" + type);
+            case Value.GEOMETRY:
+                if (version >= Constants.TCP_PROTOCOL_VERSION_14) {
+                    return ValueGeometry.get(readBytes());
+                }
+                return ValueGeometry.get(readString());
+            default:
+                throw DbException.get(ErrorCode.CONNECTION_BROKEN_1, "type=" + type);
         }
     }
 
@@ -757,13 +742,13 @@ public class Transfer {
     /**
      * Verify the HMAC.
      *
-     * @param hmac the message authentication code
+     * @param hmac  the message authentication code
      * @param lobId the lobId
      * @throws DbException if the HMAC does not match
      */
     public void verifyLobMac(byte[] hmac, long lobId) {
         byte[] result = calculateLobMac(lobId);
-        if (!Utils.compareSecure(hmac,  result)) {
+        if (!Utils.compareSecure(hmac, result)) {
             throw DbException.get(ErrorCode.REMOTE_CONNECTION_NOT_ALLOWED);
         }
     }

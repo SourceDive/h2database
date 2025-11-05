@@ -6,20 +6,14 @@
  */
 package org.h2.test.synth;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import org.h2.test.TestBase;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 /**
  * A test that runs random join statements against two databases and compares
@@ -99,7 +93,7 @@ public class TestJoin extends TestBase {
         execute("INSERT INTO TWO VALUES(4, NULL)", null);
         random = new Random();
         long startTime = System.currentTimeMillis();
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             paramCount = 0;
             buff = new StringBuilder();
             long time = System.currentTimeMillis();
@@ -204,22 +198,22 @@ public class TestJoin extends TestBase {
         } else {
             if (random.nextInt(5) == 1) {
                 switch (random.nextInt(5)) {
-                case 0:
-                    buff.append(">");
-                    break;
-                case 1:
-                    buff.append("<");
-                    break;
-                case 2:
-                    buff.append("<=");
-                    break;
-                case 3:
-                    buff.append(">=");
-                    break;
-                case 4:
-                    buff.append("<>");
-                    break;
-                default:
+                    case 0:
+                        buff.append(">");
+                        break;
+                    case 1:
+                        buff.append("<");
+                        break;
+                    case 2:
+                        buff.append("<=");
+                        break;
+                    case 3:
+                        buff.append(">=");
+                        break;
+                    case 4:
+                        buff.append("<>");
+                        break;
+                    default:
                 }
             } else {
                 buff.append("=");

@@ -6,9 +6,6 @@
  */
 package org.h2.engine;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
@@ -22,6 +19,9 @@ import org.h2.util.MathUtils;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * <p>用户</p>
@@ -95,7 +95,7 @@ public class User extends RightOwner {
      * <p>检查用户权限。</p>
      * Checks that this user has the given rights for this database object.
      *
-     * @param table the database object
+     * @param table     the database object
      * @param rightMask the rights required
      * @throws DbException if this user does not have the required rights
      */
@@ -108,7 +108,7 @@ public class User extends RightOwner {
     /**
      * See if this user has the given rights for this database object.
      *
-     * @param table the database object, or null for schema-only check
+     * @param table     the database object, or null for schema-only check
      * @param rightMask the rights required
      * @return true if the user has the rights
      */
@@ -158,7 +158,7 @@ public class User extends RightOwner {
      * Get the CREATE SQL statement for this object.
      *
      * @param password true if the password (actually the salt and hash) should
-     *            be returned
+     *                 be returned
      * @return the SQL statement
      */
     public String getCreateSQL(boolean password) {
@@ -169,10 +169,10 @@ public class User extends RightOwner {
         }
         if (password) {
             buff.append(" SALT '").
-                append(StringUtils.convertBytesToHex(salt)).
-                append("' HASH '").
-                append(StringUtils.convertBytesToHex(passwordHash)).
-                append('\'');
+                    append(StringUtils.convertBytesToHex(salt)).
+                    append("' HASH '").
+                    append(StringUtils.convertBytesToHex(passwordHash)).
+                    append('\'');
         } else {
             buff.append(" PASSWORD ''");
         }

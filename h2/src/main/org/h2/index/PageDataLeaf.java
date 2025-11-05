@@ -6,9 +6,6 @@
  */
 package org.h2.index;
 
-import java.lang.ref.SoftReference;
-import java.util.Arrays;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Session;
@@ -20,6 +17,9 @@ import org.h2.store.Page;
 import org.h2.store.PageStore;
 import org.h2.table.RegularTable;
 import org.h2.value.Value;
+
+import java.lang.ref.SoftReference;
+import java.util.Arrays;
 
 /**
  * A leaf page that contains data of one or multiple rows. Format:
@@ -83,8 +83,8 @@ public class PageDataLeaf extends PageData {
     /**
      * Create a new page.
      *
-     * @param index the index
-     * @param pageId the page id
+     * @param index        the index
+     * @param pageId       the page id
      * @param parentPageId the parent
      * @return the page
      */
@@ -103,8 +103,8 @@ public class PageDataLeaf extends PageData {
     /**
      * Read a data leaf page.
      *
-     * @param index the index
-     * @param data the data
+     * @param index  the index
+     * @param data   the data
      * @param pageId the page id
      * @return the page
      */
@@ -123,7 +123,7 @@ public class PageDataLeaf extends PageData {
         if (tableId != index.getId()) {
             throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
                     "page:" + getPos() + " expected table:" + index.getId() +
-                    " got:" + tableId + " type:" + type);
+                            " got:" + tableId + " type:" + type);
         }
         columnCount = data.readVarInt();
         entryCount = data.readShortInt();
@@ -156,7 +156,7 @@ public class PageDataLeaf extends PageData {
     private int findInsertionPoint(long key) {
         int x = find(key);
         if (x < entryCount && keys[x] == key) {
-            throw index.getDuplicateKeyException(""+key);
+            throw index.getDuplicateKeyException("" + key);
         }
         return x;
     }
@@ -373,7 +373,7 @@ public class PageDataLeaf extends PageData {
     PageData split(int splitPoint) {
         int newPageId = index.getPageStore().allocatePage();
         PageDataLeaf p2 = PageDataLeaf.create(index, newPageId, parentPageId);
-        for (int i = splitPoint; i < entryCount;) {
+        for (int i = splitPoint; i < entryCount; ) {
             int split = p2.addRowTry(getRowAt(splitPoint));
             if (split != -1) {
                 DbException.throwInternalError("split " + split);
@@ -537,10 +537,10 @@ public class PageDataLeaf extends PageData {
     @Override
     public String toString() {
         return "page[" + getPos() + "] data leaf table:" +
-            index.getId() + " " + index.getTable().getName() +
-            " entries:" + entryCount + " parent:" + parentPageId +
-            (firstOverflowPageId == 0 ? "" : " overflow:" + firstOverflowPageId) +
-            " keys:" + Arrays.toString(keys) + " offsets:" + Arrays.toString(offsets);
+                index.getId() + " " + index.getTable().getName() +
+                " entries:" + entryCount + " parent:" + parentPageId +
+                (firstOverflowPageId == 0 ? "" : " overflow:" + firstOverflowPageId) +
+                " keys:" + Arrays.toString(keys) + " offsets:" + Arrays.toString(offsets);
     }
 
     @Override
@@ -581,7 +581,7 @@ public class PageDataLeaf extends PageData {
     /**
      * Set the overflow page id.
      *
-     * @param old the old overflow page id
+     * @param old      the old overflow page id
      * @param overflow the new overflow page id
      */
     void setOverflow(int old, int overflow) {
@@ -613,8 +613,8 @@ public class PageDataLeaf extends PageData {
     /**
      * Read a row from the data page at the given position.
      *
-     * @param data the data page
-     * @param pos the position to read from
+     * @param data        the data page
+     * @param pos         the position to read from
      * @param columnCount the number of columns
      * @return the row
      */

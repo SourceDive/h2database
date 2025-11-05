@@ -6,31 +6,19 @@
  */
 package org.h2.test.poweroff;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Date;
+import org.h2.util.IOUtils;
+import org.h2.util.New;
+
+import java.io.*;
 import java.security.SecureRandom;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.h2.util.IOUtils;
-import org.h2.util.New;
 
 /**
  * This standalone test checks if recovery of a database works after power
@@ -83,7 +71,7 @@ public class TestRecover {
     }
 
     private static File backup(String sourcePath, String targetPath,
-            String basePath, int max, String node) throws IOException {
+                               String basePath, int max, String node) throws IOException {
         File root = new File(targetPath);
         if (!root.exists()) {
             root.mkdirs();
@@ -189,7 +177,7 @@ public class TestRecover {
         Statement stat = conn.createStatement();
         try {
             stat.execute("CREATE TABLE TEST(ID INT PRIMARY KEY, " +
-                    "D INT, NAME VARCHAR("+MAX_STRING_LENGTH+"))");
+                    "D INT, NAME VARCHAR(" + MAX_STRING_LENGTH + "))");
             stat.execute("CREATE INDEX IDX_TEST_D ON TEST(D)");
         } catch (SQLException e) {
             // ignore
@@ -224,7 +212,7 @@ public class TestRecover {
         PreparedStatement prepInsert = null;
         PreparedStatement prepDelete = null;
         conn.setAutoCommit(false);
-        for (int id = 0;; id++) {
+        for (int id = 0; ; id++) {
             boolean rollback = random.nextInt(10) == 1;
             int len;
             if (random.nextInt(10) == 1) {
@@ -273,16 +261,16 @@ public class TestRecover {
                 StringBuilder buff = new StringBuilder();
                 buff.append(len);
                 switch (random.nextInt(10)) {
-                case 0:
-                    len = random.nextInt(MAX_STRING_LENGTH);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                    len = random.nextInt(MAX_STRING_LENGTH / 20);
-                    break;
-                default:
-                    len = 0;
+                    case 0:
+                        len = random.nextInt(MAX_STRING_LENGTH);
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                        len = random.nextInt(MAX_STRING_LENGTH / 20);
+                        break;
+                    default:
+                        len = 0;
                 }
                 len -= 10;
                 while (len > 0) {

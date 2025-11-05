@@ -6,13 +6,6 @@
  */
 package org.h2.tools;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.sql.SQLException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
@@ -20,8 +13,16 @@ import org.h2.store.fs.FileUtils;
 import org.h2.util.IOUtils;
 import org.h2.util.Tool;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.sql.SQLException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 /**
  * Restores a H2 database by extracting the database files from a .zip file.
+ *
  * @h2.resource
  */
 public class Restore extends Tool {
@@ -40,9 +41,9 @@ public class Restore extends Tool {
      * <tr><td>[-quiet]</td>
      * <td>Do not print progress information</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new Restore().runTool(args);
@@ -137,8 +138,8 @@ public class Restore extends Tool {
      * Restores database files.
      *
      * @param zipFileName the name of the backup file
-     * @param directory the directory name
-     * @param db the database name (null for all databases)
+     * @param directory   the directory name
+     * @param db          the database name (null for all databases)
      * @throws DbException if there is an IOException
      */
     public static void execute(String zipFileName, String directory, String db) {

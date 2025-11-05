@@ -6,17 +6,17 @@
  */
 package org.h2.mvstore;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
-
 import org.h2.mvstore.cache.FilePathCache;
 import org.h2.store.fs.FilePath;
 import org.h2.store.fs.FilePathDisk;
 import org.h2.store.fs.FilePathEncrypt;
 import org.h2.store.fs.FilePathNio;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 
 /**
  * The default storage mechanism of the MVStore. This implementation persists
@@ -119,11 +119,11 @@ public class FileStore {
     /**
      * Try to open the file.
      *
-     * @param fileName the file name
-     * @param readOnly whether the file should only be opened in read-only mode,
-     *            even if the file is writable
+     * @param fileName      the file name
+     * @param readOnly      whether the file should only be opened in read-only mode,
+     *                      even if the file is writable
      * @param encryptionKey the encryption key, or null if encryption is not
-     *            used
+     *                      used
      */
     public void open(String fileName, boolean readOnly, char[] encryptionKey) {
         if (fileName != null) {
@@ -315,7 +315,7 @@ public class FileStore {
     /**
      * Mark the space as in use.
      *
-     * @param pos the position in bytes
+     * @param pos    the position in bytes
      * @param length the number of bytes
      */
     public void markUsed(long pos, int length) {
@@ -335,7 +335,7 @@ public class FileStore {
     /**
      * Mark the space as free.
      *
-     * @param pos the position in bytes
+     * @param pos    the position in bytes
      * @param length the number of bytes
      */
     public void free(long pos, int length) {

@@ -6,17 +6,17 @@
  */
 package org.h2.test.store;
 
+import org.h2.mvstore.Chunk;
+import org.h2.mvstore.DataUtils;
+import org.h2.mvstore.WriteBuffer;
+import org.h2.test.TestBase;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
-
-import org.h2.mvstore.Chunk;
-import org.h2.mvstore.DataUtils;
-import org.h2.mvstore.WriteBuffer;
-import org.h2.test.TestBase;
 
 /**
  * Test utility classes.
@@ -94,12 +94,12 @@ public class TestDataUtils extends TestBase {
 
     private void testMap() {
         StringBuilder buff = new StringBuilder();
-        DataUtils.appendMap(buff,  "", "");
-        DataUtils.appendMap(buff,  "a", "1");
-        DataUtils.appendMap(buff,  "b", ",");
-        DataUtils.appendMap(buff,  "c", "1,2");
-        DataUtils.appendMap(buff,  "d", "\"test\"");
-        DataUtils.appendMap(buff,  "e", "}");
+        DataUtils.appendMap(buff, "", "");
+        DataUtils.appendMap(buff, "a", "1");
+        DataUtils.appendMap(buff, "b", ",");
+        DataUtils.appendMap(buff, "c", "1,2");
+        DataUtils.appendMap(buff, "d", "\"test\"");
+        DataUtils.appendMap(buff, "e", "}");
         assertEquals(":,a:1,b:\",\",c:\"1,2\",d:\"\\\"test\\\"\",e:}", buff.toString());
 
         HashMap<String, String> m = DataUtils.parseMap(buff.toString());
@@ -265,7 +265,7 @@ public class TestDataUtils extends TestBase {
         assertEquals(1, DataUtils.PAGE_TYPE_NODE);
 
         long max = DataUtils.getPagePos(Chunk.MAX_ID, Integer.MAX_VALUE,
-                    Integer.MAX_VALUE, DataUtils.PAGE_TYPE_NODE);
+                Integer.MAX_VALUE, DataUtils.PAGE_TYPE_NODE);
         String hex = Long.toHexString(max);
         assertEquals(max, DataUtils.parseHexLong(hex));
         assertEquals(Chunk.MAX_ID, DataUtils.getPageChunkId(max));
@@ -286,9 +286,9 @@ public class TestDataUtils extends TestBase {
         }
         for (int type = 0; type <= 1; type++) {
             for (int chunkId = 0; chunkId < Chunk.MAX_ID;
-                    chunkId += Chunk.MAX_ID / 100) {
+                 chunkId += Chunk.MAX_ID / 100) {
                 for (long offset = 0; offset < Integer.MAX_VALUE;
-                        offset += Integer.MAX_VALUE / 100) {
+                     offset += Integer.MAX_VALUE / 100) {
                     for (int length = 0; length < 2000000; length += 200000) {
                         long pos = DataUtils.getPagePos(
                                 chunkId, (int) offset, length, type);

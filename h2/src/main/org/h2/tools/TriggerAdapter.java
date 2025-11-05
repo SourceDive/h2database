@@ -6,10 +6,11 @@
  */
 package org.h2.tools;
 
+import org.h2.api.Trigger;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.h2.api.Trigger;
 
 /**
  * An adapter for the trigger interface that allows to use the ResultSet
@@ -53,20 +54,20 @@ public abstract class TriggerAdapter implements Trigger {
      * database is opened. The default implementation initialized the result
      * sets.
      *
-     * @param conn a connection to the database
-     * @param schemaName the name of the schema
+     * @param conn        a connection to the database
+     * @param schemaName  the name of the schema
      * @param triggerName the name of the trigger used in the CREATE TRIGGER
-     *            statement
-     * @param tableName the name of the table
-     * @param before whether the fire method is called before or after the
-     *            operation is performed
-     * @param type the operation type: INSERT, UPDATE, DELETE, SELECT, or a
-     *            combination (this parameter is a bit field)
+     *                    statement
+     * @param tableName   the name of the table
+     * @param before      whether the fire method is called before or after the
+     *                    operation is performed
+     * @param type        the operation type: INSERT, UPDATE, DELETE, SELECT, or a
+     *                    combination (this parameter is a bit field)
      */
     @Override
     public void init(Connection conn, String schemaName,
-            String triggerName, String tableName,
-            boolean before, int type) throws SQLException {
+                     String triggerName, String tableName,
+                     boolean before, int type) throws SQLException {
         ResultSet rs = conn.getMetaData().getColumns(
                 null, schemaName, tableName, null);
         oldSource = new TriggerRowSource();
@@ -132,11 +133,11 @@ public abstract class TriggerAdapter implements Trigger {
      * parameters.
      * </p>
      *
-     * @param conn a connection to the database
+     * @param conn   a connection to the database
      * @param oldRow the old row, or null if no old row is available (for
-     *            INSERT)
+     *               INSERT)
      * @param newRow the new row, or null if no new row is available (for
-     *            DELETE)
+     *               DELETE)
      * @throws SQLException if the operation must be undone
      */
     @Override
@@ -156,18 +157,18 @@ public abstract class TriggerAdapter implements Trigger {
      * using the ResultSet.updateX methods.
      * </p>
      *
-     * @param conn a connection to the database
+     * @param conn   a connection to the database
      * @param oldRow the old row, or null if no old row is available (for
-     *            INSERT)
+     *               INSERT)
      * @param newRow the new row, or null if no new row is available (for
-     *            DELETE)
+     *               DELETE)
      * @throws SQLException if the operation must be undone
      */
     public abstract void fire(Connection conn, ResultSet oldRow,
-            ResultSet newRow) throws SQLException;
+                              ResultSet newRow) throws SQLException;
 
     private static SimpleResultSet wrap(SimpleResultSet rs,
-            TriggerRowSource source, Object[] row) throws SQLException {
+                                        TriggerRowSource source, Object[] row) throws SQLException {
         if (row == null) {
             return null;
         }

@@ -17,7 +17,7 @@ public interface Bench {
      * Initialize the database. This includes creating tables and inserting
      * data.
      *
-     * @param db the database object
+     * @param db   the database object
      * @param size the amount of data
      */
     void init(Database db, int size) throws SQLException;

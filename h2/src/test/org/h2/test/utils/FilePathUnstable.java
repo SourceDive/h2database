@@ -6,6 +6,10 @@
  */
 package org.h2.test.utils;
 
+import org.h2.store.fs.FileBase;
+import org.h2.store.fs.FilePath;
+import org.h2.store.fs.FilePathWrapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,10 +18,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.List;
 import java.util.Random;
-
-import org.h2.store.fs.FileBase;
-import org.h2.store.fs.FilePath;
-import org.h2.store.fs.FilePathWrapper;
 
 /**
  * An unstable file system. It is used to simulate file system problems (for
@@ -50,8 +50,8 @@ public class FilePathUnstable extends FilePathWrapper {
      * random seed (for partial writes).
      *
      * @param count the number of write operations (0 to never fail,
-     *            Integer.MAX_VALUE to count the operations)
-     * @param seed the new seed
+     *              Integer.MAX_VALUE to count the operations)
+     * @param seed  the new seed
      */
     public void setDiskFullCount(int count, int seed) {
         diskFullOffCount = count;
@@ -200,7 +200,7 @@ public class FilePathUnstable extends FilePathWrapper {
 
     @Override
     public FilePath createTempFile(String suffix, boolean deleteOnExit,
-            boolean inTempDir) throws IOException {
+                                   boolean inTempDir) throws IOException {
         return super.createTempFile(suffix, deleteOnExit, inTempDir);
     }
 
@@ -297,7 +297,7 @@ class FileUnstable extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         return channel.tryLock(position, size, shared);
     }
 

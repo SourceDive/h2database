@@ -6,6 +6,12 @@
  */
 package org.h2.dev.fs;
 
+import org.h2.engine.Constants;
+import org.h2.message.DbException;
+import org.h2.store.fs.*;
+import org.h2.util.IOUtils;
+import org.h2.util.New;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,15 +22,6 @@ import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.h2.engine.Constants;
-import org.h2.message.DbException;
-import org.h2.store.fs.FileBase;
-import org.h2.store.fs.FileChannelInputStream;
-import org.h2.store.fs.FilePath;
-import org.h2.store.fs.FilePathDisk;
-import org.h2.store.fs.FileUtils;
-import org.h2.util.IOUtils;
-import org.h2.util.New;
 
 /**
  * This is a read-only file system that allows to access databases stored in a
@@ -63,7 +60,7 @@ public class FilePathZip2 extends FilePath {
 
     @Override
     public FilePath createTempFile(String suffix, boolean deleteOnExit,
-            boolean inTempDir) throws IOException {
+                                   boolean inTempDir) throws IOException {
         if (!inTempDir) {
             throw new IOException("File system is read-only");
         }
@@ -143,7 +140,7 @@ public class FilePathZip2 extends FilePath {
                 if (n.equals(entryName)) {
                     result = entry.isDirectory();
                     break;
-                } else  if (n.startsWith(entryName)) {
+                } else if (n.startsWith(entryName)) {
                     if (n.length() == entryName.length() + 1) {
                         if (n.equals(entryName + "/")) {
                             result = true;
@@ -425,7 +422,7 @@ class FileZip2 extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         if (shared) {
 
             // cast to FileChannel to avoid JDK 1.7 ambiguity
@@ -439,7 +436,8 @@ class FileZip2 extends FileBase {
                 @Override
                 public void release() throws IOException {
                     // ignore
-                }};
+                }
+            };
         }
         return null;
     }

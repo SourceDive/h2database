@@ -6,13 +6,14 @@
  */
 package org.h2.command;
 
-import java.util.ArrayList;
 import org.h2.api.DatabaseEventListener;
 import org.h2.expression.Parameter;
 import org.h2.expression.ParameterInterface;
 import org.h2.result.ResultInterface;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
 
 /**
  * Represents a single SQL statements.

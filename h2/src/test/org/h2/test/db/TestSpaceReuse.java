@@ -6,12 +6,12 @@
  */
 package org.h2.test.db;
 
+import org.h2.test.TestBase;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.test.TestBase;
 
 /**
  * Tests if disk space is reused after deleting many rows.

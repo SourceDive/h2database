@@ -6,7 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.Arrays;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.engine.Session;
@@ -17,6 +16,8 @@ import org.h2.store.Data;
 import org.h2.store.Page;
 import org.h2.store.PageStore;
 import org.h2.util.Utils;
+
+import java.util.Arrays;
 
 /**
  * A leaf page that contains data of one or multiple rows. Format:
@@ -56,8 +57,8 @@ public class PageDataNode extends PageData {
     /**
      * Create a new page.
      *
-     * @param index the index
-     * @param pageId the page id
+     * @param index        the index
+     * @param pageId       the page id
      * @param parentPageId the parent
      * @return the page
      */
@@ -75,8 +76,8 @@ public class PageDataNode extends PageData {
     /**
      * Read a data node page.
      *
-     * @param index the index
-     * @param data the data
+     * @param index  the index
+     * @param data   the data
      * @param pageId the page id
      * @return the page
      */
@@ -95,7 +96,7 @@ public class PageDataNode extends PageData {
         if (indexId != index.getId()) {
             throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
                     "page:" + getPos() + " expected index:" + index.getId() +
-                    "got:" + indexId);
+                            "got:" + indexId);
         }
         rowCount = rowCountStored = data.readInt();
         entryCount = data.readShortInt();
@@ -173,7 +174,7 @@ public class PageDataNode extends PageData {
         int newPageId = index.getPageStore().allocatePage();
         PageDataNode p2 = PageDataNode.create(index, newPageId, parentPageId);
         int firstChild = childPageIds[splitPoint];
-        for (int i = splitPoint; i < entryCount;) {
+        for (int i = splitPoint; i < entryCount; ) {
             p2.addChild(p2.entryCount, childPageIds[splitPoint + 1], keys[splitPoint]);
             removeChild(splitPoint);
         }
@@ -204,8 +205,8 @@ public class PageDataNode extends PageData {
      */
     void init(PageData page1, long pivot, PageData page2) {
         entryCount = 1;
-        childPageIds = new int[] { page1.getPos(), page2.getPos() };
-        keys = new long[] { pivot };
+        childPageIds = new int[]{page1.getPos(), page2.getPos()};
+        keys = new long[]{pivot};
         length += 4 + Data.getVarLongLen(pivot);
         check();
     }
@@ -398,7 +399,7 @@ public class PageDataNode extends PageData {
     @Override
     public String toString() {
         return "page[" + getPos() + "] data node table:" + index.getId() +
-            " entries:" + entryCount + " " + Arrays.toString(childPageIds);
+                " entries:" + entryCount + " " + Arrays.toString(childPageIds);
     }
 
     @Override

@@ -6,12 +6,6 @@
  */
 package org.h2.test.unit;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-
 import org.h2.api.JavaObjectSerializer;
 import org.h2.store.Data;
 import org.h2.store.DataHandler;
@@ -21,28 +15,13 @@ import org.h2.test.TestBase;
 import org.h2.tools.SimpleResultSet;
 import org.h2.util.SmallLRUCache;
 import org.h2.util.TempFileDeleter;
-import org.h2.value.CompareMode;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueBoolean;
-import org.h2.value.ValueByte;
-import org.h2.value.ValueBytes;
-import org.h2.value.ValueDate;
-import org.h2.value.ValueDecimal;
-import org.h2.value.ValueDouble;
-import org.h2.value.ValueFloat;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueJavaObject;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueResultSet;
-import org.h2.value.ValueShort;
-import org.h2.value.ValueString;
-import org.h2.value.ValueStringFixed;
-import org.h2.value.ValueStringIgnoreCase;
-import org.h2.value.ValueTime;
-import org.h2.value.ValueTimestamp;
-import org.h2.value.ValueUuid;
+import org.h2.value.*;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.sql.Types;
 
 /**
  * Data page tests.
@@ -200,8 +179,8 @@ public class TestDataPage extends TestBase implements DataHandler {
             }
         }
         testValue(ValueArray.get(new Value[0]));
-        testValue(ValueArray.get(new Value[] { ValueBoolean.get(true),
-                ValueInt.get(10) }));
+        testValue(ValueArray.get(new Value[]{ValueBoolean.get(true),
+                ValueInt.get(10)}));
 
         SimpleResultSet rs = new SimpleResultSet();
         rs.setAutoClose(false);
@@ -333,7 +312,7 @@ public class TestDataPage extends TestBase implements DataHandler {
 
     @Override
     public int readLob(long lobId, byte[] hmac, long offset, byte[] buff,
-            int off, int length) {
+                       int off, int length) {
         return -1;
     }
 

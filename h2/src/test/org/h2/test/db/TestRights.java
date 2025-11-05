@@ -6,16 +6,11 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
+
+import java.sql.*;
 
 /**
  * Access rights tests.
@@ -76,11 +71,11 @@ public class TestRights extends TestBase {
         }
         deleteDb("rights");
         Connection conn = getConnection(
-                    "rights;MODE=MYSQL");
+                "rights;MODE=MYSQL");
         stat = conn.createStatement();
         stat.execute("create user test password 'test'");
         Connection conn2 = getConnection(
-                    "rights;MODE=MYSQL", "test", getPassword("test"));
+                "rights;MODE=MYSQL", "test", getPassword("test"));
         conn2.close();
         conn.close();
         if (config.memory) {
@@ -121,13 +116,13 @@ public class TestRights extends TestBase {
         assertTrue(rs.next());
         assertTrue(rs.next());
         assertFalse(rs.next());
-        for (String s : new String[] {
+        for (String s : new String[]{
                 "information_schema.settings where name='property.java.runtime.version'",
                 "information_schema.users where name='SA'",
                 "information_schema.roles",
                 "information_schema.rights",
                 "information_schema.sessions where user_name='SA'"
-                }) {
+        }) {
             rs = stat2.executeQuery("select * from " + s);
             assertFalse(rs.next());
             rs = stat.executeQuery("select * from " + s);
@@ -136,6 +131,7 @@ public class TestRights extends TestBase {
         conn2.close();
         conn.close();
     }
+
     private void testDropOwnUser() throws SQLException {
         deleteDb("rights");
         String user = getUser().toUpperCase();
@@ -303,22 +299,22 @@ public class TestRights extends TestBase {
         conn = getConnection("rights;LOG=2", "SCHEMA_CREATOR", getPassword("xyz"));
         stat = conn.createStatement();
         assertThrows(ErrorCode.ADMIN_RIGHTS_REQUIRED, stat).
-            execute("CREATE SCHEMA SCHEMA_RIGHT_TEST");
+                execute("CREATE SCHEMA SCHEMA_RIGHT_TEST");
         assertThrows(ErrorCode.ADMIN_RIGHTS_REQUIRED, stat).
-            execute("ALTER SCHEMA SCHEMA_RIGHT_TEST_EXISTS " +
-                    "RENAME TO SCHEMA_RIGHT_TEST_RENAMED");
+                execute("ALTER SCHEMA SCHEMA_RIGHT_TEST_EXISTS " +
+                        "RENAME TO SCHEMA_RIGHT_TEST_RENAMED");
         assertThrows(ErrorCode.ADMIN_RIGHTS_REQUIRED, stat).
-            execute("DROP SCHEMA SCHEMA_RIGHT_TEST_EXISTS");
+                execute("DROP SCHEMA SCHEMA_RIGHT_TEST_EXISTS");
         assertThrows(ErrorCode.NOT_ENOUGH_RIGHTS_FOR_1, stat).
-        execute("CREATE TABLE SCHEMA_RIGHT_TEST_EXISTS.TEST" +
-                "(ID INT PRIMARY KEY, NAME VARCHAR)");
+                execute("CREATE TABLE SCHEMA_RIGHT_TEST_EXISTS.TEST" +
+                        "(ID INT PRIMARY KEY, NAME VARCHAR)");
         assertThrows(ErrorCode.NOT_ENOUGH_RIGHTS_FOR_1, stat).
-        execute("INSERT INTO  SCHEMA_RIGHT_TEST_EXISTS.TEST_EXISTS " +
-                "(ID, NAME) VALUES (42, 'Adams')");
+                execute("INSERT INTO  SCHEMA_RIGHT_TEST_EXISTS.TEST_EXISTS " +
+                        "(ID, NAME) VALUES (42, 'Adams')");
         assertThrows(ErrorCode.NOT_ENOUGH_RIGHTS_FOR_1, stat).
-        execute("UPDATE SCHEMA_RIGHT_TEST_EXISTS.TEST_EXISTS Set NAME = 'Douglas'");
+                execute("UPDATE SCHEMA_RIGHT_TEST_EXISTS.TEST_EXISTS Set NAME = 'Douglas'");
         assertThrows(ErrorCode.NOT_ENOUGH_RIGHTS_FOR_1, stat).
-        execute("DELETE FROM SCHEMA_RIGHT_TEST_EXISTS.TEST_EXISTS");
+                execute("DELETE FROM SCHEMA_RIGHT_TEST_EXISTS.TEST_EXISTS");
         conn.close();
     }
 
@@ -396,7 +392,7 @@ public class TestRights extends TestBase {
         executeSuccess("CREATE USER TEST2 PASSWORD 'def' ADMIN");
         executeSuccess("ALTER USER TEST ADMIN FALSE");
         executeSuccess("SCRIPT TO '" + getBaseDir() +
-                    "/rights.sql' CIPHER AES PASSWORD 'test'");
+                "/rights.sql' CIPHER AES PASSWORD 'test'");
         conn.close();
 
         try {

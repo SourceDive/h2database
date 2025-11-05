@@ -6,15 +6,12 @@
  */
 package org.h2.test.unit;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.tools.Server;
+
+import java.sql.*;
 
 /**
  * Tests automatic embedded/server mode.
@@ -89,18 +86,18 @@ public class TestAutoReconnect extends TestBase {
         deleteDb("autoReconnect");
         if (autoServer) {
             url = "jdbc:h2:" + getBaseDir() + "/autoReconnect;" +
-                "FILE_LOCK=SOCKET;" +
-                "AUTO_SERVER=TRUE;OPEN_NEW=TRUE";
+                    "FILE_LOCK=SOCKET;" +
+                    "AUTO_SERVER=TRUE;OPEN_NEW=TRUE";
             restart();
         } else {
             server = Server.createTcpServer("-tcpPort", "8181").start();
             url = "jdbc:h2:tcp://localhost:8181/" + getBaseDir() + "/autoReconnect;" +
-                "FILE_LOCK=SOCKET;AUTO_RECONNECT=TRUE";
+                    "FILE_LOCK=SOCKET;AUTO_RECONNECT=TRUE";
         }
 
         // test the database event listener
         conn = getConnection(url + ";DATABASE_EVENT_LISTENER='" +
-        MyDatabaseEventListener.class.getName() + "'");
+                MyDatabaseEventListener.class.getName() + "'");
         conn.close();
 
         Statement stat;
@@ -147,7 +144,7 @@ public class TestAutoReconnect extends TestBase {
         restart();
         rs = stat.executeQuery("select * from system_range(1, 20)");
         restart();
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             try {
                 boolean more = rs.next();
                 if (!more) {

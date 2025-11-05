@@ -6,13 +6,13 @@
  */
 package org.h2.build.doc;
 
+import org.h2.engine.Constants;
+import org.h2.util.StringUtils;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-
-import org.h2.engine.Constants;
-import org.h2.util.StringUtils;
 
 /**
  * This application merges the html documentation to one file
@@ -30,10 +30,10 @@ public class MergeDocs {
      */
     public static void main(String... args) throws Exception {
         // the order of pages is important here
-        String[] pages = { "quickstart.html", "installation.html",
+        String[] pages = {"quickstart.html", "installation.html",
                 "tutorial.html", "features.html", "performance.html",
                 "advanced.html", "grammar.html", "functions.html",
-                "datatypes.html", "build.html", "history.html", "faq.html" };
+                "datatypes.html", "build.html", "history.html", "faq.html"};
         StringBuilder buff = new StringBuilder();
         for (String fileName : pages) {
             String text = getContent(fileName);

@@ -6,15 +6,6 @@
  */
 package org.h2.value;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
@@ -24,25 +15,25 @@ import org.h2.store.FileStore;
 import org.h2.store.FileStoreInputStream;
 import org.h2.store.FileStoreOutputStream;
 import org.h2.store.fs.FileUtils;
-import org.h2.util.IOUtils;
-import org.h2.util.MathUtils;
-import org.h2.util.SmallLRUCache;
-import org.h2.util.StringUtils;
-import org.h2.util.Utils;
+import org.h2.util.*;
+
+import java.io.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Implementation of the BLOB and CLOB data types. Small objects are kept in
  * memory and stored in the record.
- *
+ * <p>
  * Large objects are stored in their own files. When large objects are set in a
  * prepared statement, they are first stored as 'temporary' files. Later, when
  * they are used in a record, and when the record is stored, the lob files are
  * linked: the file is renamed using the file format (tableId).(objectId). There
  * is one exception: large variables are stored in the file (-1).(objectId).
- *
+ * <p>
  * When lobs are deleted, they are first renamed to a temp file, and if the
  * delete operation is committed the file is deleted.
- *
+ * <p>
  * Data compression is supported.
  */
 public class ValueLob extends Value {
@@ -66,8 +57,8 @@ public class ValueLob extends Value {
     private FileStore tempFile;
 
     private ValueLob(int type, DataHandler handler, String fileName,
-            int tableId, int objectId, boolean linked, long precision,
-            boolean compressed) {
+                     int tableId, int objectId, boolean linked, long precision,
+                     boolean compressed) {
         this.type = type;
         this.handler = handler;
         this.fileName = fileName;
@@ -101,7 +92,7 @@ public class ValueLob extends Value {
     /**
      * Create a small lob using the given byte array.
      *
-     * @param type the type (Value.BLOB or CLOB)
+     * @param type  the type (Value.BLOB or CLOB)
      * @param small the byte array
      * @return the lob value
      */
@@ -110,7 +101,7 @@ public class ValueLob extends Value {
     }
 
     private static String getFileName(DataHandler handler, int tableId,
-            int objectId) {
+                                      int objectId) {
         if (SysProperties.CHECK && tableId == 0 && objectId == 0) {
             DbException.throwInternalError("0 LOB");
         }
@@ -122,16 +113,16 @@ public class ValueLob extends Value {
     /**
      * Create a LOB value with the given parameters.
      *
-     * @param type the data type
-     * @param handler the file handler
-     * @param tableId the table object id
-     * @param objectId the object id
-     * @param precision the precision (length in elements)
+     * @param type        the data type
+     * @param handler     the file handler
+     * @param tableId     the table object id
+     * @param objectId    the object id
+     * @param precision   the precision (length in elements)
      * @param compression if compression is used
      * @return the value object
      */
     public static ValueLob openLinked(int type, DataHandler handler,
-            int tableId, int objectId, long precision, boolean compression) {
+                                      int tableId, int objectId, long precision, boolean compression) {
         String fileName = getFileName(handler, tableId, objectId);
         return new ValueLob(type, handler, fileName, tableId, objectId,
                 true/* linked */, precision, compression);
@@ -140,18 +131,18 @@ public class ValueLob extends Value {
     /**
      * Create a LOB value with the given parameters.
      *
-     * @param type the data type
-     * @param handler the file handler
-     * @param tableId the table object id
-     * @param objectId the object id
-     * @param precision the precision (length in elements)
+     * @param type        the data type
+     * @param handler     the file handler
+     * @param tableId     the table object id
+     * @param objectId    the object id
+     * @param precision   the precision (length in elements)
      * @param compression if compression is used
-     * @param fileName the file name
+     * @param fileName    the file name
      * @return the value object
      */
     public static ValueLob openUnlinked(int type, DataHandler handler,
-            int tableId, int objectId, long precision, boolean compression,
-            String fileName) {
+                                        int tableId, int objectId, long precision, boolean compression,
+                                        String fileName) {
         return new ValueLob(type, handler, fileName, tableId, objectId,
                 false/* linked */, precision, compression);
     }
@@ -159,13 +150,13 @@ public class ValueLob extends Value {
     /**
      * Create a CLOB value from a stream.
      *
-     * @param in the reader
-     * @param length the number of characters to read, or -1 for no limit
+     * @param in      the reader
+     * @param length  the number of characters to read, or -1 for no limit
      * @param handler the data handler
      * @return the lob value
      */
     private static ValueLob createClob(Reader in, long length,
-            DataHandler handler) {
+                                       DataHandler handler) {
         try {
             if (handler == null) {
                 String s = IOUtils.readStringAndClose(in, (int) length);
@@ -199,7 +190,7 @@ public class ValueLob extends Value {
     }
 
     private static int getBufferSize(DataHandler handler, boolean compress,
-            long remaining) {
+                                     long remaining) {
         if (remaining < 0 || remaining > Integer.MAX_VALUE) {
             remaining = Integer.MAX_VALUE;
         }
@@ -222,7 +213,7 @@ public class ValueLob extends Value {
     }
 
     private void createFromReader(char[] buff, int len, Reader in,
-            long remaining, DataHandler h) throws IOException {
+                                  long remaining, DataHandler h) throws IOException {
         FileStoreOutputStream out = initLarge(h);
         boolean compress = h.getLobCompressionAlgorithm(Value.CLOB) != null;
         try {
@@ -356,13 +347,13 @@ public class ValueLob extends Value {
     /**
      * Create a BLOB value from a stream.
      *
-     * @param in the input stream
-     * @param length the number of characters to read, or -1 for no limit
+     * @param in      the input stream
+     * @param length  the number of characters to read, or -1 for no limit
      * @param handler the data handler
      * @return the lob value
      */
     private static ValueLob createBlob(InputStream in, long length,
-            DataHandler handler) {
+                                       DataHandler handler) {
         try {
             if (handler == null) {
                 byte[] data = IOUtils.readBytesAndClose(in, (int) length);
@@ -421,7 +412,7 @@ public class ValueLob extends Value {
     }
 
     private void createFromStream(byte[] buff, int len, InputStream in,
-            long remaining, DataHandler h) throws IOException {
+                                  long remaining, DataHandler h) throws IOException {
         FileStoreOutputStream out = initLarge(h);
         boolean compress = h.getLobCompressionAlgorithm(Value.BLOB) != null;
         try {
@@ -768,7 +759,7 @@ public class ValueLob extends Value {
     }
 
     private static synchronized void deleteFile(DataHandler handler,
-            String fileName) {
+                                                String fileName) {
         // synchronize on the database, to avoid concurrent temp file creation /
         // deletion / backup
         synchronized (handler.getLobSyncObject()) {
@@ -777,14 +768,14 @@ public class ValueLob extends Value {
     }
 
     private static synchronized void renameFile(DataHandler handler,
-            String oldName, String newName) {
+                                                String oldName, String newName) {
         synchronized (handler.getLobSyncObject()) {
             FileUtils.moveTo(oldName, newName);
         }
     }
 
     private static void copyFileTo(DataHandler h, String sourceFileName,
-            String targetFileName) {
+                                   String targetFileName) {
         synchronized (h.getLobSyncObject()) {
             try {
                 IOUtils.copyFiles(sourceFileName, targetFileName);

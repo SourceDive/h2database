@@ -6,14 +6,14 @@
  */
 package org.h2.test.mvcc;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+import org.h2.util.Task;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
-
-import org.h2.api.ErrorCode;
-import org.h2.test.TestBase;
-import org.h2.util.Task;
 
 /**
  * Multi-threaded MVCC (multi version concurrency) test cases.
@@ -64,7 +64,7 @@ public class TestMvccMultiThreaded extends TestBase {
         conn.createStatement().execute(
                 "create table test(id int primary key, name varchar)");
         Task[] tasks = new Task[len];
-        final boolean[] stop = { false };
+        final boolean[] stop = {false};
         for (int i = 0; i < len; i++) {
             final Connection c = connList[i];
             c.setAutoCommit(false);

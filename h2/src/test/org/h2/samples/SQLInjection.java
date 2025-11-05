@@ -8,12 +8,7 @@ package org.h2.samples;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * SQL Injection is a common security vulnerability for applications that use
@@ -49,9 +44,9 @@ public class SQLInjection {
     /**
      * Run the test against the specified database.
      *
-     * @param driver the JDBC driver name
-     * @param url the database URL
-     * @param user the user name
+     * @param driver   the JDBC driver name
+     * @param url      the database URL
+     * @param user     the user name
      * @param password the password
      */
     void run(String driver, String url, String user, String password)
@@ -143,13 +138,13 @@ public class SQLInjection {
      * Utility method to get a user record given the user name and password.
      * This method is secure.
      *
-     * @param conn the database connection
+     * @param conn     the database connection
      * @param userName the user name
      * @param password the password
      * @return a result set with the user record if the password matches
      */
     public static ResultSet getUser(Connection conn, String userName,
-            String password) throws Exception {
+                                    String password) throws Exception {
         PreparedStatement prep = conn.prepareStatement(
                 "SELECT * FROM USERS WHERE NAME=? AND PASSWORD=?");
         prep.setString(1, userName);
@@ -161,13 +156,13 @@ public class SQLInjection {
      * Utility method to change a password of a user.
      * This method is secure, except that the old password is not checked.
      *
-     * @param conn the database connection
+     * @param conn     the database connection
      * @param userName the user name
      * @param password the password
      * @return the new password
      */
     public static String changePassword(Connection conn, String userName,
-            String password) throws Exception {
+                                        String password) throws Exception {
         PreparedStatement prep = conn.prepareStatement(
                 "UPDATE USERS SET PASSWORD=? WHERE NAME=?");
         prep.setString(1, password);
@@ -206,7 +201,7 @@ public class SQLInjection {
         String password = input("Password?");
         PreparedStatement prep = conn.prepareStatement(
                 "SELECT * FROM USERS WHERE " +
-                "NAME=? AND PASSWORD=?");
+                        "NAME=? AND PASSWORD=?");
         prep.setString(1, name);
         prep.setString(2, password);
         ResultSet rs = prep.executeQuery();
@@ -247,7 +242,7 @@ public class SQLInjection {
         try {
             PreparedStatement prep = conn.prepareStatement(
                     "SELECT * FROM USERS WHERE " +
-                    "ID=" + id + " AND PASSWORD=?");
+                            "ID=" + id + " AND PASSWORD=?");
             prep.setString(1, password);
             ResultSet rs = prep.executeQuery();
             if (rs.next()) {
@@ -272,7 +267,7 @@ public class SQLInjection {
         try {
             PreparedStatement prep = conn.prepareStatement(
                     "SELECT * FROM USERS WHERE " +
-                    "ID=? AND PASSWORD=?");
+                            "ID=? AND PASSWORD=?");
             prep.setInt(1, Integer.parseInt(id));
             prep.setString(2, password);
             ResultSet rs = prep.executeQuery();
@@ -389,7 +384,7 @@ public class SQLInjection {
         System.out.println("Very Secure Systems Inc. - login");
         stat.execute("DROP TABLE IF EXISTS USERS2");
         stat.execute("CREATE TABLE USERS2(ID INT PRIMARY KEY, " +
-            "NAME VARCHAR, SALT BINARY, HASH BINARY)");
+                "NAME VARCHAR, SALT BINARY, HASH BINARY)");
         stat.execute("INSERT INTO USERS2 VALUES" +
                 "(1, 'admin', SECURE_RAND(16), NULL)");
         stat.execute("DROP CONSTANT IF EXISTS HASH_ITERATIONS");
@@ -405,7 +400,7 @@ public class SQLInjection {
         stat.execute("SET ALLOW_LITERALS NONE");
         PreparedStatement prep = conn.prepareStatement(
                 "SELECT * FROM USERS2 WHERE NAME=? AND " +
-                "HASH=HASH(HASH_ALGORITHM, STRINGTOUTF8(? || SALT), HASH_ITERATIONS)");
+                        "HASH=HASH(HASH_ALGORITHM, STRINGTOUTF8(? || SALT), HASH_ITERATIONS)");
         prep.setString(1, user);
         prep.setString(2, password);
         ResultSet rs = prep.executeQuery();

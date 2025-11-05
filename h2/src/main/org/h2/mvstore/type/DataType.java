@@ -6,9 +6,9 @@
  */
 package org.h2.mvstore.type;
 
-import java.nio.ByteBuffer;
-
 import org.h2.mvstore.WriteBuffer;
+
+import java.nio.ByteBuffer;
 
 /**
  * A data type.
@@ -37,7 +37,7 @@ public interface DataType {
      * Write an object.
      *
      * @param buff the target buffer
-     * @param obj the value
+     * @param obj  the value
      */
     void write(WriteBuffer buff, Object obj);
 
@@ -45,9 +45,9 @@ public interface DataType {
      * Write a list of objects.
      *
      * @param buff the target buffer
-     * @param obj the objects
-     * @param len the number of objects to write
-     * @param key whether the objects are keys
+     * @param obj  the objects
+     * @param len  the number of objects to write
+     * @param key  whether the objects are keys
      */
     void write(WriteBuffer buff, Object[] obj, int len, boolean key);
 
@@ -63,9 +63,9 @@ public interface DataType {
      * Read a list of objects.
      *
      * @param buff the target buffer
-     * @param obj the objects
-     * @param len the number of objects to read
-     * @param key whether the objects are keys
+     * @param obj  the objects
+     * @param len  the number of objects to read
+     * @param key  whether the objects are keys
      */
     void read(ByteBuffer buff, Object[] obj, int len, boolean key);
 

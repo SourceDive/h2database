@@ -6,11 +6,13 @@
  */
 package org.h2.jdbcx;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
+import org.h2.api.ErrorCode;
+import org.h2.jdbc.JdbcConnection;
+import org.h2.message.DbException;
+import org.h2.message.TraceObject;
+import org.h2.util.JdbcUtils;
+import org.h2.util.New;
+
 import javax.sql.ConnectionEvent;
 import javax.sql.ConnectionEventListener;
 import javax.sql.StatementEventListener;
@@ -18,14 +20,11 @@ import javax.sql.XAConnection;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
-
-import org.h2.api.ErrorCode;
-import org.h2.jdbc.JdbcConnection;
-import org.h2.util.JdbcUtils;
-import org.h2.util.New;
-
-import org.h2.message.DbException;
-import org.h2.message.TraceObject;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 
 /**
@@ -52,7 +51,7 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
     }
 
     JdbcXAConnection(JdbcDataSourceFactory factory, int id,
-            JdbcConnection physicalConn) {
+                     JdbcConnection physicalConn) {
         this.factory = factory;
         setTrace(factory.getTrace(), TraceObject.XA_DATA_SOURCE, id);
         this.physicalConn = physicalConn;
@@ -187,7 +186,7 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
      * the transaction manager during recovery.
      *
      * @param flag TMSTARTRSCAN, TMENDRSCAN, or TMNOFLAGS. If no other flags are
-     *            set, TMNOFLAGS must be used.
+     *             set, TMNOFLAGS must be used.
      * @return zero or more Xid objects
      */
     @Override
@@ -231,7 +230,7 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
     @Override
     public int prepare(Xid xid) throws XAException {
         if (isDebugEnabled()) {
-            debugCode("prepare("+JdbcXid.toString(xid)+");");
+            debugCode("prepare(" + JdbcXid.toString(xid) + ");");
         }
         checkOpen();
         if (!currentTransaction.equals(xid)) {
@@ -259,7 +258,7 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
     @Override
     public void forget(Xid xid) {
         if (isDebugEnabled()) {
-            debugCode("forget("+JdbcXid.toString(xid)+");");
+            debugCode("forget(" + JdbcXid.toString(xid) + ");");
         }
         prepared = false;
     }
@@ -272,7 +271,7 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
     @Override
     public void rollback(Xid xid) throws XAException {
         if (isDebugEnabled()) {
-            debugCode("rollback("+JdbcXid.toString(xid)+");");
+            debugCode("rollback(" + JdbcXid.toString(xid) + ");");
         }
         try {
             physicalConn.rollback();
@@ -296,13 +295,13 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
     /**
      * End a transaction.
      *
-     * @param xid the transaction id
+     * @param xid   the transaction id
      * @param flags TMSUCCESS, TMFAIL, or TMSUSPEND
      */
     @Override
     public void end(Xid xid, int flags) throws XAException {
         if (isDebugEnabled()) {
-            debugCode("end("+JdbcXid.toString(xid)+", "+quoteFlags(flags)+");");
+            debugCode("end(" + JdbcXid.toString(xid) + ", " + quoteFlags(flags) + ");");
         }
         // TODO transaction end: implement this method
         if (flags == TMSUSPEND) {
@@ -317,13 +316,13 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
     /**
      * Start or continue to work on a transaction.
      *
-     * @param xid the transaction id
+     * @param xid   the transaction id
      * @param flags TMNOFLAGS, TMJOIN, or TMRESUME
      */
     @Override
     public void start(Xid xid, int flags) throws XAException {
         if (isDebugEnabled()) {
-            debugCode("start("+JdbcXid.toString(xid)+", "+quoteFlags(flags)+");");
+            debugCode("start(" + JdbcXid.toString(xid) + ", " + quoteFlags(flags) + ");");
         }
         if (flags == TMRESUME) {
             return;
@@ -347,13 +346,13 @@ public class JdbcXAConnection extends TraceObject implements XAConnection,
     /**
      * Commit a transaction.
      *
-     * @param xid the transaction id
+     * @param xid      the transaction id
      * @param onePhase use a one-phase protocol if true
      */
     @Override
     public void commit(Xid xid, boolean onePhase) throws XAException {
         if (isDebugEnabled()) {
-            debugCode("commit("+JdbcXid.toString(xid)+", "+onePhase+");");
+            debugCode("commit(" + JdbcXid.toString(xid) + ", " + onePhase + ");");
         }
         Statement stat = null;
         try {

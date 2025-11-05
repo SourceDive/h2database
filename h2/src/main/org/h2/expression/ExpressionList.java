@@ -88,7 +88,7 @@ public class ExpressionList extends Expression {
     @Override
     public String getSQL() {
         StatementBuilder buff = new StatementBuilder("(");
-        for (Expression e: list) {
+        for (Expression e : list) {
             buff.appendExceptFirst(", ");
             buff.append(e.getSQL());
         }

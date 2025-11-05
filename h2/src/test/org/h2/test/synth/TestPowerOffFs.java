@@ -6,14 +6,14 @@
  */
 package org.h2.test.synth;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+import org.h2.test.utils.FilePathDebug;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.api.ErrorCode;
-import org.h2.test.TestBase;
-import org.h2.test.utils.FilePathDebug;
 
 /**
  * Tests that use the debug file system to simulate power failure.
@@ -37,7 +37,7 @@ public class TestPowerOffFs extends TestBase {
         test(Integer.MAX_VALUE);
         System.out.println(Integer.MAX_VALUE - fs.getPowerOffCount());
         System.out.println("done");
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             boolean end = test(i);
             if (end) {
                 break;

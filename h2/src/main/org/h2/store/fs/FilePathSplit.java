@@ -6,6 +6,10 @@
  */
 package org.h2.store.fs;
 
+import org.h2.engine.SysProperties;
+import org.h2.message.DbException;
+import org.h2.util.New;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,10 +19,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.h2.engine.SysProperties;
-import org.h2.message.DbException;
-import org.h2.util.New;
 
 /**
  * A file system that may split files into multiple smaller files.
@@ -41,7 +41,7 @@ public class FilePathSplit extends FilePathWrapper {
     @Override
     public boolean setReadOnly() {
         boolean result = false;
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             FilePath f = getBase(i);
             if (f.exists()) {
                 result = f.setReadOnly();
@@ -54,7 +54,7 @@ public class FilePathSplit extends FilePathWrapper {
 
     @Override
     public void delete() {
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             FilePath f = getBase(i);
             if (f.exists()) {
                 f.delete();
@@ -67,7 +67,7 @@ public class FilePathSplit extends FilePathWrapper {
     @Override
     public long lastModified() {
         long lastModified = 0;
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             FilePath f = getBase(i);
             if (f.exists()) {
                 long l = f.lastModified();
@@ -82,7 +82,7 @@ public class FilePathSplit extends FilePathWrapper {
     @Override
     public long size() {
         long length = 0;
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             FilePath f = getBase(i);
             if (f.exists()) {
                 length += f.size();
@@ -109,7 +109,7 @@ public class FilePathSplit extends FilePathWrapper {
     @Override
     public InputStream newInputStream() throws IOException {
         InputStream input = getBase().newInputStream();
-        for (int i = 1;; i++) {
+        for (int i = 1; ; i++) {
             FilePath f = getBase(i);
             if (f.exists()) {
                 InputStream i2 = f.newInputStream();
@@ -125,7 +125,7 @@ public class FilePathSplit extends FilePathWrapper {
     public FileChannel open(String mode) throws IOException {
         ArrayList<FileChannel> list = New.arrayList();
         list.add(getBase().open(mode));
-        for (int i = 1;; i++) {
+        for (int i = 1; ; i++) {
             FilePath f = getBase(i);
             if (f.exists()) {
                 list.add(f.open(mode));
@@ -169,7 +169,7 @@ public class FilePathSplit extends FilePathWrapper {
     }
 
     private void closeAndThrow(int id, FileChannel[] array, FileChannel o,
-            long maxLength) throws IOException {
+                               long maxLength) throws IOException {
         String message = "Expected file length: " + maxLength + " got: " +
                 o.size() + " for " + getName(id);
         for (FileChannel f : array) {
@@ -186,7 +186,7 @@ public class FilePathSplit extends FilePathWrapper {
     @Override
     public void moveTo(FilePath path) {
         FilePathSplit newName = (FilePathSplit) path;
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             FilePath o = getBase(i);
             if (o.exists()) {
                 o.moveTo(newName.getBase(i));
@@ -219,7 +219,7 @@ public class FilePathSplit extends FilePathWrapper {
         } else {
             size = Long.toString(SysProperties.SPLIT_FILE_SIZE_SHIFT);
         }
-        return new String[] { size, fileName };
+        return new String[]{size, fileName};
     }
 
     /**
@@ -256,7 +256,7 @@ class FileSplit extends FileBase {
     private long length;
 
     FileSplit(FilePathSplit file, String mode, FileChannel[] list, long length,
-            long maxLength) {
+              long maxLength) {
         this.file = file;
         this.mode = mode;
         this.list = list;
@@ -391,7 +391,7 @@ class FileSplit extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         return list[0].tryLock(position, size, shared);
     }
 

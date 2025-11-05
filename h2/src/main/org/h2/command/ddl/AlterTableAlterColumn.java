@@ -6,9 +6,6 @@
  */
 package org.h2.command.ddl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
 import org.h2.command.Parser;
@@ -33,6 +30,9 @@ import org.h2.table.Column;
 import org.h2.table.Table;
 import org.h2.table.TableView;
 import org.h2.util.New;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * This class represents the statements
@@ -96,85 +96,85 @@ public class AlterTableAlterColumn extends SchemaCommand {
             }
         }
         switch (type) {
-        case CommandInterface.ALTER_TABLE_ALTER_COLUMN_NOT_NULL: {
-            if (!oldColumn.isNullable()) {
-                // no change
-                break;
-            }
-            checkNoNullValues();
-            oldColumn.setNullable(false);
-            db.update(session, table);
-            break;
-        }
-        case CommandInterface.ALTER_TABLE_ALTER_COLUMN_NULL: {
-            if (oldColumn.isNullable()) {
-                // no change
-                break;
-            }
-            checkNullable();
-            oldColumn.setNullable(true);
-            db.update(session, table);
-            break;
-        }
-        case CommandInterface.ALTER_TABLE_ALTER_COLUMN_DEFAULT: {
-            checkDefaultReferencesTable(defaultExpression);
-            oldColumn.setSequence(null);
-            oldColumn.setDefaultExpression(session, defaultExpression);
-            removeSequence(sequence);
-            db.update(session, table);
-            break;
-        }
-        case CommandInterface.ALTER_TABLE_ALTER_COLUMN_CHANGE_TYPE: {
-            // if the change is only increasing the precision, then we don't
-            // need to copy the table because the length is only a constraint,
-            // and does not affect the storage structure.
-            if (oldColumn.isWideningConversion(newColumn)) {
-                convertAutoIncrementColumn(newColumn);
-                oldColumn.copy(newColumn);
-                db.update(session, table);
-            } else {
-                oldColumn.setSequence(null);
-                oldColumn.setDefaultExpression(session, null);
-                oldColumn.setConvertNullToDefault(false);
-                if (oldColumn.isNullable() && !newColumn.isNullable()) {
-                    checkNoNullValues();
-                } else if (!oldColumn.isNullable() && newColumn.isNullable()) {
-                    checkNullable();
+            case CommandInterface.ALTER_TABLE_ALTER_COLUMN_NOT_NULL: {
+                if (!oldColumn.isNullable()) {
+                    // no change
+                    break;
                 }
-                convertAutoIncrementColumn(newColumn);
-                copyData();
-            }
-            break;
-        }
-        case CommandInterface.ALTER_TABLE_ADD_COLUMN: {
-            // ifNotExists only supported for single column add
-            if (ifNotExists && columnsToAdd.size() == 1 &&
-                    table.doesColumnExist(columnsToAdd.get(0).getName())) {
+                checkNoNullValues();
+                oldColumn.setNullable(false);
+                db.update(session, table);
                 break;
             }
-            for (Column column : columnsToAdd) {
-                convertAutoIncrementColumn(column);
+            case CommandInterface.ALTER_TABLE_ALTER_COLUMN_NULL: {
+                if (oldColumn.isNullable()) {
+                    // no change
+                    break;
+                }
+                checkNullable();
+                oldColumn.setNullable(true);
+                db.update(session, table);
+                break;
             }
-            copyData();
-            break;
-        }
-        case CommandInterface.ALTER_TABLE_DROP_COLUMN: {
-            if (table.getColumns().length == 1) {
-                throw DbException.get(ErrorCode.CANNOT_DROP_LAST_COLUMN,
-                        oldColumn.getSQL());
+            case CommandInterface.ALTER_TABLE_ALTER_COLUMN_DEFAULT: {
+                checkDefaultReferencesTable(defaultExpression);
+                oldColumn.setSequence(null);
+                oldColumn.setDefaultExpression(session, defaultExpression);
+                removeSequence(sequence);
+                db.update(session, table);
+                break;
             }
-            table.dropSingleColumnConstraintsAndIndexes(session, oldColumn);
-            copyData();
-            break;
-        }
-        case CommandInterface.ALTER_TABLE_ALTER_COLUMN_SELECTIVITY: {
-            int value = newSelectivity.optimize(session).getValue(session).getInt();
-            oldColumn.setSelectivity(value);
-            db.update(session, table);
-            break;
-        }
-        default:
-            DbException.throwInternalError("type=" + type);
+            case CommandInterface.ALTER_TABLE_ALTER_COLUMN_CHANGE_TYPE: {
+                // if the change is only increasing the precision, then we don't
+                // need to copy the table because the length is only a constraint,
+                // and does not affect the storage structure.
+                if (oldColumn.isWideningConversion(newColumn)) {
+                    convertAutoIncrementColumn(newColumn);
+                    oldColumn.copy(newColumn);
+                    db.update(session, table);
+                } else {
+                    oldColumn.setSequence(null);
+                    oldColumn.setDefaultExpression(session, null);
+                    oldColumn.setConvertNullToDefault(false);
+                    if (oldColumn.isNullable() && !newColumn.isNullable()) {
+                        checkNoNullValues();
+                    } else if (!oldColumn.isNullable() && newColumn.isNullable()) {
+                        checkNullable();
+                    }
+                    convertAutoIncrementColumn(newColumn);
+                    copyData();
+                }
+                break;
+            }
+            case CommandInterface.ALTER_TABLE_ADD_COLUMN: {
+                // ifNotExists only supported for single column add
+                if (ifNotExists && columnsToAdd.size() == 1 &&
+                        table.doesColumnExist(columnsToAdd.get(0).getName())) {
+                    break;
+                }
+                for (Column column : columnsToAdd) {
+                    convertAutoIncrementColumn(column);
+                }
+                copyData();
+                break;
+            }
+            case CommandInterface.ALTER_TABLE_DROP_COLUMN: {
+                if (table.getColumns().length == 1) {
+                    throw DbException.get(ErrorCode.CANNOT_DROP_LAST_COLUMN,
+                            oldColumn.getSQL());
+                }
+                table.dropSingleColumnConstraintsAndIndexes(session, oldColumn);
+                copyData();
+                break;
+            }
+            case CommandInterface.ALTER_TABLE_ALTER_COLUMN_SELECTIVITY: {
+                int value = newSelectivity.optimize(session).getValue(session).getInt();
+                oldColumn.setSelectivity(value);
+                db.update(session, table);
+                break;
+            }
+            default:
+                DbException.throwInternalError("type=" + type);
         }
         return 0;
     }
@@ -274,7 +274,7 @@ public class AlterTableAlterColumn extends SchemaCommand {
     }
 
     private Table cloneTableStructure(Column[] columns, Database db,
-            String tempName, ArrayList<Column> newColumns) {
+                                      String tempName, ArrayList<Column> newColumns) {
         for (Column col : columns) {
             newColumns.add(col.getClone());
         }

@@ -6,11 +6,6 @@
  */
 package org.h2.expression;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.dml.Select;
 import org.h2.command.dml.SelectOrderBy;
@@ -27,15 +22,12 @@ import org.h2.table.TableFilter;
 import org.h2.util.New;
 import org.h2.util.StatementBuilder;
 import org.h2.util.StringUtils;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueBoolean;
-import org.h2.value.ValueDouble;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueString;
+import org.h2.value.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * Implements the integrated aggregate functions, such as COUNT, MAX, SUM.
@@ -135,9 +127,9 @@ public class Aggregate extends Expression {
     /**
      * Create a new aggregate object.
      *
-     * @param type the aggregate type
-     * @param on the aggregated expression
-     * @param select the select statement
+     * @param type     the aggregate type
+     * @param on       the aggregated expression
+     * @param select   the select statement
      * @param distinct if distinct is used
      */
     public Aggregate(int type, Expression on, Select select, boolean distinct) {
@@ -267,29 +259,29 @@ public class Aggregate extends Expression {
     public Value getValue(Session session) {
         if (select.isQuickAggregateQuery()) {
             switch (type) {
-            case COUNT:
-            case COUNT_ALL:
-                Table table = select.getTopTableFilter().getTable();
-                return ValueLong.get(table.getRowCount(session));
-            case MIN:
-            case MAX:
-                boolean first = type == MIN;
-                Index index = getColumnIndex();
-                int sortType = index.getIndexColumns()[0].sortType;
-                if ((sortType & SortOrder.DESCENDING) != 0) {
-                    first = !first;
-                }
-                Cursor cursor = index.findFirstOrLast(session, first);
-                SearchRow row = cursor.getSearchRow();
-                Value v;
-                if (row == null) {
-                    v = ValueNull.INSTANCE;
-                } else {
-                    v = row.getValue(index.getColumns()[0].getColumnId());
-                }
-                return v;
-            default:
-                DbException.throwInternalError("type=" + type);
+                case COUNT:
+                case COUNT_ALL:
+                    Table table = select.getTopTableFilter().getTable();
+                    return ValueLong.get(table.getRowCount(session));
+                case MIN:
+                case MAX:
+                    boolean first = type == MIN;
+                    Index index = getColumnIndex();
+                    int sortType = index.getIndexColumns()[0].sortType;
+                    if ((sortType & SortOrder.DESCENDING) != 0) {
+                        first = !first;
+                    }
+                    Cursor cursor = index.findFirstOrLast(session, first);
+                    SearchRow row = cursor.getSearchRow();
+                    Value v;
+                    if (row == null) {
+                        v = ValueNull.INSTANCE;
+                    } else {
+                        v = row.getValue(index.getColumns()[0].getColumnId());
+                    }
+                    return v;
+                default:
+                    DbException.throwInternalError("type=" + type);
             }
         }
         HashMap<Expression, Object> group = select.getCurrentGroup();
@@ -379,65 +371,65 @@ public class Aggregate extends Expression {
             groupConcatSeparator = groupConcatSeparator.optimize(session);
         }
         switch (type) {
-        case GROUP_CONCAT:
-            dataType = Value.STRING;
-            scale = 0;
-            precision = displaySize = Integer.MAX_VALUE;
-            break;
-        case COUNT_ALL:
-        case COUNT:
-            dataType = Value.LONG;
-            scale = 0;
-            precision = ValueLong.PRECISION;
-            displaySize = ValueLong.DISPLAY_SIZE;
-            break;
-        case SELECTIVITY:
-            dataType = Value.INT;
-            scale = 0;
-            precision = ValueInt.PRECISION;
-            displaySize = ValueInt.DISPLAY_SIZE;
-            break;
-        case HISTOGRAM:
-            dataType = Value.ARRAY;
-            scale = 0;
-            precision = displaySize = Integer.MAX_VALUE;
-            break;
-        case SUM:
-            if (dataType == Value.BOOLEAN) {
-                // example: sum(id > 3) (count the rows)
+            case GROUP_CONCAT:
+                dataType = Value.STRING;
+                scale = 0;
+                precision = displaySize = Integer.MAX_VALUE;
+                break;
+            case COUNT_ALL:
+            case COUNT:
                 dataType = Value.LONG;
-            } else if (!DataType.supportsAdd(dataType)) {
-                throw DbException.get(ErrorCode.SUM_OR_AVG_ON_WRONG_DATATYPE_1, getSQL());
-            } else {
-                dataType = DataType.getAddProofType(dataType);
-            }
-            break;
-        case AVG:
-            if (!DataType.supportsAdd(dataType)) {
-                throw DbException.get(ErrorCode.SUM_OR_AVG_ON_WRONG_DATATYPE_1, getSQL());
-            }
-            break;
-        case MIN:
-        case MAX:
-            break;
-        case STDDEV_POP:
-        case STDDEV_SAMP:
-        case VAR_POP:
-        case VAR_SAMP:
-            dataType = Value.DOUBLE;
-            precision = ValueDouble.PRECISION;
-            displaySize = ValueDouble.DISPLAY_SIZE;
-            scale = 0;
-            break;
-        case BOOL_AND:
-        case BOOL_OR:
-            dataType = Value.BOOLEAN;
-            precision = ValueBoolean.PRECISION;
-            displaySize = ValueBoolean.DISPLAY_SIZE;
-            scale = 0;
-            break;
-        default:
-            DbException.throwInternalError("type=" + type);
+                scale = 0;
+                precision = ValueLong.PRECISION;
+                displaySize = ValueLong.DISPLAY_SIZE;
+                break;
+            case SELECTIVITY:
+                dataType = Value.INT;
+                scale = 0;
+                precision = ValueInt.PRECISION;
+                displaySize = ValueInt.DISPLAY_SIZE;
+                break;
+            case HISTOGRAM:
+                dataType = Value.ARRAY;
+                scale = 0;
+                precision = displaySize = Integer.MAX_VALUE;
+                break;
+            case SUM:
+                if (dataType == Value.BOOLEAN) {
+                    // example: sum(id > 3) (count the rows)
+                    dataType = Value.LONG;
+                } else if (!DataType.supportsAdd(dataType)) {
+                    throw DbException.get(ErrorCode.SUM_OR_AVG_ON_WRONG_DATATYPE_1, getSQL());
+                } else {
+                    dataType = DataType.getAddProofType(dataType);
+                }
+                break;
+            case AVG:
+                if (!DataType.supportsAdd(dataType)) {
+                    throw DbException.get(ErrorCode.SUM_OR_AVG_ON_WRONG_DATATYPE_1, getSQL());
+                }
+                break;
+            case MIN:
+            case MAX:
+                break;
+            case STDDEV_POP:
+            case STDDEV_SAMP:
+            case VAR_POP:
+            case VAR_SAMP:
+                dataType = Value.DOUBLE;
+                precision = ValueDouble.PRECISION;
+                displaySize = ValueDouble.DISPLAY_SIZE;
+                scale = 0;
+                break;
+            case BOOL_AND:
+            case BOOL_OR:
+                dataType = Value.BOOLEAN;
+                precision = ValueBoolean.PRECISION;
+                displaySize = ValueBoolean.DISPLAY_SIZE;
+                scale = 0;
+                break;
+            default:
+                DbException.throwInternalError("type=" + type);
         }
         return this;
     }
@@ -498,51 +490,51 @@ public class Aggregate extends Expression {
     public String getSQL() {
         String text;
         switch (type) {
-        case GROUP_CONCAT:
-            return getSQLGroupConcat();
-        case COUNT_ALL:
-            return "COUNT(*)";
-        case COUNT:
-            text = "COUNT";
-            break;
-        case SELECTIVITY:
-            text = "SELECTIVITY";
-            break;
-        case HISTOGRAM:
-            text = "HISTOGRAM";
-            break;
-        case SUM:
-            text = "SUM";
-            break;
-        case MIN:
-            text = "MIN";
-            break;
-        case MAX:
-            text = "MAX";
-            break;
-        case AVG:
-            text = "AVG";
-            break;
-        case STDDEV_POP:
-            text = "STDDEV_POP";
-            break;
-        case STDDEV_SAMP:
-            text = "STDDEV_SAMP";
-            break;
-        case VAR_POP:
-            text = "VAR_POP";
-            break;
-        case VAR_SAMP:
-            text = "VAR_SAMP";
-            break;
-        case BOOL_AND:
-            text = "BOOL_AND";
-            break;
-        case BOOL_OR:
-            text = "BOOL_OR";
-            break;
-        default:
-            throw DbException.throwInternalError("type=" + type);
+            case GROUP_CONCAT:
+                return getSQLGroupConcat();
+            case COUNT_ALL:
+                return "COUNT(*)";
+            case COUNT:
+                text = "COUNT";
+                break;
+            case SELECTIVITY:
+                text = "SELECTIVITY";
+                break;
+            case HISTOGRAM:
+                text = "HISTOGRAM";
+                break;
+            case SUM:
+                text = "SUM";
+                break;
+            case MIN:
+                text = "MIN";
+                break;
+            case MAX:
+                text = "MAX";
+                break;
+            case AVG:
+                text = "AVG";
+                break;
+            case STDDEV_POP:
+                text = "STDDEV_POP";
+                break;
+            case STDDEV_SAMP:
+                text = "STDDEV_SAMP";
+                break;
+            case VAR_POP:
+                text = "VAR_POP";
+                break;
+            case VAR_SAMP:
+                text = "VAR_SAMP";
+                break;
+            case BOOL_AND:
+                text = "BOOL_AND";
+                break;
+            case BOOL_OR:
+                text = "BOOL_OR";
+                break;
+            default:
+                throw DbException.throwInternalError("type=" + type);
         }
         if (distinct) {
             return text + "(DISTINCT " + on.getSQL() + ")";
@@ -568,19 +560,19 @@ public class Aggregate extends Expression {
     public boolean isEverything(ExpressionVisitor visitor) {
         if (visitor.getType() == ExpressionVisitor.OPTIMIZABLE_MIN_MAX_COUNT_ALL) {
             switch (type) {
-            case COUNT:
-                if (!distinct && on.getNullable() == Column.NOT_NULLABLE) {
+                case COUNT:
+                    if (!distinct && on.getNullable() == Column.NOT_NULLABLE) {
+                        return visitor.getTable().canGetRowCount();
+                    }
+                    return false;
+                case COUNT_ALL:
                     return visitor.getTable().canGetRowCount();
-                }
-                return false;
-            case COUNT_ALL:
-                return visitor.getTable().canGetRowCount();
-            case MIN:
-            case MAX:
-                Index index = getColumnIndex();
-                return index != null;
-            default:
-                return false;
+                case MIN:
+                case MAX:
+                    Index index = getColumnIndex();
+                    return index != null;
+                default:
+                    return false;
             }
         }
         if (on != null && !on.isEverything(visitor)) {

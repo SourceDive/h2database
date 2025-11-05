@@ -37,7 +37,7 @@ class SessionState {
      * Check if this session state is already committed at this point.
      *
      * @param logId the log id
-     * @param pos the position in the log
+     * @param pos   the position in the log
      * @return true if it is committed
      */
     public boolean isCommitted(int logId, int pos) {

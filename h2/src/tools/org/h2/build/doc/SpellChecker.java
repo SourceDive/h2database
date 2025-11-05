@@ -6,16 +6,16 @@
  */
 package org.h2.build.doc;
 
+import org.h2.build.BuildBase;
+import org.h2.util.StringUtils;
+import org.h2.util.Utils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
-
-import org.h2.build.BuildBase;
-import org.h2.util.StringUtils;
-import org.h2.util.Utils;
 
 /**
  * The spell checker makes sure that each word used in the source code
@@ -25,17 +25,17 @@ import org.h2.util.Utils;
  */
 public class SpellChecker {
 
-    private static final String[] SUFFIX = { "html", "java", "sql", "txt",
+    private static final String[] SUFFIX = {"html", "java", "sql", "txt",
             "xml", "jsp", "css", "bat", "csv", "xml", "js", "Driver",
-            "properties", "task", "MF", "mf", "sh", "" };
-    private static final String[] IGNORE = { "dev", "nsi", "gif", "png", "odg",
+            "properties", "task", "MF", "mf", "sh", ""};
+    private static final String[] IGNORE = {"dev", "nsi", "gif", "png", "odg",
             "ico", "sxd", "zip", "bz2", "rc", "layout", "res", "dll", "jar",
-            "svg", "prefs", "prop", "iml" };
+            "svg", "prefs", "prop", "iml"};
     private static final String DELIMITERS =
             " \n.();-\"=,*/{}_<>+\r:'@[]&\\!#|?$^%~`\t";
     private static final String PREFIX_IGNORE = "abc";
-    private static final String[] IGNORE_FILES = { "mainWeb.html",
-            "pg_catalog.sql" };
+    private static final String[] IGNORE_FILES = {"mainWeb.html",
+            "pg_catalog.sql"};
 
     // These are public so we can set them during development testing
 

@@ -6,14 +6,14 @@
  */
 package org.h2.dev.util;
 
+import org.h2.message.DbException;
+import org.h2.util.Tool;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.h2.message.DbException;
-import org.h2.util.Tool;
 
 /**
  * A text file viewer that support very large files.
@@ -32,7 +32,7 @@ public class FileViewer extends Tool {
     @Override
     protected void showUsage() {
         out.println("A text file viewer that support very large files.");
-        out.println("java "+getClass().getName() + "\n" +
+        out.println("java " + getClass().getName() + "\n" +
                 " -file <file>     The name of the file to view\n" +
                 " [-find <text>]   Find a string and display the next lines\n" +
                 " [-start <x>]     Start at the given position\n" +
@@ -88,8 +88,8 @@ public class FileViewer extends Tool {
     }
 
     private static void process(String fileName, String find,
-            boolean head, boolean tail, long start, int lines,
-            boolean quiet) throws IOException {
+                                boolean head, boolean tail, long start, int lines,
+                                boolean quiet) throws IOException {
         RandomAccessFile file = new RandomAccessFile(fileName, "r");
         long length = file.length();
         if (head) {
@@ -178,7 +178,7 @@ public class FileViewer extends Tool {
     }
 
     private static ArrayList<String> readLines(RandomAccessFile file,
-            int maxLines) throws IOException {
+                                               int maxLines) throws IOException {
         ArrayList<String> lines = new ArrayList<String>();
         ByteArrayOutputStream buff = new ByteArrayOutputStream(100);
         boolean lastNewline = false;

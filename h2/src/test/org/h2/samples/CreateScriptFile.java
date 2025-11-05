@@ -6,17 +6,6 @@
  */
 package org.h2.samples;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import org.h2.engine.Constants;
 import org.h2.security.SHA256;
 import org.h2.store.FileStore;
@@ -26,6 +15,10 @@ import org.h2.store.fs.FileUtils;
 import org.h2.tools.CompressTool;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
+
+import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * This sample application shows how to manually
@@ -94,17 +87,17 @@ public class CreateScriptFile {
     /**
      * Open a script writer.
      *
-     * @param fileName the file name (the file will be overwritten)
+     * @param fileName             the file name (the file will be overwritten)
      * @param compressionAlgorithm the compression algorithm (uppercase)
-     * @param cipher the encryption algorithm or null
-     * @param password the encryption password
-     * @param charset the character set (for example UTF-8)
+     * @param cipher               the encryption algorithm or null
+     * @param password             the encryption password
+     * @param charset              the character set (for example UTF-8)
      * @return the print writer
      */
     public static PrintWriter openScriptWriter(String fileName,
-            String compressionAlgorithm,
-            String cipher, String password,
-            String charset) throws IOException {
+                                               String compressionAlgorithm,
+                                               String cipher, String password,
+                                               String charset) throws IOException {
         try {
             OutputStream out;
             if (cipher != null) {
@@ -129,17 +122,17 @@ public class CreateScriptFile {
     /**
      * Open a script reader.
      *
-     * @param fileName the file name (the file will be overwritten)
+     * @param fileName             the file name (the file will be overwritten)
      * @param compressionAlgorithm the compression algorithm (uppercase)
-     * @param cipher the encryption algorithm or null
-     * @param password the encryption password
-     * @param charset the character set (for example UTF-8)
+     * @param cipher               the encryption algorithm or null
+     * @param password             the encryption password
+     * @param charset              the character set (for example UTF-8)
      * @return the script reader
      */
     public static LineNumberReader openScriptReader(String fileName,
-            String compressionAlgorithm,
-            String cipher, String password,
-            String charset) throws IOException {
+                                                    String compressionAlgorithm,
+                                                    String cipher, String password,
+                                                    String charset) throws IOException {
         try {
             InputStream in;
             if (cipher != null) {

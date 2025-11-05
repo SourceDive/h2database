@@ -6,6 +6,9 @@
  */
 package org.h2.store.fs;
 
+import org.h2.util.MathUtils;
+import org.h2.util.New;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,8 +16,6 @@ import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.h2.util.MathUtils;
-import org.h2.util.New;
 
 /**
  * A path to a file. It similar to the Java 7 <code>java.nio.file.Path</code>,
@@ -69,7 +70,7 @@ public abstract class FilePath {
         if (providers == null || defaultProvider == null) {
             Map<String, FilePath> map = Collections.synchronizedMap(
                     New.<String, FilePath>hashMap());
-            for (String c : new String[] {
+            for (String c : new String[]{
                     "org.h2.store.fs.FilePathDisk",
                     "org.h2.store.fs.FilePathMem",
                     "org.h2.store.fs.FilePathMemLZF",
@@ -216,7 +217,7 @@ public abstract class FilePath {
      * Create an output stream to write into the file.
      *
      * @param append if true, the file will grow, if false, the file will be
-     *            truncated first
+     *               truncated first
      * @return the output stream
      */
     public abstract OutputStream newOutputStream(boolean append) throws IOException;
@@ -246,14 +247,14 @@ public abstract class FilePath {
     /**
      * Create a new temporary file.
      *
-     * @param suffix the suffix
+     * @param suffix       the suffix
      * @param deleteOnExit if the file should be deleted when the virtual
-     *            machine exists
-     * @param inTempDir if the file should be stored in the temporary directory
+     *                     machine exists
+     * @param inTempDir    if the file should be stored in the temporary directory
      * @return the name of the created file
      */
     public FilePath createTempFile(String suffix, boolean deleteOnExit,
-            boolean inTempDir) throws IOException {
+                                   boolean inTempDir) throws IOException {
         while (true) {
             FilePath p = getPath(name + getNextTempFileNamePart(false) + suffix);
             if (p.exists() || !p.createFile()) {

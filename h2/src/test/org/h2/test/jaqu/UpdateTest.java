@@ -128,12 +128,12 @@ public class UpdateTest extends TestBase {
 
         // update  string and double columns
         db.from(p)
-            .set(p.productName).to("updated")
-            .increment(p.unitPrice).by(3.14)
-            .increment(p.unitsInStock).by(2)
-            .where(p.productId)
-            .is(1).
-            update();
+                .set(p.productName).to("updated")
+                .increment(p.unitPrice).by(3.14)
+                .increment(p.unitsInStock).by(2)
+                .where(p.productId)
+                .is(1).
+                update();
 
         // confirm the data was properly updated
         Product revised = db.from(p).where(p.productId).is(1).selectFirst();
@@ -143,10 +143,10 @@ public class UpdateTest extends TestBase {
 
         // restore the data
         db.from(p)
-            .set(p.productName).to(original.productName)
-            .set(p.unitPrice).to(original.unitPrice)
-            .increment(p.unitsInStock).by(-2)
-            .where(p.productId).is(1).update();
+                .set(p.productName).to(original.productName)
+                .set(p.unitPrice).to(original.unitPrice)
+                .increment(p.unitsInStock).by(-2)
+                .where(p.productId).is(1).update();
 
         // confirm the data was properly restored
         Product restored = db.from(p).

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public interface Statement {
 
     void setMethod(MethodObj method);
+
     boolean isEnd();
 
     /**
@@ -196,7 +197,7 @@ class SwitchStatement extends StatementBase {
     /**
      * Add a case.
      *
-     * @param expr the case expression
+     * @param expr  the case expression
      * @param block the execution block
      */
     public void addCase(Expr expr, StatementBlock block) {
@@ -357,7 +358,7 @@ class ForStatement extends StatementBase {
                 buff.append(") {\n");
                 buff.append(JavaParser.indent(iterableType +
                         " " + iterableVariable + " = " +
-                        iterable.asString() + "->at("+ idx +");\n"));
+                        iterable.asString() + "->at(" + idx + ");\n"));
                 buff.append(block.toString()).append("}");
             } else {
                 // TODO iterate over a collection
@@ -465,7 +466,7 @@ class VarDecStatement extends StatementBase {
     /**
      * Add a variable.
      *
-     * @param name the variable name
+     * @param name  the variable name
      * @param value the init value
      */
     public void addVariable(String name, Expr value) {

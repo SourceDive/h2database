@@ -78,7 +78,7 @@ public interface DatabaseEventListener extends EventListener {
     /**
      * This method is called if an exception occurred.
      *
-     * @param e the exception
+     * @param e   the exception
      * @param sql the SQL statement
      */
     void exceptionThrown(SQLException e, String sql);
@@ -92,9 +92,9 @@ public interface DatabaseEventListener extends EventListener {
      * </p>
      *
      * @param state the state
-     * @param name the object name
-     * @param x the current position
-     * @param max the highest possible value (might be 0)
+     * @param name  the object name
+     * @param x     the current position
+     * @param max   the highest possible value (might be 0)
      */
     void setProgress(int state, String name, int x, int max);
 

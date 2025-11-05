@@ -6,6 +6,12 @@
  */
 package org.h2.jaqu;
 
+import org.h2.jaqu.bytecode.ClassReader;
+import org.h2.jaqu.util.ClassUtils;
+import org.h2.jaqu.util.StatementLogger;
+import org.h2.util.JdbcUtils;
+import org.h2.util.New;
+
 import java.lang.reflect.Field;
 import java.sql.Clob;
 import java.sql.ResultSet;
@@ -15,11 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
-import org.h2.jaqu.bytecode.ClassReader;
-import org.h2.jaqu.util.StatementLogger;
-import org.h2.jaqu.util.ClassUtils;
-import org.h2.util.JdbcUtils;
-import org.h2.util.New;
 
 /**
  * This class represents a query.
@@ -329,7 +330,7 @@ public class Query<T> {
      * INTERNAL
      *
      * @param stat the statement
-     * @param x the alias object
+     * @param x    the alias object
      */
     public void appendSQL(SQLStatement stat, Object x) {
         if (x == Function.count()) {

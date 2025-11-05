@@ -6,18 +6,17 @@
  */
 package org.h2;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
-import java.sql.SQLException;
-import java.util.Properties;
 import org.h2.engine.Constants;
 import org.h2.jdbc.JdbcConnection;
 import org.h2.message.DbException;
 import org.h2.message.TraceSystem;
 import org.h2.upgrade.DbUpgrade;
 
-//## Java 1.7 ##
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.DriverPropertyInfo;
+import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Logger;
 //*/
 
@@ -51,7 +50,7 @@ public class Driver implements java.sql.Driver {
      * This method should not be called by an application.
      * Instead, the method DriverManager.getConnection should be used.
      *
-     * @param url the database URL
+     * @param url  the database URL
      * @param info the connection properties
      * @return the new connection or null if the URL is not supported
      */
@@ -122,7 +121,7 @@ public class Driver implements java.sql.Driver {
      * Get the list of supported properties.
      * This method should not be called by an application.
      *
-     * @param url the database URL
+     * @param url  the database URL
      * @param info the connection properties
      * @return a zero length array
      */

@@ -6,14 +6,6 @@
  */
 package org.h2.mvstore.db;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.Arrays;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.mvstore.DataUtils;
@@ -24,30 +16,15 @@ import org.h2.mvstore.type.DataType;
 import org.h2.result.SortOrder;
 import org.h2.store.DataHandler;
 import org.h2.tools.SimpleResultSet;
-import org.h2.value.CompareMode;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueBoolean;
-import org.h2.value.ValueByte;
-import org.h2.value.ValueBytes;
-import org.h2.value.ValueDate;
-import org.h2.value.ValueDecimal;
-import org.h2.value.ValueDouble;
-import org.h2.value.ValueFloat;
-import org.h2.value.ValueGeometry;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueJavaObject;
-import org.h2.value.ValueLobDb;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueResultSet;
-import org.h2.value.ValueShort;
-import org.h2.value.ValueString;
-import org.h2.value.ValueStringFixed;
-import org.h2.value.ValueStringIgnoreCase;
-import org.h2.value.ValueTime;
-import org.h2.value.ValueTimestamp;
-import org.h2.value.ValueUuid;
+import org.h2.value.*;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Arrays;
 
 /**
  * A row type.
@@ -77,7 +54,7 @@ public class ValueDataType implements DataType {
     final SpatialDataType spatialType = new SpatialDataType(2);
 
     public ValueDataType(CompareMode compareMode, DataHandler handler,
-            int[] sortTypes) {
+                         int[] sortTypes) {
         this.compareMode = compareMode;
         this.handler = handler;
         this.sortTypes = sortTypes;
@@ -182,233 +159,233 @@ public class ValueDataType implements DataType {
         }
         int type = v.getType();
         switch (type) {
-        case Value.BOOLEAN:
-            buff.put((byte) (v.getBoolean().booleanValue() ?
-                    BOOLEAN_TRUE : BOOLEAN_FALSE));
-            break;
-        case Value.BYTE:
-            buff.put((byte) type).put(v.getByte());
-            break;
-        case Value.SHORT:
-            buff.put((byte) type).putShort(v.getShort());
-            break;
-        case Value.INT: {
-            int x = v.getInt();
-            if (x < 0) {
-                buff.put((byte) INT_NEG).putVarInt(-x);
-            } else if (x < 16) {
-                buff.put((byte) (INT_0_15 + x));
-            } else {
-                buff.put((byte) type).putVarInt(x);
+            case Value.BOOLEAN:
+                buff.put((byte) (v.getBoolean().booleanValue() ?
+                        BOOLEAN_TRUE : BOOLEAN_FALSE));
+                break;
+            case Value.BYTE:
+                buff.put((byte) type).put(v.getByte());
+                break;
+            case Value.SHORT:
+                buff.put((byte) type).putShort(v.getShort());
+                break;
+            case Value.INT: {
+                int x = v.getInt();
+                if (x < 0) {
+                    buff.put((byte) INT_NEG).putVarInt(-x);
+                } else if (x < 16) {
+                    buff.put((byte) (INT_0_15 + x));
+                } else {
+                    buff.put((byte) type).putVarInt(x);
+                }
+                break;
             }
-            break;
-        }
-        case Value.LONG: {
-            long x = v.getLong();
-            if (x < 0) {
-                buff.put((byte) LONG_NEG).putVarLong(-x);
-            } else if (x < 8) {
-                buff.put((byte) (LONG_0_7 + x));
-            } else {
-                buff.put((byte) type).putVarLong(x);
+            case Value.LONG: {
+                long x = v.getLong();
+                if (x < 0) {
+                    buff.put((byte) LONG_NEG).putVarLong(-x);
+                } else if (x < 8) {
+                    buff.put((byte) (LONG_0_7 + x));
+                } else {
+                    buff.put((byte) type).putVarLong(x);
+                }
+                break;
             }
-            break;
-        }
-        case Value.DECIMAL: {
-            BigDecimal x = v.getBigDecimal();
-            if (BigDecimal.ZERO.equals(x)) {
-                buff.put((byte) DECIMAL_0_1);
-            } else if (BigDecimal.ONE.equals(x)) {
-                buff.put((byte) (DECIMAL_0_1 + 1));
-            } else {
-                int scale = x.scale();
-                BigInteger b = x.unscaledValue();
-                int bits = b.bitLength();
-                if (bits <= 63) {
-                    if (scale == 0) {
-                        buff.put((byte) DECIMAL_SMALL_0).
-                            putVarLong(b.longValue());
+            case Value.DECIMAL: {
+                BigDecimal x = v.getBigDecimal();
+                if (BigDecimal.ZERO.equals(x)) {
+                    buff.put((byte) DECIMAL_0_1);
+                } else if (BigDecimal.ONE.equals(x)) {
+                    buff.put((byte) (DECIMAL_0_1 + 1));
+                } else {
+                    int scale = x.scale();
+                    BigInteger b = x.unscaledValue();
+                    int bits = b.bitLength();
+                    if (bits <= 63) {
+                        if (scale == 0) {
+                            buff.put((byte) DECIMAL_SMALL_0).
+                                    putVarLong(b.longValue());
+                        } else {
+                            buff.put((byte) DECIMAL_SMALL).
+                                    putVarInt(scale).
+                                    putVarLong(b.longValue());
+                        }
                     } else {
-                        buff.put((byte) DECIMAL_SMALL).
-                            putVarInt(scale).
-                            putVarLong(b.longValue());
+                        byte[] bytes = b.toByteArray();
+                        buff.put((byte) type).
+                                putVarInt(scale).
+                                putVarInt(bytes.length).
+                                put(bytes);
                     }
-                } else {
-                    byte[] bytes = b.toByteArray();
-                    buff.put((byte) type).
-                        putVarInt(scale).
-                        putVarInt(bytes.length).
-                        put(bytes);
                 }
+                break;
             }
-            break;
-        }
-        case Value.TIME: {
-            ValueTime t = (ValueTime) v;
-            long nanos = t.getNanos();
-            long millis = nanos / 1000000;
-            nanos -= millis * 1000000;
-            buff.put((byte) type).
-                putVarLong(millis).
-                putVarLong(nanos);
-            break;
-        }
-        case Value.DATE: {
-            long x = ((ValueDate) v).getDateValue();
-            buff.put((byte) type).putVarLong(x);
-            break;
-        }
-        case Value.TIMESTAMP: {
-            ValueTimestamp ts = (ValueTimestamp) v;
-            long dateValue = ts.getDateValue();
-            long nanos = ts.getNanos();
-            long millis = nanos / 1000000;
-            nanos -= millis * 1000000;
-            buff.put((byte) type).
-                putVarLong(dateValue).
-                putVarLong(millis).
-                putVarLong(nanos);
-            break;
-        }
-        case Value.JAVA_OBJECT: {
-            byte[] b = v.getBytesNoCopy();
-            buff.put((byte) type).
-                putVarInt(b.length).
-                put(b);
-            break;
-        }
-        case Value.BYTES: {
-            byte[] b = v.getBytesNoCopy();
-            int len = b.length;
-            if (len < 32) {
-                buff.put((byte) (BYTES_0_31 + len)).
-                    put(b);
-            } else {
+            case Value.TIME: {
+                ValueTime t = (ValueTime) v;
+                long nanos = t.getNanos();
+                long millis = nanos / 1000000;
+                nanos -= millis * 1000000;
                 buff.put((byte) type).
-                    putVarInt(b.length).
-                    put(b);
+                        putVarLong(millis).
+                        putVarLong(nanos);
+                break;
             }
-            break;
-        }
-        case Value.UUID: {
-            ValueUuid uuid = (ValueUuid) v;
-            buff.put((byte) type).
-                putLong(uuid.getHigh()).
-                putLong(uuid.getLow());
-            break;
-        }
-        case Value.STRING: {
-            String s = v.getString();
-            int len = s.length();
-            if (len < 32) {
-                buff.put((byte) (STRING_0_31 + len)).
-                    putStringData(s, len);
-            } else {
+            case Value.DATE: {
+                long x = ((ValueDate) v).getDateValue();
+                buff.put((byte) type).putVarLong(x);
+                break;
+            }
+            case Value.TIMESTAMP: {
+                ValueTimestamp ts = (ValueTimestamp) v;
+                long dateValue = ts.getDateValue();
+                long nanos = ts.getNanos();
+                long millis = nanos / 1000000;
+                nanos -= millis * 1000000;
+                buff.put((byte) type).
+                        putVarLong(dateValue).
+                        putVarLong(millis).
+                        putVarLong(nanos);
+                break;
+            }
+            case Value.JAVA_OBJECT: {
+                byte[] b = v.getBytesNoCopy();
+                buff.put((byte) type).
+                        putVarInt(b.length).
+                        put(b);
+                break;
+            }
+            case Value.BYTES: {
+                byte[] b = v.getBytesNoCopy();
+                int len = b.length;
+                if (len < 32) {
+                    buff.put((byte) (BYTES_0_31 + len)).
+                            put(b);
+                } else {
+                    buff.put((byte) type).
+                            putVarInt(b.length).
+                            put(b);
+                }
+                break;
+            }
+            case Value.UUID: {
+                ValueUuid uuid = (ValueUuid) v;
+                buff.put((byte) type).
+                        putLong(uuid.getHigh()).
+                        putLong(uuid.getLow());
+                break;
+            }
+            case Value.STRING: {
+                String s = v.getString();
+                int len = s.length();
+                if (len < 32) {
+                    buff.put((byte) (STRING_0_31 + len)).
+                            putStringData(s, len);
+                } else {
+                    buff.put((byte) type);
+                    writeString(buff, s);
+                }
+                break;
+            }
+            case Value.STRING_IGNORECASE:
+            case Value.STRING_FIXED:
                 buff.put((byte) type);
-                writeString(buff, s);
-            }
-            break;
-        }
-        case Value.STRING_IGNORECASE:
-        case Value.STRING_FIXED:
-            buff.put((byte) type);
-            writeString(buff, v.getString());
-            break;
-        case Value.DOUBLE: {
-            double x = v.getDouble();
-            if (x == 1.0d) {
-                buff.put((byte) (DOUBLE_0_1 + 1));
-            } else {
-                long d = Double.doubleToLongBits(x);
-                if (d == ValueDouble.ZERO_BITS) {
-                    buff.put((byte) DOUBLE_0_1);
+                writeString(buff, v.getString());
+                break;
+            case Value.DOUBLE: {
+                double x = v.getDouble();
+                if (x == 1.0d) {
+                    buff.put((byte) (DOUBLE_0_1 + 1));
                 } else {
-                    buff.put((byte) type).
-                        putVarLong(Long.reverse(d));
-                }
-            }
-            break;
-        }
-        case Value.FLOAT: {
-            float x = v.getFloat();
-            if (x == 1.0f) {
-                buff.put((byte) (FLOAT_0_1 + 1));
-            } else {
-                int f = Float.floatToIntBits(x);
-                if (f == ValueFloat.ZERO_BITS) {
-                    buff.put((byte) FLOAT_0_1);
-                } else {
-                    buff.put((byte) type).
-                        putVarInt(Integer.reverse(f));
-                }
-            }
-            break;
-        }
-        case Value.BLOB:
-        case Value.CLOB: {
-            buff.put((byte) type);
-            ValueLobDb lob = (ValueLobDb) v;
-            byte[] small = lob.getSmall();
-            if (small == null) {
-                buff.putVarInt(-3).
-                    putVarInt(lob.getTableId()).
-                    putVarLong(lob.getLobId()).
-                    putVarLong(lob.getPrecision());
-            } else {
-                buff.putVarInt(small.length).
-                    put(small);
-            }
-            break;
-        }
-        case Value.ARRAY: {
-            Value[] list = ((ValueArray) v).getList();
-            buff.put((byte) type).putVarInt(list.length);
-            for (Value x : list) {
-                writeValue(buff, x);
-            }
-            break;
-        }
-        case Value.RESULT_SET: {
-            buff.put((byte) type);
-            try {
-                ResultSet rs = ((ValueResultSet) v).getResultSet();
-                rs.beforeFirst();
-                ResultSetMetaData meta = rs.getMetaData();
-                int columnCount = meta.getColumnCount();
-                buff.putVarInt(columnCount);
-                for (int i = 0; i < columnCount; i++) {
-                    writeString(buff, meta.getColumnName(i + 1));
-                    buff.putVarInt(meta.getColumnType(i + 1)).
-                        putVarInt(meta.getPrecision(i + 1)).
-                        putVarInt(meta.getScale(i + 1));
-                }
-                while (rs.next()) {
-                    buff.put((byte) 1);
-                    for (int i = 0; i < columnCount; i++) {
-                        int t = org.h2.value.DataType.
-                                getValueTypeFromResultSet(meta, i + 1);
-                        Value val = org.h2.value.DataType.readValue(
-                                null, rs, i + 1, t);
-                        writeValue(buff, val);
+                    long d = Double.doubleToLongBits(x);
+                    if (d == ValueDouble.ZERO_BITS) {
+                        buff.put((byte) DOUBLE_0_1);
+                    } else {
+                        buff.put((byte) type).
+                                putVarLong(Long.reverse(d));
                     }
                 }
-                buff.put((byte) 0);
-                rs.beforeFirst();
-            } catch (SQLException e) {
-                throw DbException.convert(e);
+                break;
             }
-            break;
-        }
-        case Value.GEOMETRY: {
-            byte[] b = v.getBytes();
-            int len = b.length;
-            buff.put((byte) type).
-                putVarInt(len).
-                put(b);
-            break;
-        }
-        default:
-            DbException.throwInternalError("type=" + v.getType());
+            case Value.FLOAT: {
+                float x = v.getFloat();
+                if (x == 1.0f) {
+                    buff.put((byte) (FLOAT_0_1 + 1));
+                } else {
+                    int f = Float.floatToIntBits(x);
+                    if (f == ValueFloat.ZERO_BITS) {
+                        buff.put((byte) FLOAT_0_1);
+                    } else {
+                        buff.put((byte) type).
+                                putVarInt(Integer.reverse(f));
+                    }
+                }
+                break;
+            }
+            case Value.BLOB:
+            case Value.CLOB: {
+                buff.put((byte) type);
+                ValueLobDb lob = (ValueLobDb) v;
+                byte[] small = lob.getSmall();
+                if (small == null) {
+                    buff.putVarInt(-3).
+                            putVarInt(lob.getTableId()).
+                            putVarLong(lob.getLobId()).
+                            putVarLong(lob.getPrecision());
+                } else {
+                    buff.putVarInt(small.length).
+                            put(small);
+                }
+                break;
+            }
+            case Value.ARRAY: {
+                Value[] list = ((ValueArray) v).getList();
+                buff.put((byte) type).putVarInt(list.length);
+                for (Value x : list) {
+                    writeValue(buff, x);
+                }
+                break;
+            }
+            case Value.RESULT_SET: {
+                buff.put((byte) type);
+                try {
+                    ResultSet rs = ((ValueResultSet) v).getResultSet();
+                    rs.beforeFirst();
+                    ResultSetMetaData meta = rs.getMetaData();
+                    int columnCount = meta.getColumnCount();
+                    buff.putVarInt(columnCount);
+                    for (int i = 0; i < columnCount; i++) {
+                        writeString(buff, meta.getColumnName(i + 1));
+                        buff.putVarInt(meta.getColumnType(i + 1)).
+                                putVarInt(meta.getPrecision(i + 1)).
+                                putVarInt(meta.getScale(i + 1));
+                    }
+                    while (rs.next()) {
+                        buff.put((byte) 1);
+                        for (int i = 0; i < columnCount; i++) {
+                            int t = org.h2.value.DataType.
+                                    getValueTypeFromResultSet(meta, i + 1);
+                            Value val = org.h2.value.DataType.readValue(
+                                    null, rs, i + 1, t);
+                            writeValue(buff, val);
+                        }
+                    }
+                    buff.put((byte) 0);
+                    rs.beforeFirst();
+                } catch (SQLException e) {
+                    throw DbException.convert(e);
+                }
+                break;
+            }
+            case Value.GEOMETRY: {
+                byte[] b = v.getBytes();
+                int len = b.length;
+                buff.put((byte) type).
+                        putVarInt(len).
+                        put(b);
+                break;
+            }
+            default:
+                DbException.throwInternalError("type=" + v.getType());
         }
     }
 
@@ -425,161 +402,161 @@ public class ValueDataType implements DataType {
     private Object readValue(ByteBuffer buff) {
         int type = buff.get() & 255;
         switch (type) {
-        case Value.NULL:
-            return ValueNull.INSTANCE;
-        case BOOLEAN_TRUE:
-            return ValueBoolean.get(true);
-        case BOOLEAN_FALSE:
-            return ValueBoolean.get(false);
-        case INT_NEG:
-            return ValueInt.get(-readVarInt(buff));
-        case Value.INT:
-            return ValueInt.get(readVarInt(buff));
-        case LONG_NEG:
-            return ValueLong.get(-readVarLong(buff));
-        case Value.LONG:
-            return ValueLong.get(readVarLong(buff));
-        case Value.BYTE:
-            return ValueByte.get(buff.get());
-        case Value.SHORT:
-            return ValueShort.get(buff.getShort());
-        case DECIMAL_0_1:
-            return ValueDecimal.ZERO;
-        case DECIMAL_0_1 + 1:
-            return ValueDecimal.ONE;
-        case DECIMAL_SMALL_0:
-            return ValueDecimal.get(BigDecimal.valueOf(
-                    readVarLong(buff)));
-        case DECIMAL_SMALL: {
-            int scale = readVarInt(buff);
-            return ValueDecimal.get(BigDecimal.valueOf(
-                    readVarLong(buff), scale));
-        }
-        case Value.DECIMAL: {
-            int scale = readVarInt(buff);
-            int len = readVarInt(buff);
-            byte[] buff2 = DataUtils.newBytes(len);
-            buff.get(buff2, 0, len);
-            BigInteger b = new BigInteger(buff2);
-            return ValueDecimal.get(new BigDecimal(b, scale));
-        }
-        case Value.DATE: {
-            return ValueDate.fromDateValue(readVarLong(buff));
-        }
-        case Value.TIME: {
-            long nanos = readVarLong(buff) * 1000000 + readVarLong(buff);
-            return ValueTime.fromNanos(nanos);
-        }
-        case Value.TIMESTAMP: {
-            long dateValue = readVarLong(buff);
-            long nanos = readVarLong(buff) * 1000000 + readVarLong(buff);
-            return ValueTimestamp.fromDateValueAndNanos(dateValue, nanos);
-        }
-        case Value.BYTES: {
-            int len = readVarInt(buff);
-            byte[] b = DataUtils.newBytes(len);
-            buff.get(b, 0, len);
-            return ValueBytes.getNoCopy(b);
-        }
-        case Value.JAVA_OBJECT: {
-            int len = readVarInt(buff);
-            byte[] b = DataUtils.newBytes(len);
-            buff.get(b, 0, len);
-            return ValueJavaObject.getNoCopy(null, b, handler);
-        }
-        case Value.UUID:
-            return ValueUuid.get(buff.getLong(), buff.getLong());
-        case Value.STRING:
-            return ValueString.get(readString(buff));
-        case Value.STRING_IGNORECASE:
-            return ValueStringIgnoreCase.get(readString(buff));
-        case Value.STRING_FIXED:
-            return ValueStringFixed.get(readString(buff));
-        case FLOAT_0_1:
-            return ValueFloat.get(0);
-        case FLOAT_0_1 + 1:
-            return ValueFloat.get(1);
-        case DOUBLE_0_1:
-            return ValueDouble.get(0);
-        case DOUBLE_0_1 + 1:
-            return ValueDouble.get(1);
-        case Value.DOUBLE:
-            return ValueDouble.get(Double.longBitsToDouble(
-                    Long.reverse(readVarLong(buff))));
-        case Value.FLOAT:
-            return ValueFloat.get(Float.intBitsToFloat(
-                    Integer.reverse(readVarInt(buff))));
-        case Value.BLOB:
-        case Value.CLOB: {
-            int smallLen = readVarInt(buff);
-            if (smallLen >= 0) {
-                byte[] small = DataUtils.newBytes(smallLen);
-                buff.get(small, 0, smallLen);
-                return ValueLobDb.createSmallLob(type, small);
-            } else if (smallLen == -3) {
-                int tableId = readVarInt(buff);
-                long lobId = readVarLong(buff);
-                long precision = readVarLong(buff);
-                ValueLobDb lob = ValueLobDb.create(type,
-                        handler, tableId, lobId, null, precision);
-                return lob;
-            } else {
-                throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
-                        "lob type: " + smallLen);
+            case Value.NULL:
+                return ValueNull.INSTANCE;
+            case BOOLEAN_TRUE:
+                return ValueBoolean.get(true);
+            case BOOLEAN_FALSE:
+                return ValueBoolean.get(false);
+            case INT_NEG:
+                return ValueInt.get(-readVarInt(buff));
+            case Value.INT:
+                return ValueInt.get(readVarInt(buff));
+            case LONG_NEG:
+                return ValueLong.get(-readVarLong(buff));
+            case Value.LONG:
+                return ValueLong.get(readVarLong(buff));
+            case Value.BYTE:
+                return ValueByte.get(buff.get());
+            case Value.SHORT:
+                return ValueShort.get(buff.getShort());
+            case DECIMAL_0_1:
+                return ValueDecimal.ZERO;
+            case DECIMAL_0_1 + 1:
+                return ValueDecimal.ONE;
+            case DECIMAL_SMALL_0:
+                return ValueDecimal.get(BigDecimal.valueOf(
+                        readVarLong(buff)));
+            case DECIMAL_SMALL: {
+                int scale = readVarInt(buff);
+                return ValueDecimal.get(BigDecimal.valueOf(
+                        readVarLong(buff), scale));
             }
-        }
-        case Value.ARRAY: {
-            int len = readVarInt(buff);
-            Value[] list = new Value[len];
-            for (int i = 0; i < len; i++) {
-                list[i] = (Value) readValue(buff);
+            case Value.DECIMAL: {
+                int scale = readVarInt(buff);
+                int len = readVarInt(buff);
+                byte[] buff2 = DataUtils.newBytes(len);
+                buff.get(buff2, 0, len);
+                BigInteger b = new BigInteger(buff2);
+                return ValueDecimal.get(new BigDecimal(b, scale));
             }
-            return ValueArray.get(list);
-        }
-        case Value.RESULT_SET: {
-            SimpleResultSet rs = new SimpleResultSet();
-            rs.setAutoClose(false);
-            int columns = readVarInt(buff);
-            for (int i = 0; i < columns; i++) {
-                rs.addColumn(readString(buff),
-                        readVarInt(buff),
-                        readVarInt(buff),
-                        readVarInt(buff));
+            case Value.DATE: {
+                return ValueDate.fromDateValue(readVarLong(buff));
             }
-            while (true) {
-                if (buff.get() == 0) {
-                    break;
-                }
-                Object[] o = new Object[columns];
-                for (int i = 0; i < columns; i++) {
-                    o[i] = ((Value) readValue(buff)).getObject();
-                }
-                rs.addRow(o);
+            case Value.TIME: {
+                long nanos = readVarLong(buff) * 1000000 + readVarLong(buff);
+                return ValueTime.fromNanos(nanos);
             }
-            return ValueResultSet.get(rs);
-        }
-        case Value.GEOMETRY: {
-            int len = readVarInt(buff);
-            byte[] b = DataUtils.newBytes(len);
-            buff.get(b, 0, len);
-            return ValueGeometry.get(b);
-        }
-        case SPATIAL_KEY_2D:
-            return spatialType.read(buff);
-        default:
-            if (type >= INT_0_15 && type < INT_0_15 + 16) {
-                return ValueInt.get(type - INT_0_15);
-            } else if (type >= LONG_0_7 && type < LONG_0_7 + 8) {
-                return ValueLong.get(type - LONG_0_7);
-            } else if (type >= BYTES_0_31 && type < BYTES_0_31 + 32) {
-                int len = type - BYTES_0_31;
+            case Value.TIMESTAMP: {
+                long dateValue = readVarLong(buff);
+                long nanos = readVarLong(buff) * 1000000 + readVarLong(buff);
+                return ValueTimestamp.fromDateValueAndNanos(dateValue, nanos);
+            }
+            case Value.BYTES: {
+                int len = readVarInt(buff);
                 byte[] b = DataUtils.newBytes(len);
                 buff.get(b, 0, len);
                 return ValueBytes.getNoCopy(b);
-            } else if (type >= STRING_0_31 && type < STRING_0_31 + 32) {
-                return ValueString.get(readString(buff, type - STRING_0_31));
             }
-            throw DbException.get(ErrorCode.FILE_CORRUPTED_1, "type: " + type);
+            case Value.JAVA_OBJECT: {
+                int len = readVarInt(buff);
+                byte[] b = DataUtils.newBytes(len);
+                buff.get(b, 0, len);
+                return ValueJavaObject.getNoCopy(null, b, handler);
+            }
+            case Value.UUID:
+                return ValueUuid.get(buff.getLong(), buff.getLong());
+            case Value.STRING:
+                return ValueString.get(readString(buff));
+            case Value.STRING_IGNORECASE:
+                return ValueStringIgnoreCase.get(readString(buff));
+            case Value.STRING_FIXED:
+                return ValueStringFixed.get(readString(buff));
+            case FLOAT_0_1:
+                return ValueFloat.get(0);
+            case FLOAT_0_1 + 1:
+                return ValueFloat.get(1);
+            case DOUBLE_0_1:
+                return ValueDouble.get(0);
+            case DOUBLE_0_1 + 1:
+                return ValueDouble.get(1);
+            case Value.DOUBLE:
+                return ValueDouble.get(Double.longBitsToDouble(
+                        Long.reverse(readVarLong(buff))));
+            case Value.FLOAT:
+                return ValueFloat.get(Float.intBitsToFloat(
+                        Integer.reverse(readVarInt(buff))));
+            case Value.BLOB:
+            case Value.CLOB: {
+                int smallLen = readVarInt(buff);
+                if (smallLen >= 0) {
+                    byte[] small = DataUtils.newBytes(smallLen);
+                    buff.get(small, 0, smallLen);
+                    return ValueLobDb.createSmallLob(type, small);
+                } else if (smallLen == -3) {
+                    int tableId = readVarInt(buff);
+                    long lobId = readVarLong(buff);
+                    long precision = readVarLong(buff);
+                    ValueLobDb lob = ValueLobDb.create(type,
+                            handler, tableId, lobId, null, precision);
+                    return lob;
+                } else {
+                    throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
+                            "lob type: " + smallLen);
+                }
+            }
+            case Value.ARRAY: {
+                int len = readVarInt(buff);
+                Value[] list = new Value[len];
+                for (int i = 0; i < len; i++) {
+                    list[i] = (Value) readValue(buff);
+                }
+                return ValueArray.get(list);
+            }
+            case Value.RESULT_SET: {
+                SimpleResultSet rs = new SimpleResultSet();
+                rs.setAutoClose(false);
+                int columns = readVarInt(buff);
+                for (int i = 0; i < columns; i++) {
+                    rs.addColumn(readString(buff),
+                            readVarInt(buff),
+                            readVarInt(buff),
+                            readVarInt(buff));
+                }
+                while (true) {
+                    if (buff.get() == 0) {
+                        break;
+                    }
+                    Object[] o = new Object[columns];
+                    for (int i = 0; i < columns; i++) {
+                        o[i] = ((Value) readValue(buff)).getObject();
+                    }
+                    rs.addRow(o);
+                }
+                return ValueResultSet.get(rs);
+            }
+            case Value.GEOMETRY: {
+                int len = readVarInt(buff);
+                byte[] b = DataUtils.newBytes(len);
+                buff.get(b, 0, len);
+                return ValueGeometry.get(b);
+            }
+            case SPATIAL_KEY_2D:
+                return spatialType.read(buff);
+            default:
+                if (type >= INT_0_15 && type < INT_0_15 + 16) {
+                    return ValueInt.get(type - INT_0_15);
+                } else if (type >= LONG_0_7 && type < LONG_0_7 + 8) {
+                    return ValueLong.get(type - LONG_0_7);
+                } else if (type >= BYTES_0_31 && type < BYTES_0_31 + 32) {
+                    int len = type - BYTES_0_31;
+                    byte[] b = DataUtils.newBytes(len);
+                    buff.get(b, 0, len);
+                    return ValueBytes.getNoCopy(b);
+                } else if (type >= STRING_0_31 && type < STRING_0_31 + 32) {
+                    return ValueString.get(readString(buff, type - STRING_0_31));
+                }
+                throw DbException.get(ErrorCode.FILE_CORRUPTED_1, "type: " + type);
         }
     }
 

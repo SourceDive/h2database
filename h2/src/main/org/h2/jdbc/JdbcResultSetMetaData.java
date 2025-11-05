@@ -6,15 +6,15 @@
  */
 package org.h2.jdbc;
 
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-
 import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.message.TraceObject;
 import org.h2.result.ResultInterface;
 import org.h2.util.MathUtils;
 import org.h2.value.DataType;
+
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 /**
  * Represents the meta data for a ResultSet.
@@ -29,7 +29,7 @@ public class JdbcResultSetMetaData extends TraceObject implements
     private final int columnCount;
 
     JdbcResultSetMetaData(JdbcResultSet rs, JdbcPreparedStatement prep,
-            ResultInterface result, String catalog, Trace trace, int id) {
+                          ResultInterface result, String catalog, Trace trace, int id) {
         setTrace(trace, TraceObject.RESULT_SET_META_DATA, id);
         this.catalog = catalog;
         this.rs = rs;

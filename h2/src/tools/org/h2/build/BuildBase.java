@@ -6,19 +6,7 @@
  */
 package org.h2.build;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,11 +14,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarOutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
@@ -63,7 +47,7 @@ public class BuildBase {
          * @param args the list to add
          * @return the new list
          */
-        public StringList plus(String...args) {
+        public StringList plus(String... args) {
             StringList newList = new StringList();
             newList.addAll(this);
             newList.addAll(Arrays.asList(args));
@@ -117,7 +101,7 @@ public class BuildBase {
         /**
          * Filter a list of file names.
          *
-         * @param keep if matching file names should be kept or removed
+         * @param keep    if matching file names should be kept or removed
          * @param pattern the file name pattern
          * @return the filtered file list
          */
@@ -303,7 +287,7 @@ public class BuildBase {
      * In Windows, the batch file with this name (.bat) is run.
      *
      * @param script the program to run
-     * @param args the command line parameters
+     * @param args   the command line parameters
      * @return the exit value
      */
     protected int execScript(String script, StringList args) {
@@ -317,7 +301,7 @@ public class BuildBase {
      * Execute a program in a separate process.
      *
      * @param command the program to run
-     * @param args the command line parameters
+     * @param args    the command line parameters
      * @return the exit value
      */
     protected int exec(String command, StringList args) {
@@ -362,7 +346,7 @@ public class BuildBase {
                     throw new RuntimeException(e);
                 }
             }
-        } .start();
+        }.start();
     }
 
     /**
@@ -386,7 +370,7 @@ public class BuildBase {
     /**
      * Reads the value from a static method of a class using reflection.
      *
-     * @param className the name of the class
+     * @param className  the name of the class
      * @param methodName the field name
      * @return the value as a string
      */
@@ -405,8 +389,8 @@ public class BuildBase {
      * Copy files to the specified target directory.
      *
      * @param targetDir the target directory
-     * @param files the list of files to copy
-     * @param baseDir the base directory
+     * @param files     the list of files to copy
+     * @param baseDir   the base directory
      */
     protected void copy(String targetDir, FileList files, String baseDir) {
         File target = new File(targetDir);
@@ -468,13 +452,13 @@ public class BuildBase {
      *
      * @param args the command line arguments to pass
      */
-    protected void javadoc(String...args) {
+    protected void javadoc(String... args) {
         int result;
         PrintStream old = System.out;
         try {
             println("Javadoc");
             if (quiet) {
-                System.setOut(filter(System.out, new String[] {
+                System.setOut(filter(System.out, new String[]{
                         "Loading source files for package",
                         "Constructing Javadoc information...",
                         "Generating ",
@@ -484,14 +468,14 @@ public class BuildBase {
                         "Building index for all classes..."
                 }));
             } else {
-                System.setOut(filter(System.out, new String[] {
+                System.setOut(filter(System.out, new String[]{
                         "Loading source files for package ",
                         "Generating ",
                 }));
             }
             Class<?> clazz = Class.forName("com.sun.tools.javadoc.Main");
             Method execute = clazz.getMethod("execute", String[].class);
-            result = (Integer) invoke(execute, null, new Object[] { args });
+            result = (Integer) invoke(execute, null, new Object[]{args});
         } catch (Exception e) {
             result = exec("javadoc", args(args));
         } finally {
@@ -507,7 +491,7 @@ public class BuildBase {
         for (byte c : value) {
             int x = c & 0xff;
             buff.append(Integer.toString(x >> 4, 16)).
-                append(Integer.toString(x & 0xf, 16));
+                    append(Integer.toString(x & 0xf, 16));
         }
         return buff.toString();
     }
@@ -533,14 +517,14 @@ public class BuildBase {
      * that the file is first downloaded to the local repository and then copied
      * from there.
      *
-     * @param target the target file name
-     * @param group the Maven group id
-     * @param artifact the Maven artifact id
-     * @param version the Maven version id
+     * @param target       the target file name
+     * @param group        the Maven group id
+     * @param artifact     the Maven artifact id
+     * @param version      the Maven version id
      * @param sha1Checksum the SHA-1 checksum or null
      */
     protected void downloadUsingMaven(String target, String group,
-            String artifact, String version, String sha1Checksum) {
+                                      String artifact, String version, String sha1Checksum) {
         String repoDir = "http://repo1.maven.org/maven2";
         File targetFile = new File(target);
         if (targetFile.exists()) {
@@ -557,7 +541,7 @@ public class BuildBase {
                     execScript("mvn", args(
                             "org.apache.maven.plugins:maven-dependency-plugin:2.1:get",
                             "-D" + "repoUrl=" + repoDir,
-                            "-D" + "artifact="+ group +":"+ artifact +":" + version));
+                            "-D" + "artifact=" + group + ":" + artifact + ":" + version));
                 } catch (RuntimeException e) {
                     println("Could not download using Maven: " + e.toString());
                 }
@@ -592,8 +576,8 @@ public class BuildBase {
      * If no checksum is used (that is, if the parameter is null), the
      * checksum is printed. For security, checksums should always be used.
      *
-     * @param target the target file name
-     * @param fileURL the source url of the file
+     * @param target       the target file name
+     * @param fileURL      the source url of the file
      * @param sha1Checksum the SHA-1 checksum or null
      */
     protected void download(String target, String fileURL, String sha1Checksum) {
@@ -658,7 +642,7 @@ public class BuildBase {
      * @param args the arguments
      * @return the string list
      */
-    protected static StringList args(String...args) {
+    protected static StringList args(String... args) {
         return new StringList(args);
     }
 
@@ -749,7 +733,7 @@ public class BuildBase {
      * Create a jar file.
      *
      * @param destFile the target file name
-     * @param files the file list
+     * @param files    the file list
      * @param basePath the base path
      * @return the size of the jar file in KB
      */
@@ -762,20 +746,20 @@ public class BuildBase {
     /**
      * Create a zip file.
      *
-     * @param destFile the target file name
-     * @param files the file list
-     * @param basePath the base path
-     * @param storeOnly if the files should not be compressed
+     * @param destFile     the target file name
+     * @param files        the file list
+     * @param basePath     the base path
+     * @param storeOnly    if the files should not be compressed
      * @param sortBySuffix if the file should be sorted by the file suffix
      */
     protected void zip(String destFile, FileList files, String basePath,
-            boolean storeOnly, boolean sortBySuffix) {
+                       boolean storeOnly, boolean sortBySuffix) {
         long kb = zipOrJar(destFile, files, basePath, storeOnly, sortBySuffix, false);
         println("Zip " + destFile + " (" + kb + " KB)");
     }
 
     private static long zipOrJar(String destFile, FileList files,
-            String basePath, boolean storeOnly, boolean sortBySuffix, boolean jar) {
+                                 String basePath, boolean storeOnly, boolean sortBySuffix, boolean jar) {
         if (sortBySuffix) {
             // for better compressibility, sort by suffix, then name
             Collections.sort(files, new Comparator<File>() {
@@ -852,7 +836,7 @@ public class BuildBase {
     /**
      * Compile the files.
      *
-     * @param args the command line parameters
+     * @param args  the command line parameters
      * @param files the file list
      */
     protected void javac(StringList args, FileList files) {
@@ -866,13 +850,13 @@ public class BuildBase {
         try {
             Class<?> clazz = Class.forName("com.sun.tools.javac.Main");
             if (quiet) {
-                System.setErr(filter(System.err, new String[] {
+                System.setErr(filter(System.err, new String[]{
                         "Note:"
                 }));
             }
-            Method compile = clazz.getMethod("compile", new Class<?>[] { String[].class });
+            Method compile = clazz.getMethod("compile", new Class<?>[]{String[].class});
             Object instance = clazz.newInstance();
-            result = (Integer) invoke(compile, instance, new Object[] { array });
+            result = (Integer) invoke(compile, instance, new Object[]{array});
         } catch (Exception e) {
             e.printStackTrace();
             result = exec("javac", new StringList(array));
@@ -888,14 +872,14 @@ public class BuildBase {
      * Call the main method of the given Java class using reflection.
      *
      * @param className the class name
-     * @param args the command line parameters to pass
+     * @param args      the command line parameters to pass
      */
     protected void java(String className, StringList args) {
         println("Running " + className);
         String[] array = args == null ? new String[0] : args.array();
         try {
             Method main = Class.forName(className).getMethod("main", String[].class);
-            invoke(main, null, new Object[] { array });
+            invoke(main, null, new Object[]{array});
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -965,9 +949,9 @@ public class BuildBase {
     /**
      * Replace each substring in a given string. Regular expression is not used.
      *
-     * @param s the original text
+     * @param s      the original text
      * @param before the old substring
-     * @param after the new substring
+     * @param after  the new substring
      * @return the string with the string replaced
      */
     protected static String replaceAll(String s, String before, String after) {

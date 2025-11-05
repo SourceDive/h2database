@@ -33,7 +33,7 @@ public class ConditionInSelect extends Condition {
     private int queryLevel;
 
     public ConditionInSelect(Database database, Expression left, Query query,
-            boolean all, int compareType) {
+                             boolean all, int compareType) {
         this.database = database;
         this.left = left;
         this.query = query;
@@ -64,10 +64,10 @@ public class ConditionInSelect extends Condition {
             return ValueBoolean.get(false);
         }
         l = l.convertTo(dataType);
-        if (rows.containsDistinct(new Value[] { l })) {
+        if (rows.containsDistinct(new Value[]{l})) {
             return ValueBoolean.get(true);
         }
-        if (rows.containsDistinct(new Value[] { ValueNull.INSTANCE })) {
+        if (rows.containsDistinct(new Value[]{ValueNull.INSTANCE})) {
             return ValueNull.INSTANCE;
         }
         return ValueBoolean.get(false);
@@ -132,17 +132,17 @@ public class ConditionInSelect extends Condition {
         buff.append('(').append(left.getSQL()).append(' ');
         if (all) {
             buff.append(Comparison.getCompareOperator(compareType)).
-                append(" ALL");
+                    append(" ALL");
         } else {
             if (compareType == Comparison.EQUAL) {
                 buff.append("IN");
             } else {
                 buff.append(Comparison.getCompareOperator(compareType)).
-                    append(" ANY");
+                        append(" ANY");
             }
         }
         buff.append("(\n").append(StringUtils.indent(query.getPlanSQL(), 4, false)).
-            append("))");
+                append("))");
         return buff.toString();
     }
 

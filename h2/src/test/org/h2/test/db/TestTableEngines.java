@@ -6,20 +6,11 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import org.h2.api.TableEngine;
 import org.h2.command.ddl.CreateTableData;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
-import org.h2.index.BaseIndex;
-import org.h2.index.Cursor;
-import org.h2.index.Index;
-import org.h2.index.IndexType;
-import org.h2.index.SingleRowCursor;
+import org.h2.index.*;
 import org.h2.result.Row;
 import org.h2.result.SearchRow;
 import org.h2.result.SortOrder;
@@ -32,6 +23,12 @@ import org.h2.value.Value;
 import org.h2.value.ValueInt;
 import org.h2.value.ValueNull;
 import org.h2.value.ValueString;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  * The class for external table engines mechanism testing.
@@ -64,7 +61,7 @@ public class TestTableEngines extends TestBase {
         Connection conn = getConnection("tableEngine;EARLY_FILTER=TRUE");
         Statement stat = conn.createStatement();
         stat.execute("CREATE TABLE t1(id int, name varchar) ENGINE \"" +
-        EndlessTableEngine.class.getName() + "\"");
+                EndlessTableEngine.class.getName() + "\"");
         ResultSet rs = stat.executeQuery(
                 "SELECT name FROM t1 where id=1 and name is not null");
         assertTrue(rs.next());
@@ -220,7 +217,7 @@ public class TestTableEngines extends TestBase {
 
                 @Override
                 public double getCost(Session session, int[] masks,
-                        TableFilter filter, SortOrder sortOrder) {
+                                      TableFilter filter, SortOrder sortOrder) {
                     return 0;
                 }
 
@@ -261,8 +258,8 @@ public class TestTableEngines extends TestBase {
 
             @Override
             public Index addIndex(Session session, String indexName,
-                    int indexId, IndexColumn[] cols, IndexType indexType,
-                    boolean create, String indexComment) {
+                                  int indexId, IndexColumn[] cols, IndexType indexType,
+                                  boolean create, String indexComment) {
                 return null;
             }
 
@@ -395,7 +392,7 @@ public class TestTableEngines extends TestBase {
 
             EndlessTable(CreateTableData data) {
                 super(data);
-                row = new Row(new Value[] { ValueInt.get(1), ValueNull.INSTANCE }, 0);
+                row = new Row(new Value[]{ValueInt.get(1), ValueNull.INSTANCE}, 0);
                 scanIndex = new Auto(this);
             }
 

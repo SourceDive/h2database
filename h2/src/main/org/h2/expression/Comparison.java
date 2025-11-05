@@ -6,7 +6,6 @@
  */
 package org.h2.expression;
 
-import java.util.Arrays;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
 import org.h2.engine.SysProperties;
@@ -19,6 +18,8 @@ import org.h2.value.Value;
 import org.h2.value.ValueBoolean;
 import org.h2.value.ValueGeometry;
 import org.h2.value.ValueNull;
+
+import java.util.Arrays;
 
 /**
  * Example comparison expressions are ID=1, NAME=NAME, NAME IS NULL.
@@ -116,7 +117,7 @@ public class Comparison extends Condition {
     private Expression right;
 
     public Comparison(Session session, int compareType, Expression left,
-            Expression right) {
+                      Expression right) {
         this.database = session.getDatabase();
         this.left = left;
         this.right = right;
@@ -127,18 +128,18 @@ public class Comparison extends Condition {
     public String getSQL() {
         String sql;
         switch (compareType) {
-        case IS_NULL:
-            sql = left.getSQL() + " IS NULL";
-            break;
-        case IS_NOT_NULL:
-            sql = left.getSQL() + " IS NOT NULL";
-            break;
-        case SPATIAL_INTERSECTS:
-            sql = "INTERSECTS(" + left.getSQL() + ", " + right.getSQL() + ")";
-            break;
-        default:
-            sql = left.getSQL() + " " + getCompareOperator(compareType) +
-                    " " + right.getSQL();
+            case IS_NULL:
+                sql = left.getSQL() + " IS NULL";
+                break;
+            case IS_NOT_NULL:
+                sql = left.getSQL() + " IS NOT NULL";
+                break;
+            case SPATIAL_INTERSECTS:
+                sql = "INTERSECTS(" + left.getSQL() + ", " + right.getSQL() + ")";
+                break;
+            default:
+                sql = left.getSQL() + " " + getCompareOperator(compareType) +
+                        " " + right.getSQL();
         }
         return "(" + sql + ")";
     }
@@ -151,26 +152,26 @@ public class Comparison extends Condition {
      */
     static String getCompareOperator(int compareType) {
         switch (compareType) {
-        case EQUAL:
-            return "=";
-        case EQUAL_NULL_SAFE:
-            return "IS";
-        case BIGGER_EQUAL:
-            return ">=";
-        case BIGGER:
-            return ">";
-        case SMALLER_EQUAL:
-            return "<=";
-        case SMALLER:
-            return "<";
-        case NOT_EQUAL:
-            return "<>";
-        case NOT_EQUAL_NULL_SAFE:
-            return "IS NOT";
-        case SPATIAL_INTERSECTS:
-            return "&&";
-        default:
-            throw DbException.throwInternalError("compareType=" + compareType);
+            case EQUAL:
+                return "=";
+            case EQUAL_NULL_SAFE:
+                return "IS";
+            case BIGGER_EQUAL:
+                return ">=";
+            case BIGGER:
+                return ">";
+            case SMALLER_EQUAL:
+                return "<=";
+            case SMALLER:
+                return "<";
+            case NOT_EQUAL:
+                return "<>";
+            case NOT_EQUAL_NULL_SAFE:
+                return "IS NOT";
+            case SPATIAL_INTERSECTS:
+                return "&&";
+            default:
+                throw DbException.throwInternalError("compareType=" + compareType);
         }
     }
 
@@ -230,14 +231,14 @@ public class Comparison extends Condition {
         if (right == null) {
             boolean result;
             switch (compareType) {
-            case IS_NULL:
-                result = l == ValueNull.INSTANCE;
-                break;
-            case IS_NOT_NULL:
-                result = !(l == ValueNull.INSTANCE);
-                break;
-            default:
-                throw DbException.throwInternalError("type=" + compareType);
+                case IS_NULL:
+                    result = l == ValueNull.INSTANCE;
+                    break;
+                case IS_NOT_NULL:
+                    result = !(l == ValueNull.INSTANCE);
+                    break;
+                default:
+                    throw DbException.throwInternalError("type=" + compareType);
             }
             return ValueBoolean.get(result);
         }
@@ -262,67 +263,67 @@ public class Comparison extends Condition {
     /**
      * Compare two values, given the values are not NULL.
      *
-     * @param database the database
-     * @param l the first value
-     * @param r the second value
+     * @param database    the database
+     * @param l           the first value
+     * @param r           the second value
      * @param compareType the compare type
      * @return true if the comparison indicated by the comparison type evaluates
-     *         to true
+     * to true
      */
     static boolean compareNotNull(Database database, Value l, Value r,
-            int compareType) {
+                                  int compareType) {
         boolean result;
         switch (compareType) {
-        case EQUAL:
-        case EQUAL_NULL_SAFE:
-            result = database.areEqual(l, r);
-            break;
-        case NOT_EQUAL:
-        case NOT_EQUAL_NULL_SAFE:
-            result = !database.areEqual(l, r);
-            break;
-        case BIGGER_EQUAL:
-            result = database.compare(l, r) >= 0;
-            break;
-        case BIGGER:
-            result = database.compare(l, r) > 0;
-            break;
-        case SMALLER_EQUAL:
-            result = database.compare(l, r) <= 0;
-            break;
-        case SMALLER:
-            result = database.compare(l, r) < 0;
-            break;
-        case SPATIAL_INTERSECTS: {
-            ValueGeometry lg = (ValueGeometry) l.convertTo(Value.GEOMETRY);
-            ValueGeometry rg = (ValueGeometry) r.convertTo(Value.GEOMETRY);
-            result = lg.intersectsBoundingBox(rg);
-            break;
-        }
-        default:
-            throw DbException.throwInternalError("type=" + compareType);
+            case EQUAL:
+            case EQUAL_NULL_SAFE:
+                result = database.areEqual(l, r);
+                break;
+            case NOT_EQUAL:
+            case NOT_EQUAL_NULL_SAFE:
+                result = !database.areEqual(l, r);
+                break;
+            case BIGGER_EQUAL:
+                result = database.compare(l, r) >= 0;
+                break;
+            case BIGGER:
+                result = database.compare(l, r) > 0;
+                break;
+            case SMALLER_EQUAL:
+                result = database.compare(l, r) <= 0;
+                break;
+            case SMALLER:
+                result = database.compare(l, r) < 0;
+                break;
+            case SPATIAL_INTERSECTS: {
+                ValueGeometry lg = (ValueGeometry) l.convertTo(Value.GEOMETRY);
+                ValueGeometry rg = (ValueGeometry) r.convertTo(Value.GEOMETRY);
+                result = lg.intersectsBoundingBox(rg);
+                break;
+            }
+            default:
+                throw DbException.throwInternalError("type=" + compareType);
         }
         return result;
     }
 
     private int getReversedCompareType(int type) {
         switch (compareType) {
-        case EQUAL:
-        case EQUAL_NULL_SAFE:
-        case NOT_EQUAL:
-        case NOT_EQUAL_NULL_SAFE:
-        case SPATIAL_INTERSECTS:
-            return type;
-        case BIGGER_EQUAL:
-            return SMALLER_EQUAL;
-        case BIGGER:
-            return SMALLER;
-        case SMALLER_EQUAL:
-            return BIGGER_EQUAL;
-        case SMALLER:
-            return BIGGER;
-        default:
-            throw DbException.throwInternalError("type=" + compareType);
+            case EQUAL:
+            case EQUAL_NULL_SAFE:
+            case NOT_EQUAL:
+            case NOT_EQUAL_NULL_SAFE:
+            case SPATIAL_INTERSECTS:
+                return type;
+            case BIGGER_EQUAL:
+                return SMALLER_EQUAL;
+            case BIGGER:
+                return SMALLER;
+            case SMALLER_EQUAL:
+                return BIGGER_EQUAL;
+            case SMALLER:
+                return BIGGER;
+            default:
+                throw DbException.throwInternalError("type=" + compareType);
         }
     }
 
@@ -337,28 +338,28 @@ public class Comparison extends Condition {
 
     private int getNotCompareType() {
         switch (compareType) {
-        case EQUAL:
-            return NOT_EQUAL;
-        case EQUAL_NULL_SAFE:
-            return NOT_EQUAL_NULL_SAFE;
-        case NOT_EQUAL:
-            return EQUAL;
-        case NOT_EQUAL_NULL_SAFE:
-            return EQUAL_NULL_SAFE;
-        case BIGGER_EQUAL:
-            return SMALLER;
-        case BIGGER:
-            return SMALLER_EQUAL;
-        case SMALLER_EQUAL:
-            return BIGGER;
-        case SMALLER:
-            return BIGGER_EQUAL;
-        case IS_NULL:
-            return IS_NOT_NULL;
-        case IS_NOT_NULL:
-            return IS_NULL;
-        default:
-            throw DbException.throwInternalError("type=" + compareType);
+            case EQUAL:
+                return NOT_EQUAL;
+            case EQUAL_NULL_SAFE:
+                return NOT_EQUAL_NULL_SAFE;
+            case NOT_EQUAL:
+                return EQUAL;
+            case NOT_EQUAL_NULL_SAFE:
+                return EQUAL_NULL_SAFE;
+            case BIGGER_EQUAL:
+                return SMALLER;
+            case BIGGER:
+                return SMALLER_EQUAL;
+            case SMALLER_EQUAL:
+                return BIGGER;
+            case SMALLER:
+                return BIGGER_EQUAL;
+            case IS_NULL:
+                return IS_NOT_NULL;
+            case IS_NOT_NULL:
+                return IS_NULL;
+            default:
+                throw DbException.throwInternalError("type=" + compareType);
         }
     }
 
@@ -374,13 +375,13 @@ public class Comparison extends Condition {
         if (right == null) {
             if (l != null) {
                 switch (compareType) {
-                case IS_NULL:
-                    if (session.getDatabase().getSettings().optimizeIsNull) {
-                        filter.addIndexCondition(
-                                IndexCondition.get(
-                                        Comparison.EQUAL_NULL_SAFE, l,
-                                        ValueExpression.getNull()));
-                    }
+                    case IS_NULL:
+                        if (session.getDatabase().getSettings().optimizeIsNull) {
+                            filter.addIndexCondition(
+                                    IndexCondition.get(
+                                            Comparison.EQUAL_NULL_SAFE, l,
+                                            ValueExpression.getNull()));
+                        }
                 }
             }
             return;
@@ -418,21 +419,21 @@ public class Comparison extends Condition {
         }
         boolean addIndex;
         switch (compareType) {
-        case NOT_EQUAL:
-        case NOT_EQUAL_NULL_SAFE:
-            addIndex = false;
-            break;
-        case EQUAL:
-        case EQUAL_NULL_SAFE:
-        case BIGGER:
-        case BIGGER_EQUAL:
-        case SMALLER_EQUAL:
-        case SMALLER:
-        case SPATIAL_INTERSECTS:
-            addIndex = true;
-            break;
-        default:
-            throw DbException.throwInternalError("type=" + compareType);
+            case NOT_EQUAL:
+            case NOT_EQUAL_NULL_SAFE:
+                addIndex = false;
+                break;
+            case EQUAL:
+            case EQUAL_NULL_SAFE:
+            case BIGGER:
+            case BIGGER_EQUAL:
+            case SMALLER_EQUAL:
+            case SMALLER:
+            case SPATIAL_INTERSECTS:
+                addIndex = true;
+                break;
+            default:
+                throw DbException.throwInternalError("type=" + compareType);
         }
         if (addIndex) {
             if (l != null) {
@@ -520,8 +521,8 @@ public class Comparison extends Condition {
      * A=1 OR A=2, the new condition A IN(1, 2) is returned.
      *
      * @param session the session
-     * @param other the second condition
-     * @param and true for AND, false for OR
+     * @param other   the second condition
+     * @param and     true for AND, false for OR
      * @return null or the third condition
      */
     Expression getAdditional(Session session, Comparison other, boolean and) {
@@ -571,7 +572,7 @@ public class Comparison extends Condition {
      * Get the left or the right sub-expression of this condition.
      *
      * @param getLeft true to get the left sub-expression, false to get the
-     *            right sub-expression.
+     *                right sub-expression.
      * @return the sub-expression
      */
     public Expression getExpression(boolean getLeft) {

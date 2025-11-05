@@ -6,14 +6,6 @@
  */
 package org.h2.test.db;
 
-import java.io.File;
-import java.io.RandomAccessFile;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.dev.fs.FilePathZip2;
 import org.h2.store.FileLister;
@@ -21,6 +13,14 @@ import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.tools.Backup;
 import org.h2.tools.Server;
+
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  * Test for the read-only database feature.
@@ -64,7 +64,7 @@ public class TestReadOnly extends TestBase {
         conn.close();
         Backup.execute(dir + "/readonly.zip", dir, "readonlyInZip", true);
         conn = getConnection(
-                "jdbc:h2:zip:"+dir+"/readonly.zip!/readonlyInZip", getUser(), getPassword());
+                "jdbc:h2:zip:" + dir + "/readonly.zip!/readonlyInZip", getUser(), getPassword());
         conn.createStatement().execute("select * from test where id=1");
         conn.close();
         Server server = Server.createTcpServer("-tcpPort", "9081", "-baseDir", dir);
@@ -72,13 +72,13 @@ public class TestReadOnly extends TestBase {
         try {
             conn = getConnection(
                     "jdbc:h2:tcp://localhost:9081/zip:readonly.zip!/readonlyInZip",
-                        getUser(), getPassword());
+                    getUser(), getPassword());
             conn.createStatement().execute("select * from test where id=1");
             conn.close();
             FilePathZip2.register();
             conn = getConnection(
                     "jdbc:h2:tcp://localhost:9081/zip2:readonly.zip!/readonlyInZip",
-                        getUser(), getPassword());
+                    getUser(), getPassword());
             conn.createStatement().execute("select * from test where id=1");
             conn.close();
         } finally {
@@ -96,7 +96,7 @@ public class TestReadOnly extends TestBase {
         conn.close();
         conn = getConnection(
                 "readonlyTemp;ACCESS_MODE_DATA=r;" +
-                "MAX_MEMORY_ROWS_DISTINCT=10");
+                        "MAX_MEMORY_ROWS_DISTINCT=10");
         stat = conn.createStatement();
         stat.execute("SELECT DISTINCT ID FROM TEST");
         conn.close();

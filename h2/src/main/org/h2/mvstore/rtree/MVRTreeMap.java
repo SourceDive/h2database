@@ -6,9 +6,6 @@
  */
 package org.h2.mvstore.rtree;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.h2.mvstore.CursorPos;
 import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.MVMap;
@@ -16,6 +13,9 @@ import org.h2.mvstore.Page;
 import org.h2.mvstore.type.DataType;
 import org.h2.mvstore.type.ObjectDataType;
 import org.h2.util.New;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * An r-tree implementation. It uses the quadratic split algorithm.
@@ -39,9 +39,9 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
     /**
      * Create a new map with the given dimensions and value type.
      *
-     * @param <V> the value type
+     * @param <V>        the value type
      * @param dimensions the number of dimensions
-     * @param valueType the value type
+     * @param valueType  the value type
      * @return the map
      */
     public static <V> MVRTreeMap<V> create(int dimensions, DataType valueType) {
@@ -64,7 +64,7 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
         return new RTreeCursor(root, x) {
             @Override
             protected boolean check(boolean leaf, SpatialKey key,
-                    SpatialKey test) {
+                                    SpatialKey test) {
                 return keyType.isOverlap(key, test);
             }
         };
@@ -81,7 +81,7 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
         return new RTreeCursor(root, x) {
             @Override
             protected boolean check(boolean leaf, SpatialKey key,
-                    SpatialKey test) {
+                                    SpatialKey test) {
                 if (leaf) {
                     return keyType.isInside(key, test);
                 }
@@ -97,7 +97,7 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
     /**
      * Get the object for the given key. An exact match is required.
      *
-     * @param p the page
+     * @param p   the page
      * @param key the key
      * @return the value, or null if not found
      */
@@ -209,7 +209,7 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
      * Add a given key-value pair. The key should not exist (if it exists, the
      * result is undefined).
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      */
     public void add(SpatialKey key, V value) {
@@ -231,11 +231,11 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
                     Page split = split(p, v);
                     Object k1 = getBounds(p);
                     Object k2 = getBounds(split);
-                    Object[] keys = { k1, k2 };
-                    long[] children = { p.getPos(), split.getPos(), 0 };
-                    Page[] childrenPages = { p, split, null };
-                    long[] counts = { p.getTotalCount(),
-                            split.getTotalCount(), 0 };
+                    Object[] keys = {k1, k2};
+                    long[] children = {p.getPos(), split.getPos(), 0};
+                    Page[] childrenPages = {p, split, null};
+                    long[] counts = {p.getTotalCount(),
+                            split.getTotalCount(), 0};
                     p = Page.create(this, v,
                             2, keys, null,
                             3, children, childrenPages, counts,
@@ -257,10 +257,10 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
     /**
      * Update the value for the given key. The key must exist.
      *
-     * @param p the page
+     * @param p            the page
      * @param writeVersion the write version
-     * @param key the key
-     * @param value the new value
+     * @param key          the key
+     * @param value        the new value
      * @return the old value (never null)
      */
     private Object set(Page p, long writeVersion, Object key, Object value) {
@@ -458,7 +458,7 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
      * This is mainly used to visualize the internal splits.
      *
      * @param list the list
-     * @param p the root page
+     * @param p    the root page
      */
     public void addNodeKeys(ArrayList<SpatialKey> list, Page p) {
         if (p != null && !p.isLeaf()) {
@@ -577,7 +577,7 @@ public class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
          * Check a given key.
          *
          * @param leaf if the key is from a leaf page
-         * @param key the stored key
+         * @param key  the stored key
          * @param test the user-supplied test key
          * @return true if there is a match
          */

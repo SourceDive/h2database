@@ -6,14 +6,16 @@
  */
 package org.h2.test.jaqu;
 
-import static org.h2.jaqu.Define.primaryKey;
-import static org.h2.jaqu.Define.tableName;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
 import org.h2.jaqu.Db;
 import org.h2.jaqu.Table;
 import org.h2.test.TestBase;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.h2.jaqu.Define.primaryKey;
+import static org.h2.jaqu.Define.tableName;
 
 /**
  * Tests if converting a CLOB to a String works.
@@ -97,7 +99,7 @@ public class ClobTest extends TestBase {
                     create(3, "While I nodded, nearly napping, suddenly there came a tapping,"),
                     create(4, "As of some one gently rapping, rapping at my chamber door."),
                     create(5, "`'Tis some visitor,' I muttered, `tapping at my chamber door -"),
-                    create(6, "Only this, and nothing more.'") };
+                    create(6, "Only this, and nothing more.'")};
 
             return Arrays.asList(list);
         }

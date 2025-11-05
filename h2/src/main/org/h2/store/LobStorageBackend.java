@@ -6,17 +6,6 @@
  */
 package org.h2.store;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Database;
 import org.h2.engine.SysProperties;
@@ -28,6 +17,17 @@ import org.h2.util.MathUtils;
 import org.h2.util.New;
 import org.h2.value.Value;
 import org.h2.value.ValueLobDb;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * This class stores LOB objects in the database, in tables. This is the
@@ -58,7 +58,7 @@ import org.h2.value.ValueLobDb;
  *      locks system session
  *      waiting to lock database.
  * </pre>
- *
+ * <p>
  * So, in this class alone, we do two things: we have our very own dedicated
  * session, the LOB session, and we take the locks in this order: first the
  * Database object, and then the LOB session. Since we own the LOB session,
@@ -123,7 +123,7 @@ public class LobStorageBackend implements LobStorageInterface {
                 boolean create = true;
                 PreparedStatement prep = initConn.prepareStatement(
                         "SELECT ZERO() FROM INFORMATION_SCHEMA.COLUMNS WHERE " +
-                        "TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?");
+                                "TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?");
                 prep.setString(1, "INFORMATION_SCHEMA");
                 prep.setString(2, "LOB_MAP");
                 prep.setString(3, "POS");
@@ -132,7 +132,7 @@ public class LobStorageBackend implements LobStorageInterface {
                 if (rs.next()) {
                     prep = initConn.prepareStatement(
                             "SELECT ZERO() FROM INFORMATION_SCHEMA.TABLES WHERE " +
-                            "TABLE_SCHEMA=? AND TABLE_NAME=?");
+                                    "TABLE_SCHEMA=? AND TABLE_NAME=?");
                     prep.setString(1, "INFORMATION_SCHEMA");
                     prep.setString(2, "LOB_DATA");
                     rs = prep.executeQuery();
@@ -228,7 +228,7 @@ public class LobStorageBackend implements LobStorageInterface {
                 ResultSet rs = prep.executeQuery();
                 if (!rs.next()) {
                     throw DbException.get(ErrorCode.IO_EXCEPTION_1,
-                            "Missing lob entry, block: " + block)
+                                    "Missing lob entry, block: " + block)
                             .getSQLException();
                 }
                 int compressed = rs.getInt(1);
@@ -264,7 +264,7 @@ public class LobStorageBackend implements LobStorageInterface {
     /**
      * Allow to re-use the prepared statement.
      *
-     * @param sql the SQL statement
+     * @param sql  the SQL statement
      * @param prep the prepared statement
      */
     void reuse(String sql, PreparedStatement prep) {
@@ -330,7 +330,7 @@ public class LobStorageBackend implements LobStorageInterface {
 
     @Override
     public InputStream getInputStream(ValueLobDb lob, byte[] hmac,
-            long byteCount) throws IOException {
+                                      long byteCount) throws IOException {
         try {
             init();
             assertNotHolds(conn.getSession());
@@ -347,7 +347,7 @@ public class LobStorageBackend implements LobStorageInterface {
     }
 
     private ValueLobDb addLob(InputStream in, long maxLength, int type,
-            CountingReaderInputStream countingReaderForClob) {
+                              CountingReaderInputStream countingReaderForClob) {
         try {
             byte[] buff = new byte[BLOCK_LENGTH];
             if (maxLength < 0) {
@@ -421,7 +421,7 @@ public class LobStorageBackend implements LobStorageInterface {
     }
 
     private ValueLobDb registerLob(int type, long lobId, int tableId,
-            long byteCount, long precision) throws SQLException {
+                                   long byteCount, long precision) throws SQLException {
         assertNotHolds(conn.getSession());
         // see locking discussion at the top
         synchronized (database) {
@@ -508,14 +508,14 @@ public class LobStorageBackend implements LobStorageInterface {
     /**
      * Store a block in the LOB storage.
      *
-     * @param lobId the lob id
-     * @param seq the sequence number
-     * @param pos the position within the lob
-     * @param b the data
+     * @param lobId             the lob id
+     * @param seq               the sequence number
+     * @param pos               the position within the lob
+     * @param b                 the data
      * @param compressAlgorithm the compression algorithm (may be null)
      */
     void storeBlock(long lobId, int seq, long pos, byte[] b,
-            String compressAlgorithm) throws SQLException {
+                    String compressAlgorithm) throws SQLException {
         long block;
         boolean blockExists = false;
         if (compressAlgorithm != null) {
@@ -526,7 +526,7 @@ public class LobStorageBackend implements LobStorageInterface {
         assertHoldsLock(database);
         block = getHashCacheBlock(hash);
         if (block != -1) {
-            String sql =  "SELECT COMPRESSED, DATA FROM " + LOB_DATA +
+            String sql = "SELECT COMPRESSED, DATA FROM " + LOB_DATA +
                     " WHERE BLOCK = ?";
             PreparedStatement prep = prepare(sql);
             prep.setLong(1, block);

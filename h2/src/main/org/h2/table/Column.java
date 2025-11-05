@@ -6,36 +6,23 @@
  */
 package org.h2.table;
 
-import java.sql.Date;
-import java.sql.ResultSetMetaData;
-import java.sql.Timestamp;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.Parser;
 import org.h2.engine.Constants;
 import org.h2.engine.Mode;
 import org.h2.engine.Session;
-import org.h2.expression.ConditionAndOr;
-import org.h2.expression.Expression;
-import org.h2.expression.ExpressionVisitor;
-import org.h2.expression.SequenceValue;
-import org.h2.expression.ValueExpression;
+import org.h2.expression.*;
 import org.h2.message.DbException;
 import org.h2.result.Row;
 import org.h2.schema.Schema;
 import org.h2.schema.Sequence;
 import org.h2.util.MathUtils;
 import org.h2.util.StringUtils;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueDate;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueString;
-import org.h2.value.ValueTime;
-import org.h2.value.ValueTimestamp;
-import org.h2.value.ValueUuid;
+import org.h2.value.*;
+
+import java.sql.Date;
+import java.sql.ResultSetMetaData;
+import java.sql.Timestamp;
 
 /**
  * This class represents a column in a table.
@@ -94,7 +81,7 @@ public class Column {
     }
 
     public Column(String name, int type, long precision, int scale,
-            int displaySize) {
+                  int displaySize) {
         this.name = name;
         this.type = type;
         if (precision == -1 && scale == -1 && displaySize == -1) {
@@ -169,7 +156,7 @@ public class Column {
      * Compute the value of this computed column.
      *
      * @param session the session
-     * @param row the row
+     * @param row     the row
      * @return the value
      */
     synchronized Value computeValue(Session session, Row row) {
@@ -192,7 +179,7 @@ public class Column {
     /**
      * Set the table and column id.
      *
-     * @param table the table
+     * @param table    the table
      * @param columnId the column index
      */
     public void setTable(Table table, int columnId) {
@@ -207,11 +194,11 @@ public class Column {
     /**
      * Set the default expression.
      *
-     * @param session the session
+     * @param session           the session
      * @param defaultExpression the default expression
      */
     public void setDefaultExpression(Session session,
-            Expression defaultExpression) {
+                                     Expression defaultExpression) {
         // also to test that no column names are used
         if (defaultExpression != null) {
             defaultExpression = defaultExpression.optimize(session);
@@ -265,7 +252,7 @@ public class Column {
      * is set) is returned. Check constraints are validated as well.
      *
      * @param session the session
-     * @param value the value or null
+     * @param value   the value or null
      * @return the new or converted value
      */
     public Value validateConvertUpdateSequence(Session session, Value value) {
@@ -360,14 +347,14 @@ public class Column {
      * Convert the auto-increment flag to a sequence that is linked with this
      * table.
      *
-     * @param session the session
-     * @param schema the schema where the sequence should be generated
-     * @param id the object id
+     * @param session   the session
+     * @param schema    the schema where the sequence should be generated
+     * @param id        the object id
      * @param temporary true if the sequence is temporary and does not need to
-     *            be stored
+     *                  be stored
      */
     public void convertAutoIncrementToSequence(Session session, Schema schema,
-            int id, boolean temporary) {
+                                               int id, boolean temporary) {
         if (!autoIncrement) {
             DbException.throwInternalError();
         }
@@ -419,18 +406,18 @@ public class Column {
         } else {
             buff.append(DataType.getDataType(type).name);
             switch (type) {
-            case Value.DECIMAL:
-                buff.append('(').append(precision).append(", ").append(scale).append(')');
-                break;
-            case Value.BYTES:
-            case Value.STRING:
-            case Value.STRING_IGNORECASE:
-            case Value.STRING_FIXED:
-                if (precision < Integer.MAX_VALUE) {
-                    buff.append('(').append(precision).append(')');
-                }
-                break;
-            default:
+                case Value.DECIMAL:
+                    buff.append('(').append(precision).append(", ").append(scale).append(')');
+                    break;
+                case Value.BYTES:
+                case Value.STRING:
+                case Value.STRING_IGNORECASE:
+                case Value.STRING_FIXED:
+                    if (precision < Integer.MAX_VALUE) {
+                        buff.append('(').append(precision).append(')');
+                    }
+                    break;
+                default:
             }
         }
         if (defaultExpression != null) {
@@ -487,8 +474,8 @@ public class Column {
     /**
      * Set the autoincrement flag and related properties of this column.
      *
-     * @param autoInc the new autoincrement flag
-     * @param start the sequence start value
+     * @param autoInc   the new autoincrement flag
+     * @param start     the sequence start value
      * @param increment the sequence increment
      */
     public void setAutoIncrement(boolean autoInc, long start, long increment) {
@@ -548,7 +535,7 @@ public class Column {
      * constraint constraint is added using AND.
      *
      * @param session the session
-     * @param expr the (additional) constraint
+     * @param expr    the (additional) constraint
      */
     public void addCheckConstraint(Session session, Expression expr) {
         if (expr == null) {
@@ -588,7 +575,7 @@ public class Column {
     /**
      * Get the check constraint expression for this column if set.
      *
-     * @param session the session
+     * @param session      the session
      * @param asColumnName the column name to use
      * @return the constraint expression
      */
@@ -623,7 +610,7 @@ public class Column {
     /**
      * Get the check constraint SQL snippet.
      *
-     * @param session the session
+     * @param session      the session
      * @param asColumnName the column name to use
      * @return the SQL snippet
      */
@@ -650,7 +637,7 @@ public class Column {
      *
      * @param visitor the visitor
      * @return true if every visited expression returned true, or if there are
-     *         no expressions
+     * no expressions
      */
     boolean isEverything(ExpressionVisitor visitor) {
         if (visitor.getType() == ExpressionVisitor.GET_DEPENDENCIES) {

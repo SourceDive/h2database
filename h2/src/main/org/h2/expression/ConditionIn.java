@@ -6,7 +6,6 @@
  */
 package org.h2.expression;
 
-import java.util.ArrayList;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
 import org.h2.index.IndexCondition;
@@ -16,6 +15,8 @@ import org.h2.util.StatementBuilder;
 import org.h2.value.Value;
 import org.h2.value.ValueBoolean;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
 
 /**
  * An 'in' condition with a list of values, as in WHERE NAME IN(...)
@@ -31,11 +32,11 @@ public class ConditionIn extends Condition {
      * Create a new IN(..) condition.
      *
      * @param database the database
-     * @param left the expression before IN
-     * @param values the value list (at least one element)
+     * @param left     the expression before IN
+     * @param values   the value list (at least one element)
      */
     public ConditionIn(Database database, Expression left,
-            ArrayList<Expression> values) {
+                       ArrayList<Expression> values) {
         this.database = database;
         this.left = left;
         this.valueList = values;

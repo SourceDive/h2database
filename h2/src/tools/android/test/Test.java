@@ -6,10 +6,10 @@
  */
 package android.test;
 
-import org.h2.android.H2Database;
-import org.h2.android.H2Utils;
 import android.app.Activity;
 import android.database.Cursor;
+import org.h2.android.H2Database;
+import org.h2.android.H2Utils;
 
 /**
  * Tests the Android API.
@@ -42,14 +42,14 @@ public class Test extends Activity {
             db.beginTransaction();
             for (int i = 0; i < 1000; i++) {
                 db.execSQL(
-                        "INSERT INTO TEST VALUES(?, 'Hello')", new Object[] { i });
+                        "INSERT INTO TEST VALUES(?, 'Hello')", new Object[]{i});
             }
             db.setTransactionSuccessful();
             db.endTransaction();
             log("inserted");
             for (int i = 0; i < 10; i++) {
                 Cursor c = db.rawQuery(
-                        "select * from test where id=?", new String[] { "" + i });
+                        "select * from test where id=?", new String[]{"" + i});
                 int count = c.getCount();
                 if (count > 0) {
                     c.move(1);

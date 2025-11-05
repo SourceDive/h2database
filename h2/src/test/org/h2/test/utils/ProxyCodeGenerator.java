@@ -6,6 +6,9 @@
  */
 package org.h2.test.utils;
 
+import org.h2.util.New;
+import org.h2.util.SourceCompiler;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -15,8 +18,6 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import org.h2.util.New;
-import org.h2.util.SourceCompiler;
 
 /**
  * A code generator for class proxies.
@@ -63,7 +64,7 @@ public class ProxyCodeGenerator {
         StringWriter sw = new StringWriter();
         cg.write(new PrintWriter(sw));
         String code = sw.toString();
-        String proxy = "bytecode."+ c.getSimpleName() + "Proxy";
+        String proxy = "bytecode." + c.getSimpleName() + "Proxy";
         compiler.setJavaSystemCompiler(false);
         compiler.setSource(proxy, code);
         // System.out.println(code);
@@ -262,7 +263,7 @@ public class ProxyCodeGenerator {
                 writer.print("public ");
             }
             writer.print(getClassName(retClass) +
-                " " + m.getName() + "(");
+                    " " + m.getName() + "(");
             Class<?>[] pc = m.getParameterTypes();
             for (int i = 0; i < pc.length; i++) {
                 Class<?> p = pc[i];
@@ -341,7 +342,7 @@ public class ProxyCodeGenerator {
     /**
      * Format a method call, including arguments, for an exception message.
      *
-     * @param m the method
+     * @param m    the method
      * @param args the arguments
      * @return the formatted string
      */

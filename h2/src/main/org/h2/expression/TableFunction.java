@@ -6,8 +6,6 @@
  */
 package org.h2.expression;
 
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
@@ -18,11 +16,9 @@ import org.h2.table.Column;
 import org.h2.tools.SimpleResultSet;
 import org.h2.util.MathUtils;
 import org.h2.util.StatementBuilder;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueResultSet;
+import org.h2.value.*;
+
+import java.util.ArrayList;
 
 /**
  * Implementation of the functions TABLE(..) and TABLE_DISTINCT(..).
@@ -70,7 +66,7 @@ public class TableFunction extends Function {
 
     @Override
     public ValueResultSet getValueForColumnList(Session session,
-            Expression[] nullArgs) {
+                                                Expression[] nullArgs) {
         return getTable(session, args, true, false);
     }
 
@@ -80,7 +76,7 @@ public class TableFunction extends Function {
     }
 
     private ValueResultSet getTable(Session session, Expression[] argList,
-            boolean onlyColumnList, boolean distinctRows) {
+                                    boolean onlyColumnList, boolean distinctRows) {
         int len = columnList.length;
         Expression[] header = new Expression[len];
         Database db = session.getDatabase();
@@ -133,7 +129,7 @@ public class TableFunction extends Function {
     }
 
     private static SimpleResultSet getSimpleResultSet(ResultInterface rs,
-            int maxrows) {
+                                                      int maxrows) {
         int columnCount = rs.getVisibleColumnCount();
         SimpleResultSet simple = new SimpleResultSet();
         simple.setAutoClose(false);

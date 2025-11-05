@@ -6,14 +6,15 @@
  */
 package org.h2.test.unit;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import org.h2.test.TestBase;
 import org.h2.util.MathUtils;
 import org.h2.util.New;
 import org.h2.value.ValueInt;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 
 /**
  * Tests if Tomcat would clear static fields when re-loading a web application.
@@ -24,28 +25,28 @@ import org.h2.value.ValueInt;
 public class TestClearReferences extends TestBase {
 
     private static final String[] KNOWN_REFRESHED = {
-        "org.h2.compress.CompressLZF.cachedHashTable",
-        "org.h2.engine.DbSettings.defaultSettings",
-        "org.h2.engine.SessionRemote.sessionFactory",
-        "org.h2.jdbcx.JdbcDataSourceFactory.cachedTraceSystem",
-        "org.h2.store.RecoverTester.instance",
-        "org.h2.store.fs.FilePath.defaultProvider",
-        "org.h2.store.fs.FilePath.providers",
-        "org.h2.store.fs.FilePath.tempRandom",
-        "org.h2.store.fs.FilePathRec.recorder",
-        "org.h2.store.fs.FileMemData.data",
-        "org.h2.tools.CompressTool.cachedBuffer",
-        "org.h2.util.CloseWatcher.queue",
-        "org.h2.util.CloseWatcher.refs",
-        "org.h2.util.DateTimeUtils.cachedCalendar",
-        "org.h2.util.MathUtils.cachedSecureRandom",
-        "org.h2.util.NetUtils.cachedLocalAddress",
-        "org.h2.util.StringUtils.softCache",
-        "org.h2.util.Utils.allowedClassNames",
-        "org.h2.util.Utils.allowedClassNamePrefixes",
-        "org.h2.util.Utils.userClassFactories",
-        "org.h2.value.CompareMode.lastUsed",
-        "org.h2.value.Value.softCache",
+            "org.h2.compress.CompressLZF.cachedHashTable",
+            "org.h2.engine.DbSettings.defaultSettings",
+            "org.h2.engine.SessionRemote.sessionFactory",
+            "org.h2.jdbcx.JdbcDataSourceFactory.cachedTraceSystem",
+            "org.h2.store.RecoverTester.instance",
+            "org.h2.store.fs.FilePath.defaultProvider",
+            "org.h2.store.fs.FilePath.providers",
+            "org.h2.store.fs.FilePath.tempRandom",
+            "org.h2.store.fs.FilePathRec.recorder",
+            "org.h2.store.fs.FileMemData.data",
+            "org.h2.tools.CompressTool.cachedBuffer",
+            "org.h2.util.CloseWatcher.queue",
+            "org.h2.util.CloseWatcher.refs",
+            "org.h2.util.DateTimeUtils.cachedCalendar",
+            "org.h2.util.MathUtils.cachedSecureRandom",
+            "org.h2.util.NetUtils.cachedLocalAddress",
+            "org.h2.util.StringUtils.softCache",
+            "org.h2.util.Utils.allowedClassNames",
+            "org.h2.util.Utils.allowedClassNamePrefixes",
+            "org.h2.util.Utils.userClassFactories",
+            "org.h2.value.CompareMode.lastUsed",
+            "org.h2.value.Value.softCache",
     };
 
     private boolean hasError;
@@ -60,7 +61,7 @@ public class TestClearReferences extends TestBase {
     }
 
     private void clear() throws Exception {
-        ArrayList<Class <?>> classes = New.arrayList();
+        ArrayList<Class<?>> classes = New.arrayList();
         check(classes, new File("bin/org/h2"));
         check(classes, new File("temp/org/h2"));
         for (Class<?> clazz : classes) {
@@ -92,7 +93,7 @@ public class TestClearReferences extends TestBase {
         }
     }
 
-    private void check(ArrayList<Class <?>> classes, File file) {
+    private void check(ArrayList<Class<?>> classes, File file) {
         String name = file.getName();
         if (file.isDirectory()) {
             if (name.equals("CVS") || name.equals(".svn")) {

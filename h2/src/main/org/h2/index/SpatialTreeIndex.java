@@ -6,8 +6,8 @@
  */
 package org.h2.index;
 
-import java.util.Iterator;
-
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.h2.engine.Constants;
 import org.h2.engine.Session;
 import org.h2.message.DbException;
@@ -25,8 +25,7 @@ import org.h2.table.TableFilter;
 import org.h2.value.Value;
 import org.h2.value.ValueGeometry;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Iterator;
 
 /**
  * This is an index based on a MVR-TreeMap.
@@ -37,7 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class SpatialTreeIndex extends BaseIndex implements SpatialIndex {
 
-    private static final String MAP_PREFIX  = "RTREE_";
+    private static final String MAP_PREFIX = "RTREE_";
 
     private final MVRTreeMap<Long> treeMap;
     private final MVStore store;
@@ -48,18 +47,18 @@ public class SpatialTreeIndex extends BaseIndex implements SpatialIndex {
     /**
      * Constructor.
      *
-     * @param table the table instance
-     * @param id the index id
-     * @param indexName the index name
-     * @param columns the indexed columns (only one geometry column allowed)
+     * @param table      the table instance
+     * @param id         the index id
+     * @param indexName  the index name
+     * @param columns    the indexed columns (only one geometry column allowed)
      * @param persistent whether the index should be persisted
-     * @param indexType the index type (only spatial index)
-     * @param create whether to create a new index
-     * @param session the session.
+     * @param indexType  the index type (only spatial index)
+     * @param create     whether to create a new index
+     * @param session    the session.
      */
     public SpatialTreeIndex(Table table, int id, String indexName,
-            IndexColumn[] columns, IndexType indexType, boolean persistent,
-            boolean create, Session session) {
+                            IndexColumn[] columns, IndexType indexType, boolean persistent,
+                            boolean create, Session session) {
         if (indexType.isUnique()) {
             throw DbException.getUnsupportedException("not unique");
         }
@@ -90,13 +89,13 @@ public class SpatialTreeIndex extends BaseIndex implements SpatialIndex {
             if (columns[0].column.getType() != Value.GEOMETRY) {
                 throw DbException.getUnsupportedException(
                         "spatial index on non-geometry column, " +
-                        columns[0].column.getCreateSQL());
+                                columns[0].column.getCreateSQL());
             }
         }
         if (!persistent) {
             // Index in memory
             store = MVStore.open(null);
-            treeMap =  store.openMap("spatialIndex",
+            treeMap = store.openMap("spatialIndex",
                     new MVRTreeMap.Builder<Long>());
         } else {
             if (id < 0) {
@@ -107,7 +106,7 @@ public class SpatialTreeIndex extends BaseIndex implements SpatialIndex {
             store = session.getDatabase().getMvStore().getStore();
             // Called after CREATE SPATIAL INDEX or
             // by PageStore.addMeta
-            treeMap =  store.openMap(MAP_PREFIX + getId(),
+            treeMap = store.openMap(MAP_PREFIX + getId(),
                     new MVRTreeMap.Builder<Long>());
             if (treeMap.isEmpty()) {
                 needRebuild = true;
@@ -174,7 +173,7 @@ public class SpatialTreeIndex extends BaseIndex implements SpatialIndex {
 
     @Override
     protected long getCostRangeIndex(int[] masks, long rowCount,
-            TableFilter filter, SortOrder sortOrder) {
+                                     TableFilter filter, SortOrder sortOrder) {
         rowCount += Constants.COST_ROW_OFFSET;
         long cost = rowCount;
         long rows = rowCount;
@@ -193,7 +192,7 @@ public class SpatialTreeIndex extends BaseIndex implements SpatialIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return getCostRangeIndex(masks, table.getRowCountApproximation(),
                 filter, sortOrder);
     }

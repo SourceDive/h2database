@@ -6,14 +6,15 @@
  */
 package org.h2.test.store;
 
+import org.h2.mvstore.cache.CacheLongKeyLIRS;
+import org.h2.test.TestBase;
+import org.h2.util.New;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
-import org.h2.mvstore.cache.CacheLongKeyLIRS;
-import org.h2.test.TestBase;
-import org.h2.util.New;
 
 /**
  * Tests the cache algorithm.
@@ -56,19 +57,19 @@ public class TestCacheLongKeyLIRS extends TestBase {
             for (; j < 30; j++) {
                 int key = r.nextInt(5);
                 switch (r.nextInt(3)) {
-                case 0:
-                    int memory = r.nextInt(5) + 1;
-                    buff.append("add ").append(key).append(' ').
-                            append(memory).append('\n');
-                    test.put(key, j, memory);
-                    break;
-                case 1:
-                    buff.append("remove ").append(key).append('\n');
-                    test.remove(key);
-                    break;
-                case 2:
-                    buff.append("get ").append(key).append('\n');
-                    test.get(key);
+                    case 0:
+                        int memory = r.nextInt(5) + 1;
+                        buff.append("add ").append(key).append(' ').
+                                append(memory).append('\n');
+                        test.put(key, j, memory);
+                        break;
+                    case 1:
+                        buff.append("remove ").append(key).append('\n');
+                        test.remove(key);
+                        break;
+                    case 2:
+                        buff.append("get ").append(key).append('\n');
+                        test.get(key);
                 }
             }
         }
@@ -79,7 +80,7 @@ public class TestCacheLongKeyLIRS extends TestBase {
         test.put(1, 10, 100);
         assertEquals(10, test.get(1).intValue());
         try {
-            test.put(1,  null, 100);
+            test.put(1, null, 100);
             fail();
         } catch (IllegalArgumentException e) {
             // expected
@@ -145,12 +146,12 @@ public class TestCacheLongKeyLIRS extends TestBase {
 
     private void testGetPutPeekRemove() {
         CacheLongKeyLIRS<Integer> test = createCache(4);
-        test.put(1,  10);
-        test.put(2,  20);
-        test.put(3,  30);
+        test.put(1, 10);
+        test.put(2, 20);
+        test.put(3, 30);
         assertNull(test.peek(4));
         assertNull(test.get(4));
-        test.put(4,  40);
+        test.put(4, 40);
         verify(test, "mem: 4 stack: 4 3 2 1 cold: non-resident:");
         // move middle to front
         assertEquals(30, test.get(3).intValue());
@@ -161,10 +162,10 @@ public class TestCacheLongKeyLIRS extends TestBase {
         assertEquals(10, test.peek(1).intValue());
         assertEquals(10, test.get(1).intValue());
         verify(test, "mem: 4 stack: 1 2 3 4 cold: non-resident:");
-        test.put(3,  30);
+        test.put(3, 30);
         verify(test, "mem: 4 stack: 3 1 2 4 cold: non-resident:");
         // 5 is cold; will make 4 non-resident
-        test.put(5,  50);
+        test.put(5, 50);
         verify(test, "mem: 4 stack: 5 3 1 2 cold: 5 non-resident: 4");
         assertEquals(1, test.getMemory(1));
         assertEquals(1, test.getMemory(5));
@@ -189,8 +190,8 @@ public class TestCacheLongKeyLIRS extends TestBase {
         verify(test, "mem: 3 stack: 3 2 1 cold: non-resident:");
         assertNull(test.remove(4));
         verify(test, "mem: 3 stack: 3 2 1 cold: non-resident:");
-        test.put(4,  40);
-        test.put(5,  50);
+        test.put(4, 40);
+        test.put(5, 50);
         verify(test, "mem: 4 stack: 5 4 3 2 cold: 5 non-resident: 1");
         test.get(5);
         test.get(2);
@@ -204,8 +205,8 @@ public class TestCacheLongKeyLIRS extends TestBase {
         assertNull(test.remove(1));
         assertFalse(test.containsKey(1));
         verify(test, "mem: 2 stack: 4 3 cold: non-resident:");
-        test.put(1,  10);
-        test.put(2,  20);
+        test.put(1, 10);
+        test.put(2, 20);
         verify(test, "mem: 4 stack: 2 1 4 3 cold: non-resident:");
         test.get(1);
         test.get(3);
@@ -273,8 +274,8 @@ public class TestCacheLongKeyLIRS extends TestBase {
         // this call needs to prune the stack
         test.remove(1);
         verify(test, "mem: 4 stack: 2 3 4 6 cold: non-resident: 5 0");
-        test.put(0,  0);
-        test.put(1,  10);
+        test.put(0, 0);
+        test.put(1, 10);
         // the the stack was not pruned, the following will fail
         verify(test, "mem: 5 stack: 1 0 2 3 4 cold: 1 non-resident: 6 5");
     }
@@ -295,12 +296,12 @@ public class TestCacheLongKeyLIRS extends TestBase {
         for (long x : test.keySet()) {
             assertTrue(x >= 1 && x <= 4);
         }
-        assertEquals(40,  test.getMaxMemory());
+        assertEquals(40, test.getMaxMemory());
         assertEquals(10, test.getAverageMemory());
-        assertEquals(36,  test.getUsedMemory());
+        assertEquals(36, test.getUsedMemory());
         assertEquals(4, test.size());
-        assertEquals(3,  test.sizeHot());
-        assertEquals(1,  test.sizeNonResident());
+        assertEquals(3, test.sizeHot());
+        assertEquals(1, test.sizeNonResident());
         assertFalse(test.isEmpty());
 
         // changing the limit is not supposed to modify the map
@@ -319,12 +320,12 @@ public class TestCacheLongKeyLIRS extends TestBase {
         test.clear();
         verify(test, "mem: 0 stack: cold: non-resident:");
 
-        assertEquals(40,  test.getMaxMemory());
+        assertEquals(40, test.getMaxMemory());
         assertEquals(10, test.getAverageMemory());
-        assertEquals(0,  test.getUsedMemory());
+        assertEquals(0, test.getUsedMemory());
         assertEquals(0, test.size());
-        assertEquals(0,  test.sizeHot());
-        assertEquals(0,  test.sizeNonResident());
+        assertEquals(0, test.sizeHot());
+        assertEquals(0, test.sizeNonResident());
         assertTrue(test.isEmpty());
     }
 
@@ -411,32 +412,32 @@ public class TestCacheLongKeyLIRS extends TestBase {
                 int key = r.nextInt(size);
                 int value = r.nextInt();
                 switch (r.nextInt(3)) {
-                case 0:
-                    if (log) {
-                        System.out.println(i + " put " + key + " " + value);
-                    }
-                    good.put(key, value);
-                    test.put(key, value);
-                    break;
-                case 1:
-                    if (log) {
-                        System.out.println(i + " get " + key);
-                    }
-                    Integer a = good.get(key);
-                    Integer b = test.get(key);
-                    if (a == null) {
-                        assertNull(b);
-                    } else if (b != null) {
-                        assertEquals(a, b);
-                    }
-                    break;
-                case 2:
-                    if (log) {
-                        System.out.println(i + " remove " + key);
-                    }
-                    good.remove(key);
-                    test.remove(key);
-                    break;
+                    case 0:
+                        if (log) {
+                            System.out.println(i + " put " + key + " " + value);
+                        }
+                        good.put(key, value);
+                        test.put(key, value);
+                        break;
+                    case 1:
+                        if (log) {
+                            System.out.println(i + " get " + key);
+                        }
+                        Integer a = good.get(key);
+                        Integer b = test.get(key);
+                        if (a == null) {
+                            assertNull(b);
+                        } else if (b != null) {
+                            assertEquals(a, b);
+                        }
+                        break;
+                    case 2:
+                        if (log) {
+                            System.out.println(i + " remove " + key);
+                        }
+                        good.remove(key);
+                        test.remove(key);
+                        break;
                 }
                 if (log) {
                     System.out.println(" -> " + toString(test));
@@ -450,15 +451,15 @@ public class TestCacheLongKeyLIRS extends TestBase {
         StringBuilder buff = new StringBuilder();
         buff.append("mem: " + cache.getUsedMemory());
         buff.append(" stack:");
-        for (long k : cache.keys(false,  false)) {
+        for (long k : cache.keys(false, false)) {
             buff.append(' ').append(k);
         }
         buff.append(" cold:");
-        for (long k : cache.keys(true,  false)) {
+        for (long k : cache.keys(true, false)) {
             buff.append(' ').append(k);
         }
         buff.append(" non-resident:");
-        for (long k : cache.keys(true,  true)) {
+        for (long k : cache.keys(true, true)) {
             buff.append(' ').append(k);
         }
         return buff.toString();
@@ -494,7 +495,7 @@ public class TestCacheLongKeyLIRS extends TestBase {
     }
 
     private static <V> CacheLongKeyLIRS<V> createCache(int maxSize,
-            int averageSize) {
+                                                       int averageSize) {
         return new CacheLongKeyLIRS<V>(maxSize, averageSize, 1, 0);
     }
 

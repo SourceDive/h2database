@@ -6,11 +6,6 @@
  */
 package org.h2.store;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.compress.CompressLZF;
 import org.h2.engine.Session;
@@ -24,6 +19,11 @@ import org.h2.util.IntIntHashMap;
 import org.h2.util.New;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Transaction log mechanism. The stream contains a list of records. The data
@@ -177,7 +177,7 @@ public class PageLog {
      * must be run first.
      *
      * @param newFirstTrunkPage the first trunk page
-     * @param atEnd whether only pages at the end of the file should be used
+     * @param atEnd             whether only pages at the end of the file should be used
      */
     void openForWriting(int newFirstTrunkPage, boolean atEnd) {
         trace.debug("log openForWriting firstPage: " + newFirstTrunkPage);
@@ -237,12 +237,12 @@ public class PageLog {
     /**
      * Open the log for reading.
      *
-     * @param newLogKey the first expected log key
+     * @param newLogKey         the first expected log key
      * @param newFirstTrunkPage the first trunk page
-     * @param newFirstDataPage the index of the first data page
+     * @param newFirstDataPage  the index of the first data page
      */
     void openForReading(int newLogKey, int newFirstTrunkPage,
-            int newFirstDataPage) {
+                        int newFirstDataPage) {
         this.logKey = newLogKey;
         this.firstTrunkPage = newFirstTrunkPage;
         this.firstDataPage = newFirstDataPage;
@@ -363,7 +363,7 @@ public class PageLog {
                             store.redoTruncate(tableId);
                         } else {
                             if (trace.isDebugEnabled()) {
-                                trace.debug("log ignore s: "+ sessionId +
+                                trace.debug("log ignore s: " + sessionId +
                                         " truncate table: " + tableId);
                             }
                         }
@@ -393,7 +393,7 @@ public class PageLog {
                     if (stage == RECOVERY_STAGE_UNDO) {
                         setLastCommitForSession(sessionId, logId, pos);
                     }
-                } else  if (x == NOOP) {
+                } else if (x == NOOP) {
                     // nothing to do
                 } else if (x == CHECKPOINT) {
                     logId++;
@@ -434,8 +434,8 @@ public class PageLog {
      * This method is called when a 'prepare commit' log entry is read when
      * opening the database.
      *
-     * @param sessionId the session id
-     * @param pageId the data page with the prepare entry
+     * @param sessionId   the session id
+     * @param pageId      the data page with the prepare entry
      * @param transaction the transaction name, or null to rollback
      */
     private void setPrepareCommit(int sessionId, int pageId, String transaction) {
@@ -453,7 +453,7 @@ public class PageLog {
     /**
      * Read a row from an input stream.
      *
-     * @param in the input stream
+     * @param in   the input stream
      * @param data a temporary buffer
      * @return the row
      */
@@ -488,7 +488,7 @@ public class PageLog {
      * the next checkpoint.
      *
      * @param pageId the page id
-     * @param page the old page data
+     * @param page   the old page data
      */
     void addUndo(int pageId, Data page) {
         if (undo.get(pageId) || freeing) {
@@ -577,7 +577,7 @@ public class PageLog {
     /**
      * Prepare a transaction.
      *
-     * @param session the session
+     * @param session     the session
      * @param transaction the name of the transaction
      */
     void prepareCommit(Session session, String transaction) {
@@ -596,7 +596,7 @@ public class PageLog {
         buffer.writeByte((byte) PREPARE_COMMIT);
         buffer.writeVarInt(session.getId());
         buffer.writeString(transaction);
-        if (buffer.length()  >= PageStreamData.getCapacity(pageSize)) {
+        if (buffer.length() >= PageStreamData.getCapacity(pageSize)) {
             throw DbException.getInvalidValueException(
                     "transaction name (too long)", transaction);
         }
@@ -614,8 +614,8 @@ public class PageLog {
      *
      * @param session the session
      * @param tableId the table id
-     * @param row the row to add
-     * @param add true if the row is added, false if it is removed
+     * @param row     the row to add
+     * @param add     true if the row is added, false if it is removed
      */
     void logAddOrRemoveRow(Session session, int tableId, Row row, boolean add) {
         if (trace.isDebugEnabled()) {
@@ -736,7 +736,7 @@ public class PageLog {
     /**
      * Remove all pages until the given data page.
      *
-     * @param trunkPage the first trunk page
+     * @param trunkPage           the first trunk page
      * @param firstDataPageToKeep the first data page to keep
      * @return the trunk page of the data page to keep
      */
@@ -758,7 +758,7 @@ public class PageLog {
             trunkPage = t.getNextTrunk();
             IntArray list = new IntArray();
             list.add(t.getPos());
-            for (int i = 0;; i++) {
+            for (int i = 0; ; i++) {
                 int next = t.getPageData(i);
                 if (next == -1) {
                     break;
@@ -786,8 +786,8 @@ public class PageLog {
      * Check if the session committed after than the given position.
      *
      * @param sessionId the session id
-     * @param logId the log id
-     * @param pos the position in the log
+     * @param logId     the log id
+     * @param pos       the position in the log
      * @return true if it is committed
      */
     private boolean isSessionCommitted(int sessionId, int logId, int pos) {
@@ -802,8 +802,8 @@ public class PageLog {
      * Set the last commit record for a session.
      *
      * @param sessionId the session id
-     * @param logId the log id
-     * @param pos the position in the log
+     * @param logId     the log id
+     * @param pos       the position in the log
      */
     private void setLastCommitForSession(int sessionId, int logId, int pos) {
         SessionState state = getOrAddSessionState(sessionId);
@@ -849,8 +849,8 @@ public class PageLog {
      * Set the state of an in-doubt transaction.
      *
      * @param sessionId the session
-     * @param pageId the page where the commit was prepared
-     * @param commit whether the transaction should be committed
+     * @param pageId    the page where the commit was prepared
+     * @param commit    whether the transaction should be committed
      */
     void setInDoubtTransactionState(int sessionId, int pageId, boolean commit) {
         PageStreamData d = (PageStreamData) store.getPage(pageId);

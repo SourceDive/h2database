@@ -79,12 +79,12 @@ public class SwitchSource {
 
     private void showUsage() {
         System.out.println("Switched source code to a specific Java version.");
-        System.out.println("java "+getClass().getName() + "\n" +
-            " -dir <dir>  The target directory\n" +
-            " [-version]   Use the specified Java version (1.4 or newer)\n" +
-            " [-auto]      Auto-detect Java version (1.4 or newer)\n" +
-            " [+MODE]     Enable code labeled MODE\n" +
-            " [-MODE]     Disable code labeled MODE");
+        System.out.println("java " + getClass().getName() + "\n" +
+                " -dir <dir>  The target directory\n" +
+                " [-version]   Use the specified Java version (1.4 or newer)\n" +
+                " [-auto]      Auto-detect Java version (1.4 or newer)\n" +
+                " [+MODE]     Enable code labeled MODE\n" +
+                " [-MODE]     Disable code labeled MODE");
     }
 
     private void process(File f) throws IOException {

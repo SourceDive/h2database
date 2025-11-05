@@ -6,8 +6,6 @@
  */
 package org.h2.result;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
@@ -16,6 +14,9 @@ import org.h2.store.Data;
 import org.h2.store.FileStore;
 import org.h2.util.New;
 import org.h2.value.Value;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 /**
  * This class implements the disk buffer for the LocalResult class.

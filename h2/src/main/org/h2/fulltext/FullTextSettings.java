@@ -6,15 +6,12 @@
  */
 package org.h2.fulltext;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.HashSet;
 import org.h2.util.New;
 import org.h2.util.SoftHashMap;
+
+import java.sql.*;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * The global settings of a full text search.
@@ -150,7 +147,7 @@ class FullTextSettings {
         if ("MEM:UNNAMED".equals(path)) {
             throw FullText.throwException(
                     "Fulltext search for private (unnamed) " +
-                    "in-memory databases is not supported.");
+                            "in-memory databases is not supported.");
         }
         rs.close();
         return path;
@@ -160,7 +157,7 @@ class FullTextSettings {
      * Prepare a statement. The statement is cached in a soft reference cache.
      *
      * @param conn the connection
-     * @param sql the statement
+     * @param sql  the statement
      * @return the prepared statement
      */
     protected synchronized PreparedStatement prepare(Connection conn, String sql)

@@ -6,14 +6,11 @@
  */
 package org.h2.build.doc;
 
+import org.h2.bnf.*;
+import org.h2.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import org.h2.bnf.Bnf;
-import org.h2.bnf.BnfVisitor;
-import org.h2.bnf.Rule;
-import org.h2.bnf.RuleFixed;
-import org.h2.bnf.RuleHead;
-import org.h2.util.StringUtils;
 
 /**
  * A BNF visitor that generates BNF in HTML form.
@@ -25,7 +22,7 @@ public class BnfSyntax implements BnfVisitor {
     /**
      * Get the HTML syntax for the given syntax.
      *
-     * @param bnf the BNF
+     * @param bnf         the BNF
      * @param syntaxLines the syntax
      * @return the HTML
      */
@@ -50,7 +47,7 @@ public class BnfSyntax implements BnfVisitor {
     /**
      * Get the HTML link to the given token.
      *
-     * @param bnf the BNF
+     * @param bnf   the BNF
      * @param token the token
      * @return the HTML link
      */

@@ -6,24 +6,19 @@
  */
 package org.h2.jaqu.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.Writer;
+import org.h2.jaqu.Db;
+import org.h2.jaqu.DbInspector;
+import org.h2.message.DbException;
+import org.h2.util.JdbcUtils;
+import org.h2.util.StringUtils;
+
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.h2.jaqu.Db;
-import org.h2.jaqu.DbInspector;
-import org.h2.message.DbException;
-import org.h2.util.JdbcUtils;
-import org.h2.util.StringUtils;
 
 /**
  * Generates JaQu models.
@@ -94,20 +89,20 @@ public class GenerateModels {
     /**
      * Generates models from the database.
      *
-     * @param url the database URL
-     * @param user the user name
-     * @param password the password
-     * @param schema the schema to read from. null for all schemas.
-     * @param table the table to model. null for all tables within schema.
-     * @param packageName the package name of the model classes.
-     * @param folder destination folder for model classes (package path not
-     *            included)
+     * @param url            the database URL
+     * @param user           the user name
+     * @param password       the password
+     * @param schema         the schema to read from. null for all schemas.
+     * @param table          the table to model. null for all tables within schema.
+     * @param packageName    the package name of the model classes.
+     * @param folder         destination folder for model classes (package path not
+     *                       included)
      * @param annotateSchema includes the schema in the table model annotations
-     * @param trimStrings automatically trim strings that exceed maxLength
+     * @param trimStrings    automatically trim strings that exceed maxLength
      */
     public static void execute(String url, String user, String password,
-            String schema, String table, String packageName, String folder,
-            boolean annotateSchema, boolean trimStrings) throws SQLException {
+                               String schema, String table, String packageName, String folder,
+                               boolean annotateSchema, boolean trimStrings) throws SQLException {
         Connection conn = null;
         try {
             org.h2.Driver.load();

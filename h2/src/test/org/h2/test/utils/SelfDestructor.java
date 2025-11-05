@@ -24,7 +24,7 @@ public class SelfDestructor extends Thread {
      * value is used, otherwise the given default value is used.
      *
      * @param defaultMinutes the default number of minutes after which the
-     *            current process is killed.
+     *                       current process is killed.
      */
     public static void startCountdown(int defaultMinutes) {
         final int minutes = Integer.parseInt(

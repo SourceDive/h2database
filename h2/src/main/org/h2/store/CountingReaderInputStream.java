@@ -6,6 +6,8 @@
  */
 package org.h2.store;
 
+import org.h2.engine.Constants;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -13,8 +15,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
-
-import org.h2.engine.Constants;
 
 /**
  * An input stream that reads the data from a reader.

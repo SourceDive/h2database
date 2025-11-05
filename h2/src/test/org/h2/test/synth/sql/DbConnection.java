@@ -6,14 +6,10 @@
  */
 package org.h2.test.synth.sql;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import org.h2.util.New;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Represents a connection to a real database.
@@ -30,7 +26,7 @@ class DbConnection implements DbInterface {
     private final boolean useSentinel;
 
     DbConnection(TestSynth config, String driver, String url, String user,
-            String password, int id, boolean useSentinel) {
+                 String password, int id, boolean useSentinel) {
         this.config = config;
         this.driver = driver;
         this.url = url;
@@ -47,7 +43,7 @@ class DbConnection implements DbInterface {
         DatabaseMetaData meta = conn.getMetaData();
         Statement stat = conn.createStatement();
         ArrayList<String> tables = New.arrayList();
-        ResultSet rs = meta.getTables(null, null, null, new String[] { "TABLE" });
+        ResultSet rs = meta.getTables(null, null, null, new String[]{"TABLE"});
         while (rs.next()) {
             String schemaName = rs.getString("TABLE_SCHEM");
             if (!"INFORMATION_SCHEMA".equals(schemaName)) {
@@ -164,7 +160,7 @@ class DbConnection implements DbInterface {
 
     @Override
     public Result update(Table table, Column[] columns, Value[] values,
-            String condition) throws SQLException {
+                         String condition) throws SQLException {
         String sql = "UPDATE " + table.getName() + " SET ";
         for (int i = 0; i < columns.length; i++) {
             if (i > 0) {

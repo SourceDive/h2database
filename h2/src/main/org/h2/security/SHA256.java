@@ -17,7 +17,7 @@ public class SHA256 {
      * The first 32 bits of the fractional parts of the cube roots of the first
      * sixty-four prime numbers.
      */
-    private static final int[] K = { 0x428a2f98, 0x71374491, 0xb5c0fbcf,
+    private static final int[] K = {0x428a2f98, 0x71374491, 0xb5c0fbcf,
             0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
             0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74,
             0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
@@ -30,10 +30,10 @@ public class SHA256 {
             0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3,
             0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f,
             0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7,
-            0xc67178f2 };
+            0xc67178f2};
 
-    private static final int[] HH = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372,
-            0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+    private static final int[] HH = {0x6a09e667, 0xbb67ae85, 0x3c6ef372,
+            0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
     private final byte[] result = new byte[32];
     private final int[] w = new int[64];
@@ -89,7 +89,7 @@ public class SHA256 {
     /**
      * Calculate the hash-based message authentication code.
      *
-     * @param key the key
+     * @param key     the key
      * @param message the message
      * @return the hash
      */
@@ -108,7 +108,7 @@ public class SHA256 {
     }
 
     private void calculateHMAC(byte[] key, byte[] message, int len,
-            byte[] iKey, byte[] oKey, byte[] byteBuff, int[] intBuff) {
+                               byte[] iKey, byte[] oKey, byte[] byteBuff, int[] intBuff) {
         Arrays.fill(iKey, 0, 64, (byte) 0x36);
         xor(iKey, key, 64);
         System.arraycopy(message, 0, iKey, 64, len);
@@ -138,14 +138,14 @@ public class SHA256 {
     /**
      * Calculate the hash using the password-based key derivation function 2.
      *
-     * @param password the password
-     * @param salt the salt
+     * @param password   the password
+     * @param salt       the salt
      * @param iterations the number of iterations
-     * @param resultLen the number of bytes in the result
+     * @param resultLen  the number of bytes in the result
      * @return the result
      */
     public static byte[] getPBKDF2(byte[] password, byte[] salt,
-            int iterations, int resultLen) {
+                                   int iterations, int resultLen) {
         byte[] result = new byte[resultLen];
         byte[] key = normalizeKeyForHMAC(password);
         SHA256 sha = new SHA256();
@@ -180,9 +180,9 @@ public class SHA256 {
     /**
      * Calculate the hash code for the given data.
      *
-     * @param data the data to hash
+     * @param data     the data to hash
      * @param nullData if the data should be filled with zeros after calculating
-     *            the hash code
+     *                 the hash code
      * @return the hash code
      */
     public static byte[] getHash(byte[] data, boolean nullData) {
@@ -211,7 +211,7 @@ public class SHA256 {
     }
 
     private void calculateHash(byte[] data, int len,
-            byte[] byteBuff, int[] intBuff) {
+                               byte[] byteBuff, int[] intBuff) {
         int[] w = this.w;
         int[] hh = this.hh;
         byte[] result = this.result;

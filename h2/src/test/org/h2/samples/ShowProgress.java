@@ -6,14 +6,10 @@
  */
 package org.h2.samples;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.DatabaseEventListener;
 import org.h2.jdbc.JdbcConnection;
+
+import java.sql.*;
 
 /**
  * This example application implements a database event listener. This is useful
@@ -81,7 +77,7 @@ public class ShowProgress implements DatabaseEventListener {
         time = System.currentTimeMillis();
         conn = DriverManager.getConnection(
                 "jdbc:h2:test;DATABASE_EVENT_LISTENER='" +
-                getClass().getName() + "'", "sa", "");
+                        getClass().getName() + "'", "sa", "");
         time = System.currentTimeMillis() - time;
         System.out.println("Done after " + time + " ms");
         prep.close();
@@ -93,7 +89,7 @@ public class ShowProgress implements DatabaseEventListener {
     /**
      * This method is called if an exception occurs in the database.
      *
-     * @param e the exception
+     * @param e   the exception
      * @param sql the SQL statement
      */
     @Override
@@ -106,10 +102,10 @@ public class ShowProgress implements DatabaseEventListener {
      * This method is called when opening the database to notify about the
      * progress.
      *
-     * @param state the current state
-     * @param name the object name (depends on the state)
+     * @param state   the current state
+     * @param name    the object name (depends on the state)
      * @param current the current progress
-     * @param max the 100% mark
+     * @param max     the 100% mark
      */
     @Override
     public void setProgress(int state, String name, int current, int max) {
@@ -120,17 +116,17 @@ public class ShowProgress implements DatabaseEventListener {
         last = time;
         String stateName = "?";
         switch (state) {
-        case STATE_SCAN_FILE:
-            stateName = "Scan " + name;
-            break;
-        case STATE_CREATE_INDEX:
-            stateName = "Create Index " + name;
-            break;
-        case STATE_RECOVER:
-            stateName = "Recover";
-            break;
-        default:
-            return;
+            case STATE_SCAN_FILE:
+                stateName = "Scan " + name;
+                break;
+            case STATE_CREATE_INDEX:
+                stateName = "Create Index " + name;
+                break;
+            case STATE_RECOVER:
+                stateName = "Recover";
+                break;
+            default:
+                return;
         }
         try {
             Thread.sleep(1);

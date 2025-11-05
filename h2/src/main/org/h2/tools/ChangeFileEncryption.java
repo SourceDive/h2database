@@ -6,6 +6,14 @@
  */
 package org.h2.tools;
 
+import org.h2.engine.Constants;
+import org.h2.message.DbException;
+import org.h2.security.SHA256;
+import org.h2.store.FileLister;
+import org.h2.store.FileStore;
+import org.h2.store.fs.*;
+import org.h2.util.Tool;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,23 +21,12 @@ import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.h2.engine.Constants;
-import org.h2.message.DbException;
-import org.h2.security.SHA256;
-import org.h2.store.FileLister;
-import org.h2.store.FileStore;
-import org.h2.store.fs.FileChannelInputStream;
-import org.h2.store.fs.FileChannelOutputStream;
-import org.h2.store.fs.FilePath;
-import org.h2.store.fs.FilePathEncrypt;
-import org.h2.store.fs.FileUtils;
-import org.h2.util.Tool;
-
 /**
  * Allows changing the database file encryption password or algorithm.
  * <br />
  * This tool can not be used to change a password of a user.
  * The database must be closed before using this tool.
+ *
  * @h2.resource
  */
 public class ChangeFileEncryption extends Tool {
@@ -59,9 +56,9 @@ public class ChangeFileEncryption extends Tool {
      * <tr><td>[-quiet]</td>
      * <td>Do not print progress information</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new ChangeFileEncryption().runTool(args);
@@ -127,15 +124,15 @@ public class ChangeFileEncryption extends Tool {
      * char arrays and are cleaned in this method. The database must be closed
      * before calling this method.
      *
-     * @param dir the directory (. for the current directory)
-     * @param db the database name (null for all databases)
-     * @param cipher the cipher (AES)
+     * @param dir             the directory (. for the current directory)
+     * @param db              the database name (null for all databases)
+     * @param cipher          the cipher (AES)
      * @param decryptPassword the decryption password as a char array
      * @param encryptPassword the encryption password as a char array
-     * @param quiet don't print progress information
+     * @param quiet           don't print progress information
      */
     public static void execute(String dir, String db, String cipher,
-            char[] decryptPassword, char[] encryptPassword, boolean quiet)
+                               char[] decryptPassword, char[] encryptPassword, boolean quiet)
             throws SQLException {
         try {
             new ChangeFileEncryption().process(dir, db, cipher,
@@ -146,7 +143,7 @@ public class ChangeFileEncryption extends Tool {
     }
 
     private void process(String dir, String db, String cipher,
-            char[] decryptPassword, char[] encryptPassword, boolean quiet)
+                         char[] decryptPassword, char[] encryptPassword, boolean quiet)
             throws SQLException {
         dir = FileLister.getDir(dir);
         ChangeFileEncryption change = new ChangeFileEncryption();

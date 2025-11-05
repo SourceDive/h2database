@@ -6,8 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import org.h2.engine.Session;
 import org.h2.expression.Comparison;
 import org.h2.message.DbException;
@@ -22,6 +20,9 @@ import org.h2.table.TableFilter;
 import org.h2.value.Value;
 import org.h2.value.ValueGeometry;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * The filter used to walk through an index. This class supports IN(..)
@@ -71,7 +72,7 @@ public class IndexCursor implements Cursor {
     /**
      * Re-evaluate the start and end values of the index search for rows.
      *
-     * @param s the session
+     * @param s               the session
      * @param indexConditions the index conditions
      */
     public void find(Session s, ArrayList<IndexCondition> indexConditions) {
@@ -200,7 +201,7 @@ public class IndexCursor implements Cursor {
     }
 
     private SearchRow getSearchRow(SearchRow row, int columnId, Value v,
-            boolean max) {
+                                   boolean max) {
         if (row == null) {
             row = table.getTemplateRow();
         } else {

@@ -6,38 +6,11 @@
  */
 package org.h2.command.dml;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Set;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
 import org.h2.command.Parser;
 import org.h2.constraint.Constraint;
-import org.h2.engine.Comment;
-import org.h2.engine.Constants;
-import org.h2.engine.Database;
-import org.h2.engine.DbObject;
-import org.h2.engine.Right;
-import org.h2.engine.Role;
-import org.h2.engine.Session;
-import org.h2.engine.Setting;
-import org.h2.engine.SysProperties;
-import org.h2.engine.User;
-import org.h2.engine.UserAggregate;
-import org.h2.engine.UserDataType;
+import org.h2.engine.*;
 import org.h2.expression.Expression;
 import org.h2.expression.ExpressionColumn;
 import org.h2.index.Cursor;
@@ -46,21 +19,22 @@ import org.h2.message.DbException;
 import org.h2.result.LocalResult;
 import org.h2.result.ResultInterface;
 import org.h2.result.Row;
-import org.h2.schema.Constant;
-import org.h2.schema.Schema;
-import org.h2.schema.SchemaObject;
-import org.h2.schema.Sequence;
-import org.h2.schema.TriggerObject;
+import org.h2.schema.*;
 import org.h2.table.Column;
 import org.h2.table.PlanItem;
 import org.h2.table.Table;
-import org.h2.util.IOUtils;
-import org.h2.util.MathUtils;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
-import org.h2.util.Utils;
+import org.h2.util.*;
 import org.h2.value.Value;
 import org.h2.value.ValueString;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Set;
 
 /**
  * This class represents the statement
@@ -135,8 +109,8 @@ public class ScriptCommand extends ScriptBase {
     }
 
     private LocalResult createResult() {
-        Expression[] expressions = { new ExpressionColumn(
-                session.getDatabase(), new Column("SCRIPT", Value.STRING)) };
+        Expression[] expressions = {new ExpressionColumn(
+                session.getDatabase(), new Column("SCRIPT", Value.STRING))};
         return new LocalResult(session, expressions, 1);
     }
 
@@ -446,8 +420,8 @@ public class ScriptCommand extends ScriptBase {
     private int writeLobStream(Value v) throws IOException {
         if (!tempLobTableCreated) {
             add("CREATE TABLE IF NOT EXISTS SYSTEM_LOB_STREAM" +
-                    "(ID INT NOT NULL, PART INT NOT NULL, " +
-                    "CDATA VARCHAR, BDATA BINARY)",
+                            "(ID INT NOT NULL, PART INT NOT NULL, " +
+                            "CDATA VARCHAR, BDATA BINARY)",
                     true);
             add("CREATE PRIMARY KEY SYSTEM_LOB_STREAM_PRIMARY_KEY " +
                     "ON SYSTEM_LOB_STREAM(ID, PART)", true);
@@ -459,50 +433,50 @@ public class ScriptCommand extends ScriptBase {
         }
         int id = nextLobId++;
         switch (v.getType()) {
-        case Value.BLOB: {
-            byte[] bytes = new byte[lobBlockSize];
-            InputStream input = v.getInputStream();
-            try {
-                for (int i = 0;; i++) {
-                    StringBuilder buff = new StringBuilder(lobBlockSize * 2);
-                    buff.append("INSERT INTO SYSTEM_LOB_STREAM VALUES(" + id +
-                            ", " + i + ", NULL, '");
-                    int len = IOUtils.readFully(input, bytes, lobBlockSize);
-                    if (len <= 0) {
-                        break;
+            case Value.BLOB: {
+                byte[] bytes = new byte[lobBlockSize];
+                InputStream input = v.getInputStream();
+                try {
+                    for (int i = 0; ; i++) {
+                        StringBuilder buff = new StringBuilder(lobBlockSize * 2);
+                        buff.append("INSERT INTO SYSTEM_LOB_STREAM VALUES(" + id +
+                                ", " + i + ", NULL, '");
+                        int len = IOUtils.readFully(input, bytes, lobBlockSize);
+                        if (len <= 0) {
+                            break;
+                        }
+                        buff.append(StringUtils.convertBytesToHex(bytes, len)).append("')");
+                        String sql = buff.toString();
+                        add(sql, true);
                     }
-                    buff.append(StringUtils.convertBytesToHex(bytes, len)).append("')");
-                    String sql = buff.toString();
-                    add(sql, true);
+                } finally {
+                    IOUtils.closeSilently(input);
                 }
-            } finally {
-                IOUtils.closeSilently(input);
+                break;
             }
-            break;
-        }
-        case Value.CLOB: {
-            char[] chars = new char[lobBlockSize];
-            Reader reader = v.getReader();
-            try {
-                for (int i = 0;; i++) {
-                    StringBuilder buff = new StringBuilder(lobBlockSize * 2);
-                    buff.append("INSERT INTO SYSTEM_LOB_STREAM VALUES(" + id + ", " + i + ", ");
-                    int len = IOUtils.readFully(reader, chars, lobBlockSize);
-                    if (len == 0) {
-                        break;
+            case Value.CLOB: {
+                char[] chars = new char[lobBlockSize];
+                Reader reader = v.getReader();
+                try {
+                    for (int i = 0; ; i++) {
+                        StringBuilder buff = new StringBuilder(lobBlockSize * 2);
+                        buff.append("INSERT INTO SYSTEM_LOB_STREAM VALUES(" + id + ", " + i + ", ");
+                        int len = IOUtils.readFully(reader, chars, lobBlockSize);
+                        if (len == 0) {
+                            break;
+                        }
+                        buff.append(StringUtils.quoteStringSQL(new String(chars, 0, len))).
+                                append(", NULL)");
+                        String sql = buff.toString();
+                        add(sql, true);
                     }
-                    buff.append(StringUtils.quoteStringSQL(new String(chars, 0, len))).
-                        append(", NULL)");
-                    String sql = buff.toString();
-                    add(sql, true);
+                } finally {
+                    IOUtils.closeSilently(reader);
                 }
-            } finally {
-                IOUtils.closeSilently(reader);
+                break;
             }
-            break;
-        }
-        default:
-            DbException.throwInternalError("type:" + v.getType());
+            default:
+                DbException.throwInternalError("type:" + v.getType());
         }
         return id;
     }
@@ -513,7 +487,7 @@ public class ScriptCommand extends ScriptBase {
      * When calling with id -1, the file is deleted.
      *
      * @param conn a connection
-     * @param id the lob id
+     * @param id   the lob id
      * @return a stream for the combined data
      */
     public static InputStream combineBlob(Connection conn, int id)
@@ -525,6 +499,7 @@ public class ScriptCommand extends ScriptBase {
         return new InputStream() {
             private InputStream current;
             private boolean closed;
+
             @Override
             public int read() throws IOException {
                 while (true) {
@@ -550,6 +525,7 @@ public class ScriptCommand extends ScriptBase {
                     }
                 }
             }
+
             @Override
             public void close() throws IOException {
                 if (closed) {
@@ -570,7 +546,7 @@ public class ScriptCommand extends ScriptBase {
      * This method is called from the script.
      *
      * @param conn a connection
-     * @param id the lob id
+     * @param id   the lob id
      * @return a reader for the combined data
      */
     public static Reader combineClob(Connection conn, int id) throws SQLException {
@@ -581,6 +557,7 @@ public class ScriptCommand extends ScriptBase {
         return new Reader() {
             private Reader current;
             private boolean closed;
+
             @Override
             public int read() throws IOException {
                 while (true) {
@@ -606,6 +583,7 @@ public class ScriptCommand extends ScriptBase {
                     }
                 }
             }
+
             @Override
             public void close() throws IOException {
                 if (closed) {
@@ -618,6 +596,7 @@ public class ScriptCommand extends ScriptBase {
                     throw DbException.convertToIOException(e);
                 }
             }
+
             @Override
             public int read(char[] buffer, int off, int len) throws IOException {
                 if (len == 0) {
@@ -702,11 +681,11 @@ public class ScriptCommand extends ScriptBase {
             }
             out.write(buffer, 0, len);
             if (!insert) {
-                Value[] row = { ValueString.get(s) };
+                Value[] row = {ValueString.get(s)};
                 result.addRow(row);
             }
         } else {
-            Value[] row = { ValueString.get(s) };
+            Value[] row = {ValueString.get(s)};
             result.addRow(row);
         }
     }

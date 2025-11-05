@@ -6,8 +6,6 @@
  */
 package org.h2.mvstore.db;
 
-import java.util.List;
-
 import org.h2.engine.Session;
 import org.h2.index.BaseIndex;
 import org.h2.index.Cursor;
@@ -21,6 +19,8 @@ import org.h2.table.IndexColumn;
 import org.h2.table.TableFilter;
 import org.h2.value.ValueLong;
 
+import java.util.List;
+
 /**
  * An index that delegates indexing to another index.
  */
@@ -29,10 +29,10 @@ public class MVDelegateIndex extends BaseIndex implements MVIndex {
     private final MVPrimaryIndex mainIndex;
 
     public MVDelegateIndex(MVTable table, int id, String name,
-            MVPrimaryIndex mainIndex,
-            IndexType indexType) {
-        IndexColumn[] cols = IndexColumn.wrap(new Column[] { table
-                .getColumn(mainIndex.getMainIndexColumn()) });
+                           MVPrimaryIndex mainIndex,
+                           IndexType indexType) {
+        IndexColumn[] cols = IndexColumn.wrap(new Column[]{table
+                .getColumn(mainIndex.getMainIndexColumn())});
         this.initBaseIndex(table, id, name, cols, indexType);
         this.mainIndex = mainIndex;
         if (id < 0) {
@@ -91,7 +91,7 @@ public class MVDelegateIndex extends BaseIndex implements MVIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return 10 * getCostRangeIndex(masks,
                 mainIndex.getRowCountApproximation(), filter, sortOrder);
     }

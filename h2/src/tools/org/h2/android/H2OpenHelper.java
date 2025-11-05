@@ -18,12 +18,12 @@ public abstract class H2OpenHelper {
      * Construct a new instance.
      *
      * @param context the context to use
-     * @param name the name of the database (use null for an in-memory database)
+     * @param name    the name of the database (use null for an in-memory database)
      * @param factory the cursor factory to use
      * @param version the expected database version
      */
     H2OpenHelper(Context context, String name,
-            H2Database.CursorFactory factory, int version) {
+                 H2Database.CursorFactory factory, int version) {
         // TODO
     }
 
@@ -72,7 +72,7 @@ public abstract class H2OpenHelper {
      * This method is called when the version stored in the database file does
      * not match the expected value.
      *
-     * @param db the connection
+     * @param db         the connection
      * @param oldVersion the current version
      * @param newVersion the expected version
      */

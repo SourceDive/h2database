@@ -6,12 +6,13 @@
  */
 package org.h2.build.doc;
 
-import java.util.ArrayList;
 import org.h2.bnf.Bnf;
 import org.h2.bnf.BnfVisitor;
 import org.h2.bnf.Rule;
 import org.h2.bnf.RuleFixed;
 import org.h2.util.StringUtils;
+
+import java.util.ArrayList;
 
 /**
  * A BNF visitor that generates HTML railroad diagrams.
@@ -27,7 +28,7 @@ public class BnfRailroad implements BnfVisitor {
     /**
      * Generate the HTML for the given syntax.
      *
-     * @param bnf the BNF parser
+     * @param bnf         the BNF parser
      * @param syntaxLines the syntax
      * @return the HTML
      */
@@ -95,37 +96,37 @@ public class BnfRailroad implements BnfVisitor {
      * @return the HTML text
      */
     static String getHtmlText(int type) {
-        switch(type) {
-        case RuleFixed.YMD:
-            return "2000-01-01";
-        case RuleFixed.HMS:
-            return "12:00:00";
-        case RuleFixed.NANOS:
-            return "000000000";
-        case RuleFixed.ANY_UNTIL_EOL:
-        case RuleFixed.ANY_EXCEPT_SINGLE_QUOTE:
-        case RuleFixed.ANY_EXCEPT_DOUBLE_QUOTE:
-        case RuleFixed.ANY_WORD:
-        case RuleFixed.ANY_EXCEPT_2_DOLLAR:
-        case RuleFixed.ANY_UNTIL_END: {
-            return "anything";
-        }
-        case RuleFixed.HEX_START:
-            return "0x";
-        case RuleFixed.CONCAT:
-            return "||";
-        case RuleFixed.AZ_UNDERSCORE:
-            return "A-Z | _";
-        case RuleFixed.AF:
-            return "A-F";
-        case RuleFixed.DIGIT:
-            return "0-9";
-        case RuleFixed.OPEN_BRACKET:
-            return "[";
-        case RuleFixed.CLOSE_BRACKET:
-            return "]";
-        default:
-            throw new AssertionError("type="+type);
+        switch (type) {
+            case RuleFixed.YMD:
+                return "2000-01-01";
+            case RuleFixed.HMS:
+                return "12:00:00";
+            case RuleFixed.NANOS:
+                return "000000000";
+            case RuleFixed.ANY_UNTIL_EOL:
+            case RuleFixed.ANY_EXCEPT_SINGLE_QUOTE:
+            case RuleFixed.ANY_EXCEPT_DOUBLE_QUOTE:
+            case RuleFixed.ANY_WORD:
+            case RuleFixed.ANY_EXCEPT_2_DOLLAR:
+            case RuleFixed.ANY_UNTIL_END: {
+                return "anything";
+            }
+            case RuleFixed.HEX_START:
+                return "0x";
+            case RuleFixed.CONCAT:
+                return "||";
+            case RuleFixed.AZ_UNDERSCORE:
+                return "A-Z | _";
+            case RuleFixed.AF:
+                return "A-F";
+            case RuleFixed.DIGIT:
+                return "0-9";
+            case RuleFixed.OPEN_BRACKET:
+                return "[";
+            case RuleFixed.CLOSE_BRACKET:
+                return "]";
+            default:
+                throw new AssertionError("type=" + type);
         }
     }
 

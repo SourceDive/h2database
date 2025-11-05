@@ -6,8 +6,6 @@
  */
 package org.h2.result;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import org.h2.engine.SessionRemote;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
@@ -15,6 +13,9 @@ import org.h2.message.Trace;
 import org.h2.util.New;
 import org.h2.value.Transfer;
 import org.h2.value.Value;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * The client side part of a result set that is kept on the server.
@@ -35,7 +36,7 @@ public class ResultRemote implements ResultInterface {
     private final Trace trace;
 
     public ResultRemote(SessionRemote session, Transfer transfer, int id,
-            int columnCount, int fetchSize) throws IOException {
+                        int columnCount, int fetchSize) throws IOException {
         this.session = session;
         trace = session.getTrace();
         this.transfer = transfer;

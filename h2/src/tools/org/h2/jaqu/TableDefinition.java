@@ -6,25 +6,18 @@
  */
 package org.h2.jaqu;
 
+import org.h2.jaqu.Table.*;
+import org.h2.jaqu.util.ClassUtils;
+import org.h2.jaqu.util.StatementLogger;
+import org.h2.util.New;
+import org.h2.util.StatementBuilder;
+import org.h2.util.StringUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import org.h2.jaqu.Table.IndexType;
-import org.h2.jaqu.Table.JQColumn;
-import org.h2.jaqu.Table.JQIndex;
-import org.h2.jaqu.Table.JQSchema;
-import org.h2.jaqu.Table.JQTable;
-import org.h2.jaqu.util.StatementLogger;
-import org.h2.jaqu.util.ClassUtils;
-import org.h2.util.New;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
+import java.util.*;
 
 /**
  * A table definition contains the index definitions of a table, the field
@@ -147,7 +140,7 @@ class TableDefinition<T> {
         // set isPrimaryKey flag for all field definitions
         for (FieldDefinition fieldDefinition : fieldMap.values()) {
             fieldDefinition.isPrimaryKey = this.primaryKeyColumnNames
-                .contains(fieldDefinition.columnName);
+                    .contains(fieldDefinition.columnName);
         }
     }
 
@@ -167,7 +160,7 @@ class TableDefinition<T> {
     /**
      * Defines an index with the specified model fields.
      *
-     * @param type the index type (STANDARD, HASH, UNIQUE, UNIQUE_HASH)
+     * @param type        the index type (STANDARD, HASH, UNIQUE, UNIQUE_HASH)
      * @param modelFields the ordered list of model fields
      */
     void addIndex(IndexType type, Object[] modelFields) {
@@ -178,7 +171,7 @@ class TableDefinition<T> {
     /**
      * Defines an index with the specified column names.
      *
-     * @param type the index type (STANDARD, HASH, UNIQUE, UNIQUE_HASH)
+     * @param type        the index type (STANDARD, HASH, UNIQUE, UNIQUE_HASH)
      * @param columnNames the ordered list of column names
      */
     void addIndex(IndexType type, List<String> columnNames) {
@@ -191,7 +184,7 @@ class TableDefinition<T> {
 
     public void setMaxLength(Object column, int maxLength) {
         String columnName = getColumnName(column);
-        for (FieldDefinition f: fields) {
+        for (FieldDefinition f : fields) {
             if (f.columnName.equals(columnName)) {
                 f.maxLength = maxLength;
                 break;
@@ -314,7 +307,7 @@ class TableDefinition<T> {
     void merge(Db db, Object obj) {
         if (primaryKeyColumnNames == null || primaryKeyColumnNames.size() == 0) {
             throw new IllegalStateException("No primary key columns defined "
-                + "for table " + obj.getClass() + " - no update possible");
+                    + "for table " + obj.getClass() + " - no update possible");
         }
         SQLStatement stat = new SQLStatement(db);
         StatementBuilder buff = new StatementBuilder("MERGE INTO ");
@@ -350,7 +343,7 @@ class TableDefinition<T> {
     void update(Db db, Object obj) {
         if (primaryKeyColumnNames == null || primaryKeyColumnNames.size() == 0) {
             throw new IllegalStateException("No primary key columns defined "
-                + "for table " + obj.getClass() + " - no update possible");
+                    + "for table " + obj.getClass() + " - no update possible");
         }
         SQLStatement stat = new SQLStatement(db);
         StatementBuilder buff = new StatementBuilder("UPDATE ");
@@ -392,7 +385,7 @@ class TableDefinition<T> {
     void delete(Db db, Object obj) {
         if (primaryKeyColumnNames == null || primaryKeyColumnNames.size() == 0) {
             throw new IllegalStateException("No primary key columns defined "
-                + "for table " + obj.getClass() + " - no update possible");
+                    + "for table " + obj.getClass() + " - no update possible");
         }
         SQLStatement stat = new SQLStatement(db);
         StatementBuilder buff = new StatementBuilder("DELETE FROM ");
@@ -410,8 +403,8 @@ class TableDefinition<T> {
                 }
                 firstCondition = false;
                 query.addConditionToken(
-                    new Condition<Object>(
-                        aliasValue, value, CompareType.EQUAL));
+                        new Condition<Object>(
+                                aliasValue, value, CompareType.EQUAL));
             }
         }
         stat.setSQL(buff.toString());
@@ -481,7 +474,7 @@ class TableDefinition<T> {
         stat.executeUpdate();
 
         // create indexes
-        for (IndexDefinition index:indexes) {
+        for (IndexDefinition index : indexes) {
             String sql = db.getDialect().getCreateIndex(schemaName, tableName, index);
             stat.setSQL(sql);
             StatementLogger.create(stat.getSQL());
@@ -563,8 +556,8 @@ class TableDefinition<T> {
         }
     }
 
-    void addIndexes(IndexType type, String [] indexes) {
-        for (String index:indexes) {
+    void addIndexes(IndexType type, String[] indexes) {
+        for (String index : indexes) {
             List<String> validatedColumns = getColumns(index);
             if (validatedColumns == null) {
                 return;
@@ -575,7 +568,7 @@ class TableDefinition<T> {
 
     List<IndexDefinition> getIndexes(IndexType type) {
         List<IndexDefinition> list = New.arrayList();
-        for (IndexDefinition def:indexes) {
+        for (IndexDefinition def : indexes) {
             if (def.type.equals(type)) {
                 list.add(def);
             }
@@ -591,7 +584,7 @@ class TableDefinition<T> {
     }
 
     void initSelectObject(SelectTable<T> table, Object obj,
-            Map<Object, SelectColumn<T>> map) {
+                          Map<Object, SelectColumn<T>> map) {
         for (FieldDefinition def : fields) {
             def.initWithNewObject(obj);
             SelectColumn<T> column = new SelectColumn<T>(table, def);

@@ -6,24 +6,14 @@
  */
 package org.h2.test.jdbc;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-
-import org.h2.api.ErrorCode;
-import org.h2.test.TestBase;
+import java.sql.*;
 
 /**
  * Updatable result set tests.
@@ -337,7 +327,7 @@ public class TestUpdatableResultSet extends TestBase {
         rs.updateShort(14, (short) 0);
         rs.updateCharacterStream(15, new StringReader("test"), 0);
         rs.updateBinaryStream(16,
-                new ByteArrayInputStream(new byte[] { (byte) 0xff, 0x00 }), 0);
+                new ByteArrayInputStream(new byte[]{(byte) 0xff, 0x00}), 0);
         rs.insertRow();
 
         rs.moveToInsertRow();
@@ -346,7 +336,7 @@ public class TestUpdatableResultSet extends TestBase {
         rs.updateBigDecimal("DEC", new BigDecimal("1.2"));
         rs.updateBoolean("BOO", true);
         rs.updateByte("BYE", (byte) 0xff);
-        rs.updateBytes("BIN", new byte[] { 0x00, (byte) 0xff });
+        rs.updateBytes("BIN", new byte[]{0x00, (byte) 0xff});
         rs.updateDate("D", Date.valueOf("2005-09-21"));
         rs.updateTime("T", Time.valueOf("21:46:28"));
         rs.updateTimestamp("TS",
@@ -359,35 +349,35 @@ public class TestUpdatableResultSet extends TestBase {
         // auml, ouml, uuml
         rs.updateCharacterStream("CL", new StringReader("\u00ef\u00f6\u00fc"), 0);
         rs.updateBinaryStream("BL",
-                new ByteArrayInputStream(new byte[] { (byte) 0xab, 0x12 }), 0);
+                new ByteArrayInputStream(new byte[]{(byte) 0xab, 0x12}), 0);
         rs.insertRow();
 
         rs.moveToInsertRow();
         rs.updateInt("ID", 3);
         rs.updateCharacterStream("CL", new StringReader("\u00ef\u00f6\u00fc"));
         rs.updateBinaryStream("BL",
-                new ByteArrayInputStream(new byte[] { (byte) 0xab, 0x12 }));
+                new ByteArrayInputStream(new byte[]{(byte) 0xab, 0x12}));
         rs.insertRow();
 
         rs.moveToInsertRow();
         rs.updateInt("ID", 4);
         rs.updateCharacterStream(15, new StringReader("\u00ef\u00f6\u00fc"));
         rs.updateBinaryStream(16,
-                new ByteArrayInputStream(new byte[] { (byte) 0xab, 0x12 }));
+                new ByteArrayInputStream(new byte[]{(byte) 0xab, 0x12}));
         rs.insertRow();
 
         rs.moveToInsertRow();
         rs.updateInt("ID", 5);
         rs.updateClob("CL", new StringReader("\u00ef\u00f6\u00fc"));
         rs.updateBlob("BL",
-                new ByteArrayInputStream(new byte[] { (byte) 0xab, 0x12 }));
+                new ByteArrayInputStream(new byte[]{(byte) 0xab, 0x12}));
         rs.insertRow();
 
         rs.moveToInsertRow();
         rs.updateInt("ID", 6);
         rs.updateClob(15, new StringReader("\u00ef\u00f6\u00fc"));
         rs.updateBlob(16,
-                new ByteArrayInputStream(new byte[] { (byte) 0xab, 0x12 }));
+                new ByteArrayInputStream(new byte[]{(byte) 0xab, 0x12}));
         rs.insertRow();
 
         rs.moveToInsertRow();
@@ -395,7 +385,7 @@ public class TestUpdatableResultSet extends TestBase {
         rs.updateNClob("CL", new StringReader("\u00ef\u00f6\u00fc"));
         Blob b = conn.createBlob();
         OutputStream out = b.setBinaryStream(1);
-        out.write(new byte[] { (byte) 0xab, 0x12 });
+        out.write(new byte[]{(byte) 0xab, 0x12});
         out.close();
         rs.updateBlob("BL", b);
         rs.insertRow();
@@ -481,7 +471,7 @@ public class TestUpdatableResultSet extends TestBase {
         assertTrue(rs.getObject(13) == null && rs.wasNull());
         assertTrue(rs.getShort(14) == 0 && !rs.wasNull());
         assertEquals("test", rs.getString(15));
-        assertEquals(new byte[] { (byte) 0xff, 0x00 }, rs.getBytes(16));
+        assertEquals(new byte[]{(byte) 0xff, 0x00}, rs.getBytes(16));
 
         rs.next();
         assertTrue(rs.getInt(1) == 2);
@@ -489,7 +479,7 @@ public class TestUpdatableResultSet extends TestBase {
         assertEquals("1.20", rs.getBigDecimal(3).toString());
         assertTrue(rs.getBoolean(4));
         assertTrue((rs.getByte(5) & 0xff) == 0xff);
-        assertEquals(new byte[] { 0x00, (byte) 0xff }, rs.getBytes(6));
+        assertEquals(new byte[]{0x00, (byte) 0xff}, rs.getBytes(6));
         assertEquals("2005-09-21", rs.getDate(7).toString());
         assertEquals("21:46:28", rs.getTime(8).toString());
         assertEquals("2005-09-21 21:47:09.567890123", rs.getTimestamp(9).toString());
@@ -500,13 +490,13 @@ public class TestUpdatableResultSet extends TestBase {
         assertTrue(rs.getShort(14) == Short.MIN_VALUE);
         // auml ouml uuml
         assertEquals("\u00ef\u00f6\u00fc", rs.getString(15));
-        assertEquals(new byte[] { (byte) 0xab, 0x12 }, rs.getBytes(16));
+        assertEquals(new byte[]{(byte) 0xab, 0x12}, rs.getBytes(16));
 
         for (int i = 3; i <= 14; i++) {
             rs.next();
             assertEquals(i, rs.getInt(1));
             assertEquals("\u00ef\u00f6\u00fc", rs.getString(15));
-            assertEquals(new byte[] { (byte) 0xab, 0x12 }, rs.getBytes(16));
+            assertEquals(new byte[]{(byte) 0xab, 0x12}, rs.getBytes(16));
         }
         assertFalse(rs.next());
 
@@ -668,7 +658,7 @@ public class TestUpdatableResultSet extends TestBase {
     }
 
     private void assertState(ResultSet rs, boolean beforeFirst,
-            boolean first, boolean last, boolean afterLast) throws SQLException {
+                             boolean first, boolean last, boolean afterLast) throws SQLException {
         assertEquals(beforeFirst, rs.isBeforeFirst());
         assertEquals(first, rs.isFirst());
         assertEquals(last, rs.isLast());

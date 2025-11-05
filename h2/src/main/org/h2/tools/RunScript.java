@@ -6,30 +6,19 @@
  */
 package org.h2.tools;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
 import org.h2.store.fs.FileUtils;
-import org.h2.util.Utils;
-import org.h2.util.IOUtils;
-import org.h2.util.JdbcUtils;
-import org.h2.util.ScriptReader;
-import org.h2.util.StringUtils;
-import org.h2.util.Tool;
+import org.h2.util.*;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.sql.*;
 
 /**
  * Runs a SQL script against a database.
+ *
  * @h2.resource
  */
 public class RunScript extends Tool {
@@ -61,9 +50,9 @@ public class RunScript extends Tool {
      * <tr><td>[-options ...]</td>
      * <td>RUNSCRIPT options (embedded H2; -*Results not supported)</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new RunScript().runTool(args);
@@ -150,7 +139,7 @@ public class RunScript extends Tool {
     /**
      * Executes the SQL commands read from the reader against a database.
      *
-     * @param conn the connection to a database
+     * @param conn   the connection to a database
      * @param reader the reader
      * @return the last result set
      */
@@ -181,7 +170,7 @@ public class RunScript extends Tool {
     }
 
     private void process(Connection conn, String fileName,
-            boolean continueOnError, Charset charset) throws SQLException,
+                         boolean continueOnError, Charset charset) throws SQLException,
             IOException {
         InputStream in = FileUtils.newInputStream(fileName);
         String path = FileUtils.getParent(fileName);
@@ -195,7 +184,7 @@ public class RunScript extends Tool {
     }
 
     private void process(Connection conn, boolean continueOnError, String path,
-            Reader reader, Charset charset) throws SQLException, IOException {
+                         Reader reader, Charset charset) throws SQLException, IOException {
         Statement stat = conn.createStatement();
         ScriptReader r = new ScriptReader(reader);
         while (true) {
@@ -252,7 +241,7 @@ public class RunScript extends Tool {
                                     result = StringUtils.replaceAll(result, " ", "+");
                                     throw new SQLException(
                                             "Unexpected output for:\n" + sql.trim() +
-                                            "\nGot:\n" + result + "\nExpected:\n" + expected);
+                                                    "\nGot:\n" + result + "\nExpected:\n" + expected);
                                 }
                             }
 
@@ -272,7 +261,7 @@ public class RunScript extends Tool {
     }
 
     private static void processRunscript(String url, String user, String password,
-            String fileName, String options) throws SQLException {
+                                         String fileName, String options) throws SQLException {
         Connection conn = null;
         Statement stat = null;
         try {
@@ -290,16 +279,16 @@ public class RunScript extends Tool {
     /**
      * Executes the SQL commands in a script file against a database.
      *
-     * @param url the database URL
-     * @param user the user name
-     * @param password the password
-     * @param fileName the script file
-     * @param charset the character set or null for UTF-8
+     * @param url             the database URL
+     * @param user            the user name
+     * @param password        the password
+     * @param fileName        the script file
+     * @param charset         the character set or null for UTF-8
      * @param continueOnError if execution should be continued if an error
-     *            occurs
+     *                        occurs
      */
     public static void execute(String url, String user, String password,
-            String fileName, Charset charset, boolean continueOnError)
+                               String fileName, Charset charset, boolean continueOnError)
             throws SQLException {
         new RunScript().process(url, user, password, fileName, charset,
                 continueOnError);
@@ -308,17 +297,17 @@ public class RunScript extends Tool {
     /**
      * Executes the SQL commands in a script file against a database.
      *
-     * @param url the database URL
-     * @param user the user name
-     * @param password the password
-     * @param fileName the script file
-     * @param charset the character set or null for UTF-8
+     * @param url             the database URL
+     * @param user            the user name
+     * @param password        the password
+     * @param fileName        the script file
+     * @param charset         the character set or null for UTF-8
      * @param continueOnError if execution should be continued if an error
-     *            occurs
+     *                        occurs
      */
     void process(String url, String user, String password,
-            String fileName, Charset charset,
-            boolean continueOnError) throws SQLException {
+                 String fileName, Charset charset,
+                 boolean continueOnError) throws SQLException {
         try {
             org.h2.Driver.load();
             Connection conn = DriverManager.getConnection(url, user, password);

@@ -6,9 +6,6 @@
  */
 package org.h2.engine;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.util.ArrayList;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.api.JavaObjectSerializer;
@@ -25,15 +22,13 @@ import org.h2.store.FileStore;
 import org.h2.store.LobStorageFrontend;
 import org.h2.store.LobStorageInterface;
 import org.h2.store.fs.FileUtils;
-import org.h2.util.MathUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.New;
-import org.h2.util.SmallLRUCache;
-import org.h2.util.StringUtils;
-import org.h2.util.TempFileDeleter;
-import org.h2.util.Utils;
+import org.h2.util.*;
 import org.h2.value.Transfer;
 import org.h2.value.Value;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * The client side part of a session when using the server mode. This object
@@ -456,8 +451,8 @@ public class SessionRemote extends SessionWithState implements DataHandler {
      * Remove a server from the list of cluster nodes and disables the cluster
      * mode.
      *
-     * @param e the exception (used for debugging)
-     * @param i the index of the server to remove
+     * @param e     the exception (used for debugging)
+     * @param i     the index of the server to remove
      * @param count the retry count index
      */
     public void removeServer(IOException e, int i, int count) {
@@ -592,7 +587,7 @@ public class SessionRemote extends SessionWithState implements DataHandler {
      * @param transfer the transfer object
      * @throws DbException if the server sent an exception
      * @throws IOException if there is a communication problem between client
-     *             and server
+     *                     and server
      */
     public void done(Transfer transfer) throws IOException {
         transfer.flush();
@@ -641,7 +636,7 @@ public class SessionRemote extends SessionWithState implements DataHandler {
      * Write the operation to the trace system if debug trace is enabled.
      *
      * @param operation the operation performed
-     * @param id the id of the operation
+     * @param id        the id of the operation
      */
     public void traceOperation(String operation, int id) {
         if (trace.isDebugEnabled()) {
@@ -747,7 +742,7 @@ public class SessionRemote extends SessionWithState implements DataHandler {
 
     @Override
     public synchronized int readLob(long lobId, byte[] hmac, long offset,
-            byte[] buff, int off, int length) {
+                                    byte[] buff, int off, int length) {
         for (int i = 0, count = 0; i < transferList.size(); i++) {
             Transfer transfer = transferList.get(i);
             try {
@@ -811,8 +806,8 @@ public class SessionRemote extends SessionWithState implements DataHandler {
     private String readSerializationSettings() {
         String javaObjectSerializerFQN = null;
         CommandInterface ci = prepareCommand(
-                "SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS "+
-                " WHERE NAME='JAVA_OBJECT_SERIALIZER'", Integer.MAX_VALUE);
+                "SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS " +
+                        " WHERE NAME='JAVA_OBJECT_SERIALIZER'", Integer.MAX_VALUE);
         try {
             ResultInterface result = ci.executeQuery(0, false);
             if (result.next()) {

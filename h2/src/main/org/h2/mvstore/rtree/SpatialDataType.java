@@ -6,11 +6,12 @@
  */
 package org.h2.mvstore.rtree;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.WriteBuffer;
 import org.h2.mvstore.type.DataType;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 /**
  * A spatial data type. This class supports up to 31 dimensions. Each dimension
@@ -130,7 +131,7 @@ public class SpatialDataType implements DataType {
      * Increase the bounds in the given spatial object.
      *
      * @param bounds the bounds (may be modified)
-     * @param add the value
+     * @param add    the value
      */
     public void increaseBounds(Object bounds, Object add) {
         SpatialKey b = (SpatialKey) bounds;
@@ -154,15 +155,15 @@ public class SpatialDataType implements DataType {
         float min = a.min(0);
         float max = a.max(0);
         float areaOld = max - min;
-        min = Math.min(min,  b.min(0));
-        max = Math.max(max,  b.max(0));
+        min = Math.min(min, b.min(0));
+        max = Math.max(max, b.max(0));
         float areaNew = max - min;
         for (int i = 1; i < dimensions; i++) {
             min = a.min(i);
             max = a.max(i);
             areaOld *= max - min;
-            min = Math.min(min,  b.min(i));
-            max = Math.max(max,  b.max(i));
+            min = Math.min(min, b.min(i));
+            max = Math.max(max, b.max(i));
             areaNew *= max - min;
         }
         return areaNew - areaOld;
@@ -180,8 +181,8 @@ public class SpatialDataType implements DataType {
         SpatialKey b = (SpatialKey) objB;
         float area = 1;
         for (int i = 0; i < dimensions; i++) {
-            float min = Math.min(a.min(i),  b.min(i));
-            float max = Math.max(a.max(i),  b.max(i));
+            float min = Math.min(a.min(i), b.min(i));
+            float max = Math.max(a.max(i), b.max(i));
             area *= max - min;
         }
         return area;
@@ -290,7 +291,7 @@ public class SpatialDataType implements DataType {
                 lastIndex = i;
             }
         }
-        return new int[] { firstIndex, lastIndex };
+        return new int[]{firstIndex, lastIndex};
     }
 
     private void increaseMaxInnerBounds(Object bounds, Object add) {

@@ -6,15 +6,10 @@
  */
 package org.h2.test.jdbc;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
+
+import java.sql.*;
 
 /**
  * Tests Statement.cancel
@@ -183,7 +178,7 @@ public class TestCancel extends TestBase {
         }
         trace("inserted");
         // TODO test insert into ... select
-        for (int i = 1;;) {
+        for (int i = 1; ; ) {
             Statement query = conn.createStatement();
             CancelThread cancel = new CancelThread(query, i);
             visit(0);

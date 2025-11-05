@@ -6,7 +6,6 @@
  */
 package org.h2.command;
 
-import java.util.ArrayList;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.engine.Database;
@@ -18,6 +17,8 @@ import org.h2.message.Trace;
 import org.h2.result.ResultInterface;
 import org.h2.util.StatementBuilder;
 import org.h2.value.Value;
+
+import java.util.ArrayList;
 
 /**
  * A prepared statement.
@@ -304,7 +305,7 @@ public abstract class Prepared {
      * enabled.
      *
      * @param startTime when the statement was started
-     * @param rowCount the query or update row count
+     * @param rowCount  the query or update row count
      */
     void trace(long startTime, int rowCount) {
         if (session.getTrace().isInfoEnabled() && startTime > 0) {
@@ -409,8 +410,8 @@ public abstract class Prepared {
     /**
      * Set the SQL statement of the exception to the given row.
      *
-     * @param e the exception
-     * @param rowId the row number
+     * @param e      the exception
+     * @param rowId  the row number
      * @param values the values of the row
      * @return the exception
      */

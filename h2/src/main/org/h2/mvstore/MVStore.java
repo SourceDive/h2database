@@ -6,20 +6,6 @@
  */
 package org.h2.mvstore;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.h2.compress.CompressDeflate;
 import org.h2.compress.CompressLZF;
 import org.h2.compress.Compressor;
@@ -27,6 +13,12 @@ import org.h2.mvstore.cache.CacheLongKeyLIRS;
 import org.h2.mvstore.type.StringDataType;
 import org.h2.util.MathUtils;
 import org.h2.util.New;
+
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
 
@@ -247,8 +239,8 @@ public class MVStore {
      * Create and open the store.
      *
      * @param config the configuration to use
-     * @throws IllegalStateException if the file is corrupt, or an exception
-     *             occurred while opening
+     * @throws IllegalStateException    if the file is corrupt, or an exception
+     *                                  occurred while opening
      * @throws IllegalArgumentException if the directory does not exist
      */
     MVStore(HashMap<String, Object> config) {
@@ -346,14 +338,14 @@ public class MVStore {
     /**
      * Open an old, stored version of a map.
      *
-     * @param version the version
-     * @param mapId the map id
+     * @param version  the version
+     * @param mapId    the map id
      * @param template the template map
      * @return the read-only map
      */
     @SuppressWarnings("unchecked")
     <T extends MVMap<?, ?>> T openMapVersion(long version, int mapId,
-            MVMap<?, ?> template) {
+                                             MVMap<?, ?> template) {
         MVMap<String, String> oldMeta = getMetaMap(version);
         long rootPos = getRootPos(oldMeta, mapId);
         MVMap<?, ?> m = template.openReadOnly();
@@ -366,8 +358,8 @@ public class MVStore {
      * it does not yet exist. If a map with this name is already open, this map
      * is returned.
      *
-     * @param <K> the key type
-     * @param <V> the value type
+     * @param <K>  the key type
+     * @param <V>  the value type
      * @param name the name of the map
      * @return the map
      */
@@ -380,9 +372,9 @@ public class MVStore {
      * does not yet exist. If a map with this name is already open, this map is
      * returned.
      *
-     * @param <K> the key type
-     * @param <V> the value type
-     * @param name the name of the map
+     * @param <K>     the key type
+     * @param <V>     the value type
+     * @param name    the name of the map
      * @param builder the map builder
      * @return the map
      */
@@ -434,7 +426,7 @@ public class MVStore {
     public synchronized Set<String> getMapNames() {
         HashSet<String> set = New.hashSet();
         checkOpen();
-        for (Iterator<String> it = meta.keyIterator("name."); it.hasNext();) {
+        for (Iterator<String> it = meta.keyIterator("name."); it.hasNext(); ) {
             String x = it.next();
             if (!x.startsWith("name.")) {
                 break;
@@ -557,8 +549,8 @@ public class MVStore {
             throw DataUtils.newIllegalStateException(
                     DataUtils.ERROR_UNSUPPORTED_FORMAT,
                     "The write format {0} is larger " +
-                    "than the supported format {1}, " +
-                    "and the file was not opened in read-only mode",
+                            "than the supported format {1}, " +
+                            "and the file was not opened in read-only mode",
                     format, FORMAT_WRITE);
         }
         format = DataUtils.readHexLong(fileHeader, "formatRead", format);
@@ -566,7 +558,7 @@ public class MVStore {
             throw DataUtils.newIllegalStateException(
                     DataUtils.ERROR_UNSUPPORTED_FORMAT,
                     "The read format {0} is larger " +
-                    "than the supported format {1}",
+                            "than the supported format {1}",
                     format, FORMAT_READ);
         }
         lastStoredVersion = -1;
@@ -574,7 +566,7 @@ public class MVStore {
         long now = System.currentTimeMillis();
         // calculate the year (doesn't have to be exact;
         // we assume 365.25 days per year, * 4 = 1461)
-        int year =  1970 + (int) (now / (1000L * 60 * 60 * 6 * 1461));
+        int year = 1970 + (int) (now / (1000L * 60 * 60 * 6 * 1461));
         if (year < 2014) {
             // if the year is before 2014,
             // we assume the system doesn't have a real-time clock,
@@ -641,7 +633,7 @@ public class MVStore {
 
         // load the chunk metadata: we can load in any order,
         // because loading chunk metadata might recursively load another chunk
-        for (Iterator<String> it = meta.keyIterator("chunk."); it.hasNext();) {
+        for (Iterator<String> it = meta.keyIterator("chunk."); it.hasNext(); ) {
             String s = it.next();
             if (!s.startsWith("chunk.")) {
                 break;
@@ -1445,7 +1437,7 @@ public class MVStore {
      * before calling this method.
      *
      * @param targetFillRate the minimum percentage of live entries
-     * @param minSaving the minimum amount of saved space
+     * @param minSaving      the minimum amount of saved space
      * @return if a chunk was re-written
      */
     public synchronized boolean compact(int targetFillRate, int minSaving) {
@@ -1516,7 +1508,7 @@ public class MVStore {
 
         // remove the chunks we want to keep from this list
         boolean remove = false;
-        for (Iterator<Chunk> it = old.iterator(); it.hasNext();) {
+        for (Iterator<Chunk> it = old.iterator(); it.hasNext(); ) {
             Chunk c = it.next();
             if (move == c) {
                 remove = true;
@@ -1621,8 +1613,8 @@ public class MVStore {
     /**
      * Remove a page.
      *
-     * @param map the map the page belongs to
-     * @param pos the position of the page
+     * @param map    the map the page belongs to
+     * @param pos    the position of the page
      * @param memory the memory usage
      */
     void removePage(MVMap<?, ?> map, long pos, int memory) {
@@ -1660,7 +1652,7 @@ public class MVStore {
     }
 
     private void registerFreePage(long version, int chunkId,
-            long maxLengthLive, int pageCount) {
+                                  long maxLengthLive, int pageCount) {
         HashMap<Integer, Chunk> freed = freedPageSpace.get(version);
         if (freed == null) {
             freed = New.hashMap();
@@ -1745,7 +1737,7 @@ public class MVStore {
      * This setting is not persisted.
      *
      * @param ms how many milliseconds to retain old chunks (0 to overwrite them
-     *            as early as possible)
+     *           as early as possible)
      */
     public void setRetentionTime(int ms) {
         this.retentionTime = ms;
@@ -1816,7 +1808,7 @@ public class MVStore {
             return false;
         }
         for (Iterator<String> it = oldMeta.keyIterator("chunk.");
-                it.hasNext();) {
+             it.hasNext(); ) {
             String chunkKey = it.next();
             if (!chunkKey.startsWith("chunk.")) {
                 break;
@@ -1996,7 +1988,7 @@ public class MVStore {
 
     private void revertTemp(long storeVersion) {
         for (Iterator<Long> it = freedPageSpace.keySet().iterator();
-                it.hasNext();) {
+             it.hasNext(); ) {
             long v = it.next();
             if (v > storeVersion) {
                 continue;
@@ -2048,7 +2040,7 @@ public class MVStore {
     /**
      * Rename a map.
      *
-     * @param map the map
+     * @param map     the map
      * @param newName the new name
      */
     public synchronized void renameMap(MVMap<?, ?> map, String newName) {
@@ -2234,8 +2226,8 @@ public class MVStore {
     /**
      * Put the page in the cache.
      *
-     * @param pos the page position
-     * @param page the page
+     * @param pos    the page position
+     * @param page   the page
      * @param memory the memory used
      */
     void cachePage(long pos, Page page, int memory) {

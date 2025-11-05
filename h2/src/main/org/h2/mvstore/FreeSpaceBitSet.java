@@ -6,9 +6,9 @@
  */
 package org.h2.mvstore;
 
-import java.util.BitSet;
-
 import org.h2.util.MathUtils;
+
+import java.util.BitSet;
 
 /**
  * A free space bit set.
@@ -34,7 +34,7 @@ public class FreeSpaceBitSet {
      * Create a new free space map.
      *
      * @param firstFreeBlock the first free block
-     * @param blockSize the block size
+     * @param blockSize      the block size
      */
     public FreeSpaceBitSet(int firstFreeBlock, int blockSize) {
         this.firstFreeBlock = firstFreeBlock;
@@ -53,7 +53,7 @@ public class FreeSpaceBitSet {
     /**
      * Check whether one of the blocks is in use.
      *
-     * @param pos the position in bytes
+     * @param pos    the position in bytes
      * @param length the number of bytes
      * @return true if a block is in use
      */
@@ -71,7 +71,7 @@ public class FreeSpaceBitSet {
     /**
      * Check whether one of the blocks is free.
      *
-     * @param pos the position in bytes
+     * @param pos    the position in bytes
      * @param length the number of bytes
      * @return true if a block is free
      */
@@ -94,7 +94,7 @@ public class FreeSpaceBitSet {
      */
     public long allocate(int length) {
         int blocks = getBlockCount(length);
-        for (int i = 0;;) {
+        for (int i = 0; ; ) {
             int start = set.nextClearBit(i);
             int end = set.nextSetBit(start + 1);
             if (end < 0 || end - start >= blocks) {
@@ -108,7 +108,7 @@ public class FreeSpaceBitSet {
     /**
      * Mark the space as in use.
      *
-     * @param pos the position in bytes
+     * @param pos    the position in bytes
      * @param length the number of bytes
      */
     public void markUsed(long pos, int length) {
@@ -120,7 +120,7 @@ public class FreeSpaceBitSet {
     /**
      * Mark the space as free.
      *
-     * @param pos the position in bytes
+     * @param pos    the position in bytes
      * @param length the number of bytes
      */
     public void free(long pos, int length) {
@@ -172,7 +172,7 @@ public class FreeSpaceBitSet {
     @Override
     public String toString() {
         StringBuilder buff = new StringBuilder("[");
-        for (int i = 0;;) {
+        for (int i = 0; ; ) {
             if (i > 0) {
                 buff.append(", ");
             }

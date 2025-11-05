@@ -49,7 +49,7 @@ public class WriteBuffer {
     /**
      * Write the characters of a string in a format similar to UTF-8.
      *
-     * @param s the string
+     * @param s   the string
      * @param len the number of characters to write
      * @return this
      */
@@ -162,7 +162,7 @@ public class WriteBuffer {
     /**
      * Put a byte array.
      *
-     * @param bytes the value
+     * @param bytes  the value
      * @param offset the source offset
      * @param length the number of bytes
      * @return this

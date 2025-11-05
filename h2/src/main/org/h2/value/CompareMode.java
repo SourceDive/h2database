@@ -6,11 +6,11 @@
  */
 package org.h2.value;
 
-import java.text.Collator;
-import java.util.Locale;
-
 import org.h2.engine.SysProperties;
 import org.h2.util.StringUtils;
+
+import java.text.Collator;
+import java.util.Locale;
 
 /**
  * Instances of this class can compare strings. Case sensitive and case
@@ -83,12 +83,12 @@ public class CompareMode {
      * returned. A cache is used to speed up comparison when using a collator;
      * CollationKey objects are cached.
      *
-     * @param name the collation name or null
+     * @param name     the collation name or null
      * @param strength the collation strength
      * @return the compare mode
      */
     public static synchronized CompareMode getInstance(String name,
-            int strength) {
+                                                       int strength) {
         return getInstance(name, strength, SysProperties.SORT_BINARY_UNSIGNED);
     }
 
@@ -98,13 +98,13 @@ public class CompareMode {
      * returned. A cache is used to speed up comparison when using a collator;
      * CollationKey objects are cached.
      *
-     * @param name the collation name or null
-     * @param strength the collation strength
+     * @param name           the collation name or null
+     * @param strength       the collation strength
      * @param binaryUnsigned whether to compare binaries as unsigned
      * @return the compare mode
      */
     public static synchronized CompareMode getInstance(String name,
-            int strength, boolean binaryUnsigned) {
+                                                       int strength, boolean binaryUnsigned) {
         if (lastUsed != null) {
             if (StringUtils.equals(lastUsed.name, name) &&
                     lastUsed.strength == strength &&
@@ -137,15 +137,15 @@ public class CompareMode {
     /**
      * Compare two characters in a string.
      *
-     * @param a the first string
-     * @param ai the character index in the first string
-     * @param b the second string
-     * @param bi the character index in the second string
+     * @param a          the first string
+     * @param ai         the character index in the first string
+     * @param b          the second string
+     * @param bi         the character index in the second string
      * @param ignoreCase true if a case-insensitive comparison should be made
      * @return true if the characters are equals
      */
     public boolean equalsChars(String a, int ai, String b, int bi,
-            boolean ignoreCase) {
+                               boolean ignoreCase) {
         char ca = a.charAt(ai);
         char cb = b.charAt(bi);
         if (ignoreCase) {
@@ -158,11 +158,11 @@ public class CompareMode {
     /**
      * Compare two strings.
      *
-     * @param a the first string
-     * @param b the second string
+     * @param a          the first string
+     * @param b          the second string
      * @param ignoreCase true if a case-insensitive comparison should be made
      * @return -1 if the first string is 'smaller', 1 if the second string is
-     *         smaller, and 0 if they are equal
+     * smaller, and 0 if they are equal
      */
     public int compareString(String a, String b, boolean ignoreCase) {
         if (ignoreCase) {
@@ -190,7 +190,7 @@ public class CompareMode {
      * is ignored.
      *
      * @param locale the locale
-     * @param name the name
+     * @param name   the name
      * @return true if they match
      */
     static boolean compareLocaleNames(Locale locale, String name) {

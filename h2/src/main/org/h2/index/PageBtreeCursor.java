@@ -33,7 +33,7 @@ public class PageBtreeCursor implements Cursor {
      * Set the position of the current row.
      *
      * @param current the leaf page
-     * @param i the index within the page
+     * @param i       the index within the page
      */
     void setCurrent(PageBtreeLeaf current, int i) {
         this.current = current;

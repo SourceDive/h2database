@@ -15,7 +15,7 @@ public class Arrays {
      * Fill an array with the given value.
      *
      * @param array the array
-     * @param x the value
+     * @param x     the value
      */
     public static void fill(char[] array, char x) {
         for (int i = 0, size = array.length; i < size; i++) {
@@ -27,7 +27,7 @@ public class Arrays {
      * Fill an array with the given value.
      *
      * @param array the array
-     * @param x the value
+     * @param x     the value
      */
     public static void fill(byte[] array, byte x) {
         for (int i = 0; i < array.length; i++) {
@@ -39,7 +39,7 @@ public class Arrays {
      * Fill an array with the given value.
      *
      * @param array the array
-     * @param x the value
+     * @param x     the value
      */
     public static void fill(int[] array, int x) {
         for (int i = 0; i < array.length; i++) {
@@ -52,7 +52,7 @@ public class Arrays {
      * Fill an array with the given value.
      *
      * @param array the array
-     * @param x the value
+     * @param x     the value
      */
     public static void fillByte(byte[] array, byte x) {
         for (int i = 0; i < array.length; i++) {
@@ -64,7 +64,7 @@ public class Arrays {
      * Fill an array with the given value.
      *
      * @param array the array
-     * @param x the value
+     * @param x     the value
      */
     public static void fillInt(int[] array, int x) {
         for (int i = 0; i < array.length; i++) {

@@ -6,27 +6,20 @@
  */
 package org.h2.store.fs;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
 import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.util.Utils;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This file system stores files on disk.
@@ -93,7 +86,7 @@ public class FilePathDisk extends FilePath {
         }
         if (newFile.exists()) {
             throw DbException.get(ErrorCode.FILE_RENAME_FAILED_2,
-                    new String[] { name, newName + " (exists)" });
+                    new String[]{name, newName + " (exists)"});
         }
         for (int i = 0; i < SysProperties.MAX_FILE_RETRY; i++) {
             IOUtils.trace("rename", name + " >" + newName, null);
@@ -356,7 +349,7 @@ public class FilePathDisk extends FilePath {
 
     @Override
     public FilePath createTempFile(String suffix, boolean deleteOnExit,
-            boolean inTempDir) throws IOException {
+                                   boolean inTempDir) throws IOException {
         String fileName = name + ".";
         String prefix = new File(fileName).getName();
         File dir;
@@ -427,7 +420,7 @@ class FileDisk extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         return file.getChannel().tryLock(position, size, shared);
     }
 

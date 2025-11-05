@@ -6,15 +6,11 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import org.h2.store.FileLister;
 import org.h2.test.TestBase;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Test for big result sets.
@@ -52,7 +48,7 @@ public class TestBigResult extends TestBase {
         stat.execute("CREATE TABLE RECOVERY(TRANSACTION_ID INT, SQL_STMT VARCHAR)");
         stat.execute("INSERT INTO RECOVERY " +
                 "SELECT X, CASE MOD(X, 2) WHEN 0 THEN 'commit' ELSE 'begin' END " +
-                "FROM SYSTEM_RANGE(1, "+len+")");
+                "FROM SYSTEM_RANGE(1, " + len + ")");
         ResultSet rs = stat.executeQuery("SELECT * FROM RECOVERY " +
                 "WHERE SQL_STMT LIKE 'begin%' AND " +
                 "TRANSACTION_ID NOT IN(SELECT TRANSACTION_ID FROM RECOVERY " +

@@ -6,7 +6,6 @@
  */
 package org.h2.engine;
 
-import java.sql.SQLException;
 import org.h2.api.DatabaseEventListener;
 import org.h2.command.Prepared;
 import org.h2.message.DbException;
@@ -14,6 +13,8 @@ import org.h2.message.Trace;
 import org.h2.result.SearchRow;
 import org.h2.value.ValueInt;
 import org.h2.value.ValueString;
+
+import java.sql.SQLException;
 
 /**
  * A record in the system table of the database.
@@ -47,12 +48,12 @@ public class MetaRecord implements Comparable<MetaRecord> {
     /**
      * Execute the meta data statement.
      *
-     * @param db the database
+     * @param db            the database
      * @param systemSession the system session
-     * @param listener the database event listener
+     * @param listener      the database event listener
      */
     void execute(Database db, Session systemSession,
-            DatabaseEventListener listener) {
+                 DatabaseEventListener listener) {
         try {
             Prepared command = systemSession.prepare(sql);
             command.setObjectId(id);
@@ -105,39 +106,39 @@ public class MetaRecord implements Comparable<MetaRecord> {
      * @return the sort index
      */
     private int getCreateOrder() {
-        switch(objectType) {
-        case DbObject.SETTING:
-            return 0;
-        case DbObject.USER:
-            return 1;
-        case DbObject.SCHEMA:
-            return 2;
-        case DbObject.FUNCTION_ALIAS:
-            return 3;
-        case DbObject.USER_DATATYPE:
-            return 4;
-        case DbObject.SEQUENCE:
-            return 5;
-        case DbObject.CONSTANT:
-            return 6;
-        case DbObject.TABLE_OR_VIEW:
-            return 7;
-        case DbObject.INDEX:
-            return 8;
-        case DbObject.CONSTRAINT:
-            return 9;
-        case DbObject.TRIGGER:
-            return 10;
-        case DbObject.ROLE:
-            return 11;
-        case DbObject.RIGHT:
-            return 12;
-        case DbObject.AGGREGATE:
-            return 13;
-        case DbObject.COMMENT:
-            return 14;
-        default:
-            throw DbException.throwInternalError("type="+objectType);
+        switch (objectType) {
+            case DbObject.SETTING:
+                return 0;
+            case DbObject.USER:
+                return 1;
+            case DbObject.SCHEMA:
+                return 2;
+            case DbObject.FUNCTION_ALIAS:
+                return 3;
+            case DbObject.USER_DATATYPE:
+                return 4;
+            case DbObject.SEQUENCE:
+                return 5;
+            case DbObject.CONSTANT:
+                return 6;
+            case DbObject.TABLE_OR_VIEW:
+                return 7;
+            case DbObject.INDEX:
+                return 8;
+            case DbObject.CONSTRAINT:
+                return 9;
+            case DbObject.TRIGGER:
+                return 10;
+            case DbObject.ROLE:
+                return 11;
+            case DbObject.RIGHT:
+                return 12;
+            case DbObject.AGGREGATE:
+                return 13;
+            case DbObject.COMMENT:
+                return 14;
+            default:
+                throw DbException.throwInternalError("type=" + objectType);
         }
     }
 

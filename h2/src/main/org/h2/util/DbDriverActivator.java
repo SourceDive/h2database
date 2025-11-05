@@ -6,11 +6,12 @@
  */
 package org.h2.util;
 
-import java.util.Properties;
 import org.h2.engine.Constants;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.jdbc.DataSourceFactory;
+
+import java.util.Properties;
 
 /**
  * The driver activator loads the H2 driver when starting the bundle. The driver

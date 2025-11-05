@@ -6,14 +6,14 @@
  */
 package org.h2.test.unit;
 
-import java.io.File;
-import java.util.Properties;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.SysProperties;
 import org.h2.test.TestBase;
 import org.h2.tools.DeleteDbFiles;
+
+import java.io.File;
+import java.util.Properties;
 
 /**
  * Test the ConnectionInfo class.
@@ -45,9 +45,9 @@ public class TestConnectionInfo extends TestBase {
             return;
         }
         assertThrows(ErrorCode.URL_RELATIVE_TO_CWD, this).
-            getConnection("jdbc:h2:test");
+                getConnection("jdbc:h2:test");
         assertThrows(ErrorCode.URL_RELATIVE_TO_CWD, this).
-            getConnection("jdbc:h2:data/test");
+                getConnection("jdbc:h2:data/test");
 
         getConnection("jdbc:h2:./testDatabase").close();
         DeleteDbFiles.execute(".", "testDatabase", true);

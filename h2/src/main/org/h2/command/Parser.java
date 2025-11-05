@@ -9,146 +9,32 @@
  */
 package org.h2.command;
 
+import org.h2.api.ErrorCode;
+import org.h2.api.Trigger;
+import org.h2.command.ddl.*;
+import org.h2.command.dml.*;
+import org.h2.constraint.ConstraintReferential;
+import org.h2.engine.*;
+import org.h2.expression.*;
+import org.h2.index.Index;
+import org.h2.message.DbException;
+import org.h2.result.SortOrder;
+import org.h2.schema.Schema;
+import org.h2.schema.Sequence;
+import org.h2.table.*;
+import org.h2.table.TableFilter.TableFilterVisitor;
+import org.h2.util.MathUtils;
+import org.h2.util.New;
+import org.h2.util.StatementBuilder;
+import org.h2.util.StringUtils;
+import org.h2.value.*;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import org.h2.api.ErrorCode;
-import org.h2.api.Trigger;
-import org.h2.command.ddl.AlterIndexRename;
-import org.h2.command.ddl.AlterSchemaRename;
-import org.h2.command.ddl.AlterTableAddConstraint;
-import org.h2.command.ddl.AlterTableAlterColumn;
-import org.h2.command.ddl.AlterTableDropConstraint;
-import org.h2.command.ddl.AlterTableRename;
-import org.h2.command.ddl.AlterTableRenameColumn;
-import org.h2.command.ddl.AlterUser;
-import org.h2.command.ddl.AlterView;
-import org.h2.command.ddl.Analyze;
-import org.h2.command.ddl.CreateAggregate;
-import org.h2.command.ddl.CreateConstant;
-import org.h2.command.ddl.CreateFunctionAlias;
-import org.h2.command.ddl.CreateIndex;
-import org.h2.command.ddl.CreateLinkedTable;
-import org.h2.command.ddl.CreateRole;
-import org.h2.command.ddl.CreateSchema;
-import org.h2.command.ddl.CreateSequence;
-import org.h2.command.ddl.CreateTable;
-import org.h2.command.ddl.CreateTableData;
-import org.h2.command.ddl.CreateTrigger;
-import org.h2.command.ddl.CreateUser;
-import org.h2.command.ddl.CreateUserDataType;
-import org.h2.command.ddl.CreateView;
-import org.h2.command.ddl.DeallocateProcedure;
-import org.h2.command.ddl.DefineCommand;
-import org.h2.command.ddl.DropAggregate;
-import org.h2.command.ddl.DropConstant;
-import org.h2.command.ddl.DropDatabase;
-import org.h2.command.ddl.DropFunctionAlias;
-import org.h2.command.ddl.DropIndex;
-import org.h2.command.ddl.DropRole;
-import org.h2.command.ddl.DropSchema;
-import org.h2.command.ddl.DropSequence;
-import org.h2.command.ddl.DropTable;
-import org.h2.command.ddl.DropTrigger;
-import org.h2.command.ddl.DropUser;
-import org.h2.command.ddl.DropUserDataType;
-import org.h2.command.ddl.DropView;
-import org.h2.command.ddl.GrantRevoke;
-import org.h2.command.ddl.PrepareProcedure;
-import org.h2.command.ddl.SetComment;
-import org.h2.command.ddl.TruncateTable;
-import org.h2.command.dml.AlterSequence;
-import org.h2.command.dml.AlterTableSet;
-import org.h2.command.dml.BackupCommand;
-import org.h2.command.dml.Call;
-import org.h2.command.dml.Delete;
-import org.h2.command.dml.ExecuteProcedure;
-import org.h2.command.dml.Explain;
-import org.h2.command.dml.Insert;
-import org.h2.command.dml.Merge;
-import org.h2.command.dml.NoOperation;
-import org.h2.command.dml.Query;
-import org.h2.command.dml.Replace;
-import org.h2.command.dml.RunScriptCommand;
-import org.h2.command.dml.ScriptCommand;
-import org.h2.command.dml.Select;
-import org.h2.command.dml.SelectOrderBy;
-import org.h2.command.dml.SelectUnion;
-import org.h2.command.dml.Set;
-import org.h2.command.dml.SetTypes;
-import org.h2.command.dml.TransactionCommand;
-import org.h2.command.dml.Update;
-import org.h2.constraint.ConstraintReferential;
-import org.h2.engine.Constants;
-import org.h2.engine.Database;
-import org.h2.engine.DbObject;
-import org.h2.engine.FunctionAlias;
-import org.h2.engine.Procedure;
-import org.h2.engine.Right;
-import org.h2.engine.Session;
-import org.h2.engine.SysProperties;
-import org.h2.engine.User;
-import org.h2.engine.UserAggregate;
-import org.h2.engine.UserDataType;
-import org.h2.expression.Aggregate;
-import org.h2.expression.Alias;
-import org.h2.expression.CompareLike;
-import org.h2.expression.Comparison;
-import org.h2.expression.ConditionAndOr;
-import org.h2.expression.ConditionExists;
-import org.h2.expression.ConditionIn;
-import org.h2.expression.ConditionInSelect;
-import org.h2.expression.ConditionNot;
-import org.h2.expression.Expression;
-import org.h2.expression.ExpressionColumn;
-import org.h2.expression.ExpressionList;
-import org.h2.expression.Function;
-import org.h2.expression.FunctionCall;
-import org.h2.expression.JavaAggregate;
-import org.h2.expression.JavaFunction;
-import org.h2.expression.Operation;
-import org.h2.expression.Parameter;
-import org.h2.expression.Rownum;
-import org.h2.expression.SequenceValue;
-import org.h2.expression.Subquery;
-import org.h2.expression.TableFunction;
-import org.h2.expression.ValueExpression;
-import org.h2.expression.Variable;
-import org.h2.expression.Wildcard;
-import org.h2.index.Index;
-import org.h2.message.DbException;
-import org.h2.result.SortOrder;
-import org.h2.schema.Schema;
-import org.h2.schema.Sequence;
-import org.h2.table.Column;
-import org.h2.table.FunctionTable;
-import org.h2.table.IndexColumn;
-import org.h2.table.RangeTable;
-import org.h2.table.Table;
-import org.h2.table.TableFilter;
-import org.h2.table.TableView;
-import org.h2.table.TableFilter.TableFilterVisitor;
-import org.h2.util.MathUtils;
-import org.h2.util.New;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
-import org.h2.value.CompareMode;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueBoolean;
-import org.h2.value.ValueBytes;
-import org.h2.value.ValueDate;
-import org.h2.value.ValueDecimal;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueString;
-import org.h2.value.ValueTime;
-import org.h2.value.ValueTimestamp;
 
 /**
  * The parser is used to convert a SQL statement string to an command object.
@@ -186,20 +72,30 @@ public class Parser {
      */
     private final boolean identifiersToUpper;
 
-    /** indicates character-type for each char in sqlCommand */
+    /**
+     * indicates character-type for each char in sqlCommand
+     */
     private int[] characterTypes;
     private int currentTokenType;
     private String currentToken;
     private boolean currentTokenQuoted;
     private Value currentValue;
     private String originalSQL;
-    /** copy of originalSQL, with comments blanked out */
+    /**
+     * copy of originalSQL, with comments blanked out
+     */
     private String sqlCommand;
-    /** cached array if chars from sqlCommand */
+    /**
+     * cached array if chars from sqlCommand
+     */
     private char[] sqlCommandChars;
-    /** index into sqlCommand of previous token */
+    /**
+     * index into sqlCommand of previous token
+     */
     private int lastParseIndex;
-    /** index into sqlCommand of current token */
+    /**
+     * index into sqlCommand of current token
+     */
     private int parseIndex;
     private CreateView createView;
     private Prepared currentPrepared;
@@ -315,168 +211,168 @@ public class Parser {
         } else {
             char first = token.charAt(0);
             switch (first) {
-            case '?':
-                // read the ? as a parameter
-                readTerm();
-                // this is an 'out' parameter - set a dummy value
-                parameters.get(0).setValue(ValueNull.INSTANCE);
-                read("=");
-                read("CALL");
-                c = parseCall();
-                break;
-            case '(':
-                c = parseSelect();
-                break;
-            case 'a':
-            case 'A':
-                if (readIf("ALTER")) {
-                    c = parseAlter();
-                } else if (readIf("ANALYZE")) {
-                    c = parseAnalyze();
-                }
-                break;
-            case 'b':
-            case 'B':
-                if (readIf("BACKUP")) {
-                    c = parseBackup();
-                } else if (readIf("BEGIN")) {
-                    c = parseBegin();
-                }
-                break;
-            case 'c':
-            case 'C':
-                if (readIf("COMMIT")) {
-                    c = parseCommit();
-                } else if (readIf("CREATE")) {
-                    c = parseCreate();
-                } else if (readIf("CALL")) {
+                case '?':
+                    // read the ? as a parameter
+                    readTerm();
+                    // this is an 'out' parameter - set a dummy value
+                    parameters.get(0).setValue(ValueNull.INSTANCE);
+                    read("=");
+                    read("CALL");
                     c = parseCall();
-                } else if (readIf("CHECKPOINT")) {
-                    c = parseCheckpoint();
-                } else if (readIf("COMMENT")) {
-                    c = parseComment();
-                }
-                break;
-            case 'd':
-            case 'D':
-                if (readIf("DELETE")) {
-                    c = parseDelete();
-                } else if (readIf("DROP")) {
-                    c = parseDrop();
-                } else if (readIf("DECLARE")) {
-                    // support for DECLARE GLOBAL TEMPORARY TABLE...
-                    c = parseCreate();
-                } else if (readIf("DEALLOCATE")) {
-                    c = parseDeallocate();
-                }
-                break;
-            case 'e':
-            case 'E':
-                if (readIf("EXPLAIN")) {
-                    c = parseExplain();
-                } else if (readIf("EXECUTE")) {
-                    c = parseExecute();
-                }
-                break;
-            case 'f':
-            case 'F':
-                if (isToken("FROM")) {
+                    break;
+                case '(':
                     c = parseSelect();
-                }
-                break;
-            case 'g':
-            case 'G':
-                if (readIf("GRANT")) {
-                    c = parseGrantRevoke(CommandInterface.GRANT);
-                }
-                break;
-            case 'h':
-            case 'H':
-                if (readIf("HELP")) {
-                    c = parseHelp();
-                }
-                break;
-            case 'i':
-            case 'I':
-                if (readIf("INSERT")) {
-                    c = parseInsert();
-                }
-                break;
-            case 'm':
-            case 'M':
-                if (readIf("MERGE")) {
-                    c = parseMerge();
-                }
-                break;
-            case 'p':
-            case 'P':
-                if (readIf("PREPARE")) {
-                    c = parsePrepare();
-                }
-                break;
-            case 'r':
-            case 'R':
-                if (readIf("ROLLBACK")) {
-                    c = parseRollback();
-                } else if (readIf("REVOKE")) {
-                    c = parseGrantRevoke(CommandInterface.REVOKE);
-                } else if (readIf("RUNSCRIPT")) {
-                    c = parseRunScript();
-                } else if (readIf("RELEASE")) {
-                    c = parseReleaseSavepoint();
-                } else if (readIf("REPLACE")) {
-                    c = parseReplace();
-                }
-                break;
-            case 's':
-            case 'S':
-                if (isToken("SELECT")) {
-                    c = parseSelect();
-                } else if (readIf("SET")) {
-                    c = parseSet();
-                } else if (readIf("SAVEPOINT")) {
-                    c = parseSavepoint();
-                } else if (readIf("SCRIPT")) {
-                    c = parseScript();
-                } else if (readIf("SHUTDOWN")) {
-                    c = parseShutdown();
-                } else if (readIf("SHOW")) {
-                    c = parseShow();
-                }
-                break;
-            case 't':
-            case 'T':
-                if (readIf("TRUNCATE")) {
-                    c = parseTruncate();
-                }
-                break;
-            case 'u':
-            case 'U':
-                if (readIf("UPDATE")) {
-                    c = parseUpdate();
-                }
-                break;
-            case 'v':
-            case 'V':
-                if (readIf("VALUES")) {
-                    c = parseValues();
-                }
-                break;
-            case 'w':
-            case 'W':
-                if (readIf("WITH")) {
-                    c = parseWith();
-                }
-                break;
-            case ';':
-                c = new NoOperation(session);
-                break;
-            default:
-                throw getSyntaxError();
+                    break;
+                case 'a':
+                case 'A':
+                    if (readIf("ALTER")) {
+                        c = parseAlter();
+                    } else if (readIf("ANALYZE")) {
+                        c = parseAnalyze();
+                    }
+                    break;
+                case 'b':
+                case 'B':
+                    if (readIf("BACKUP")) {
+                        c = parseBackup();
+                    } else if (readIf("BEGIN")) {
+                        c = parseBegin();
+                    }
+                    break;
+                case 'c':
+                case 'C':
+                    if (readIf("COMMIT")) {
+                        c = parseCommit();
+                    } else if (readIf("CREATE")) {
+                        c = parseCreate();
+                    } else if (readIf("CALL")) {
+                        c = parseCall();
+                    } else if (readIf("CHECKPOINT")) {
+                        c = parseCheckpoint();
+                    } else if (readIf("COMMENT")) {
+                        c = parseComment();
+                    }
+                    break;
+                case 'd':
+                case 'D':
+                    if (readIf("DELETE")) {
+                        c = parseDelete();
+                    } else if (readIf("DROP")) {
+                        c = parseDrop();
+                    } else if (readIf("DECLARE")) {
+                        // support for DECLARE GLOBAL TEMPORARY TABLE...
+                        c = parseCreate();
+                    } else if (readIf("DEALLOCATE")) {
+                        c = parseDeallocate();
+                    }
+                    break;
+                case 'e':
+                case 'E':
+                    if (readIf("EXPLAIN")) {
+                        c = parseExplain();
+                    } else if (readIf("EXECUTE")) {
+                        c = parseExecute();
+                    }
+                    break;
+                case 'f':
+                case 'F':
+                    if (isToken("FROM")) {
+                        c = parseSelect();
+                    }
+                    break;
+                case 'g':
+                case 'G':
+                    if (readIf("GRANT")) {
+                        c = parseGrantRevoke(CommandInterface.GRANT);
+                    }
+                    break;
+                case 'h':
+                case 'H':
+                    if (readIf("HELP")) {
+                        c = parseHelp();
+                    }
+                    break;
+                case 'i':
+                case 'I':
+                    if (readIf("INSERT")) {
+                        c = parseInsert();
+                    }
+                    break;
+                case 'm':
+                case 'M':
+                    if (readIf("MERGE")) {
+                        c = parseMerge();
+                    }
+                    break;
+                case 'p':
+                case 'P':
+                    if (readIf("PREPARE")) {
+                        c = parsePrepare();
+                    }
+                    break;
+                case 'r':
+                case 'R':
+                    if (readIf("ROLLBACK")) {
+                        c = parseRollback();
+                    } else if (readIf("REVOKE")) {
+                        c = parseGrantRevoke(CommandInterface.REVOKE);
+                    } else if (readIf("RUNSCRIPT")) {
+                        c = parseRunScript();
+                    } else if (readIf("RELEASE")) {
+                        c = parseReleaseSavepoint();
+                    } else if (readIf("REPLACE")) {
+                        c = parseReplace();
+                    }
+                    break;
+                case 's':
+                case 'S':
+                    if (isToken("SELECT")) {
+                        c = parseSelect();
+                    } else if (readIf("SET")) {
+                        c = parseSet();
+                    } else if (readIf("SAVEPOINT")) {
+                        c = parseSavepoint();
+                    } else if (readIf("SCRIPT")) {
+                        c = parseScript();
+                    } else if (readIf("SHUTDOWN")) {
+                        c = parseShutdown();
+                    } else if (readIf("SHOW")) {
+                        c = parseShow();
+                    }
+                    break;
+                case 't':
+                case 'T':
+                    if (readIf("TRUNCATE")) {
+                        c = parseTruncate();
+                    }
+                    break;
+                case 'u':
+                case 'U':
+                    if (readIf("UPDATE")) {
+                        c = parseUpdate();
+                    }
+                    break;
+                case 'v':
+                case 'V':
+                    if (readIf("VALUES")) {
+                        c = parseValues();
+                    }
+                    break;
+                case 'w':
+                case 'W':
+                    if (readIf("WITH")) {
+                        c = parseWith();
+                    }
+                    break;
+                case ';':
+                    c = new NoOperation(session);
+                    break;
+                default:
+                    throw getSyntaxError();
             }
             if (indexedParameterList != null) {
                 for (int i = 0, size = indexedParameterList.size();
-                        i < size; i++) {
+                     i < size; i++) {
                     if (indexedParameterList.get(i) == null) {
                         indexedParameterList.set(i, new Parameter(i));
                     }
@@ -608,7 +504,7 @@ public class Parser {
         String procedureName = readAliasIdentifier();
         if (readIf("(")) {
             ArrayList<Column> list = New.arrayList();
-            for (int i = 0;; i++) {
+            for (int i = 0; ; i++) {
                 Column column = parseColumnForTable("C" + i, true);
                 list.add(column);
                 if (readIf(")")) {
@@ -952,7 +848,7 @@ public class Parser {
     }
 
     private static Prepared prepare(Session s, String sql,
-            ArrayList<Value> paramValues) {
+                                    ArrayList<Value> paramValues) {
         Prepared prep = s.prepare(sql);
         ArrayList<Parameter> params = prep.getParameters();
         if (params != null) {
@@ -1464,7 +1360,7 @@ public class Parser {
     }
 
     private TableFilter readJoin(TableFilter top, Select command,
-            boolean nested, boolean fromOuter) {
+                                 boolean nested, boolean fromOuter) {
         boolean joined = false;
         TableFilter last = top;
         boolean nestedJoins = database.getSettings().nestedJoins;
@@ -1611,7 +1507,7 @@ public class Parser {
         }
         command.setProcedure(p);
         if (readIf("(")) {
-            for (int i = 0;; i++) {
+            for (int i = 0; ; i++) {
                 command.setExpression(i, readExpression());
                 if (readIf(")")) {
                     break;
@@ -1676,7 +1572,7 @@ public class Parser {
     }
 
     private Query parseSelectUnionExtension(Query command, int start,
-            boolean unionOnly) {
+                                            boolean unionOnly) {
         while (true) {
             if (readIf("UNION")) {
                 SelectUnion union = new SelectUnion(session, command);
@@ -2378,157 +2274,157 @@ public class Parser {
             return readJavaFunction(null, name);
         }
         switch (function.getFunctionType()) {
-        case Function.CAST: {
-            function.setParameter(0, readExpression());
-            read("AS");
-            Column type = parseColumnWithType(null);
-            function.setDataType(type);
-            read(")");
-            break;
-        }
-        case Function.CONVERT: {
-            if (database.getMode().swapConvertFunctionParameters) {
-                Column type = parseColumnWithType(null);
-                function.setDataType(type);
-                read(",");
+            case Function.CAST: {
                 function.setParameter(0, readExpression());
-                read(")");
-            } else {
-                function.setParameter(0, readExpression());
-                read(",");
+                read("AS");
                 Column type = parseColumnWithType(null);
                 function.setDataType(type);
                 read(")");
+                break;
             }
-            break;
-        }
-        case Function.EXTRACT: {
-            function.setParameter(0,
-                    ValueExpression.get(ValueString.get(currentToken)));
-            read();
-            read("FROM");
-            function.setParameter(1, readExpression());
-            read(")");
-            break;
-        }
-        case Function.DATE_ADD:
-        case Function.DATE_DIFF: {
-            if (Function.isDatePart(currentToken)) {
+            case Function.CONVERT: {
+                if (database.getMode().swapConvertFunctionParameters) {
+                    Column type = parseColumnWithType(null);
+                    function.setDataType(type);
+                    read(",");
+                    function.setParameter(0, readExpression());
+                    read(")");
+                } else {
+                    function.setParameter(0, readExpression());
+                    read(",");
+                    Column type = parseColumnWithType(null);
+                    function.setDataType(type);
+                    read(")");
+                }
+                break;
+            }
+            case Function.EXTRACT: {
                 function.setParameter(0,
                         ValueExpression.get(ValueString.get(currentToken)));
                 read();
-            } else {
-                function.setParameter(0, readExpression());
-            }
-            read(",");
-            function.setParameter(1, readExpression());
-            read(",");
-            function.setParameter(2, readExpression());
-            read(")");
-            break;
-        }
-        case Function.SUBSTRING: {
-            // Different variants include:
-            // SUBSTRING(X,1)
-            // SUBSTRING(X,1,1)
-            // SUBSTRING(X FROM 1 FOR 1) -- Postgres
-            // SUBSTRING(X FROM 1) -- Postgres
-            // SUBSTRING(X FOR 1) -- Postgres
-            function.setParameter(0, readExpression());
-            if (readIf("FROM")) {
+                read("FROM");
                 function.setParameter(1, readExpression());
-                if (readIf("FOR")) {
-                    function.setParameter(2, readExpression());
+                read(")");
+                break;
+            }
+            case Function.DATE_ADD:
+            case Function.DATE_DIFF: {
+                if (Function.isDatePart(currentToken)) {
+                    function.setParameter(0,
+                            ValueExpression.get(ValueString.get(currentToken)));
+                    read();
+                } else {
+                    function.setParameter(0, readExpression());
                 }
-            } else if (readIf("FOR")) {
-                function.setParameter(1, ValueExpression.get(ValueInt.get(0)));
-                function.setParameter(2, readExpression());
-            } else {
                 read(",");
                 function.setParameter(1, readExpression());
-                if (readIf(",")) {
+                read(",");
+                function.setParameter(2, readExpression());
+                read(")");
+                break;
+            }
+            case Function.SUBSTRING: {
+                // Different variants include:
+                // SUBSTRING(X,1)
+                // SUBSTRING(X,1,1)
+                // SUBSTRING(X FROM 1 FOR 1) -- Postgres
+                // SUBSTRING(X FROM 1) -- Postgres
+                // SUBSTRING(X FOR 1) -- Postgres
+                function.setParameter(0, readExpression());
+                if (readIf("FROM")) {
+                    function.setParameter(1, readExpression());
+                    if (readIf("FOR")) {
+                        function.setParameter(2, readExpression());
+                    }
+                } else if (readIf("FOR")) {
+                    function.setParameter(1, ValueExpression.get(ValueInt.get(0)));
                     function.setParameter(2, readExpression());
+                } else {
+                    read(",");
+                    function.setParameter(1, readExpression());
+                    if (readIf(",")) {
+                        function.setParameter(2, readExpression());
+                    }
                 }
+                read(")");
+                break;
             }
-            read(")");
-            break;
-        }
-        case Function.POSITION: {
-            // can't read expression because IN would be read too early
-            function.setParameter(0, readConcat());
-            if (!readIf(",")) {
-                read("IN");
+            case Function.POSITION: {
+                // can't read expression because IN would be read too early
+                function.setParameter(0, readConcat());
+                if (!readIf(",")) {
+                    read("IN");
+                }
+                function.setParameter(1, readExpression());
+                read(")");
+                break;
             }
-            function.setParameter(1, readExpression());
-            read(")");
-            break;
-        }
-        case Function.TRIM: {
-            Expression space = null;
-            if (readIf("LEADING")) {
-                function = Function.getFunction(database, "LTRIM");
-                if (!readIf("FROM")) {
+            case Function.TRIM: {
+                Expression space = null;
+                if (readIf("LEADING")) {
+                    function = Function.getFunction(database, "LTRIM");
+                    if (!readIf("FROM")) {
+                        space = readExpression();
+                        read("FROM");
+                    }
+                } else if (readIf("TRAILING")) {
+                    function = Function.getFunction(database, "RTRIM");
+                    if (!readIf("FROM")) {
+                        space = readExpression();
+                        read("FROM");
+                    }
+                } else if (readIf("BOTH")) {
+                    if (!readIf("FROM")) {
+                        space = readExpression();
+                        read("FROM");
+                    }
+                }
+                Expression p0 = readExpression();
+                if (readIf(",")) {
                     space = readExpression();
-                    read("FROM");
+                } else if (readIf("FROM")) {
+                    space = p0;
+                    p0 = readExpression();
                 }
-            } else if (readIf("TRAILING")) {
-                function = Function.getFunction(database, "RTRIM");
-                if (!readIf("FROM")) {
-                    space = readExpression();
-                    read("FROM");
+                function.setParameter(0, p0);
+                if (space != null) {
+                    function.setParameter(1, space);
                 }
-            } else if (readIf("BOTH")) {
-                if (!readIf("FROM")) {
-                    space = readExpression();
-                    read("FROM");
-                }
+                read(")");
+                break;
             }
-            Expression p0 = readExpression();
-            if (readIf(",")) {
-                space = readExpression();
-            } else if (readIf("FROM")) {
-                space = p0;
-                p0 = readExpression();
-            }
-            function.setParameter(0, p0);
-            if (space != null) {
-                function.setParameter(1, space);
-            }
-            read(")");
-            break;
-        }
-        case Function.TABLE:
-        case Function.TABLE_DISTINCT: {
-            int i = 0;
-            ArrayList<Column> columns = New.arrayList();
-            do {
-                String columnName = readAliasIdentifier();
-                Column column = parseColumnWithType(columnName);
-                columns.add(column);
-                read("=");
-                function.setParameter(i, readExpression());
-                i++;
-            } while (readIf(","));
-            read(")");
-            TableFunction tf = (TableFunction) function;
-            tf.setColumns(columns);
-            break;
-        }
-        case Function.ROW_NUMBER:
-            read(")");
-            read("OVER");
-            read("(");
-            read(")");
-            return new Rownum(currentSelect == null ? currentPrepared
-                    : currentSelect);
-        default:
-            if (!readIf(")")) {
+            case Function.TABLE:
+            case Function.TABLE_DISTINCT: {
                 int i = 0;
+                ArrayList<Column> columns = New.arrayList();
                 do {
-                    function.setParameter(i++, readExpression());
+                    String columnName = readAliasIdentifier();
+                    Column column = parseColumnWithType(columnName);
+                    columns.add(column);
+                    read("=");
+                    function.setParameter(i, readExpression());
+                    i++;
                 } while (readIf(","));
                 read(")");
+                TableFunction tf = (TableFunction) function;
+                tf.setColumns(columns);
+                break;
             }
+            case Function.ROW_NUMBER:
+                read(")");
+                read("OVER");
+                read("(");
+                read(")");
+                return new Rownum(currentSelect == null ? currentPrepared
+                        : currentSelect);
+            default:
+                if (!readIf(")")) {
+                    int i = 0;
+                    do {
+                        function.setParameter(i++, readExpression());
+                    } while (readIf(","));
+                    read(")");
+                }
         }
         function.doneWithParameters();
         return function;
@@ -2544,7 +2440,7 @@ public class Parser {
     }
 
     private Expression readWildcardOrSequenceValue(String schema,
-            String objectName) {
+                                                   String objectName) {
         if (readIf("*")) {
             return new Wildcard(schema, objectName);
         }
@@ -2624,248 +2520,248 @@ public class Parser {
     private Expression readTerm() {
         Expression r;
         switch (currentTokenType) {
-        case AT:
-            read();
-            r = new Variable(session, readAliasIdentifier());
-            if (readIf(":=")) {
-                Expression value = readExpression();
-                Function function = Function.getFunction(database, "SET");
-                function.setParameter(0, r);
-                function.setParameter(1, value);
-                r = function;
-            }
-            break;
-        case PARAMETER:
-            // there must be no space between ? and the number
-            boolean indexed = Character.isDigit(sqlCommandChars[parseIndex]);
-            read();
-            Parameter p;
-            if (indexed && currentTokenType == VALUE &&
-                    currentValue.getType() == Value.INT) {
-                if (indexedParameterList == null) {
-                    if (parameters == null) {
-                        // this can occur when parsing expressions only (for
-                        // example check constraints)
-                        throw getSyntaxError();
-                    } else if (parameters.size() > 0) {
+            case AT:
+                read();
+                r = new Variable(session, readAliasIdentifier());
+                if (readIf(":=")) {
+                    Expression value = readExpression();
+                    Function function = Function.getFunction(database, "SET");
+                    function.setParameter(0, r);
+                    function.setParameter(1, value);
+                    r = function;
+                }
+                break;
+            case PARAMETER:
+                // there must be no space between ? and the number
+                boolean indexed = Character.isDigit(sqlCommandChars[parseIndex]);
+                read();
+                Parameter p;
+                if (indexed && currentTokenType == VALUE &&
+                        currentValue.getType() == Value.INT) {
+                    if (indexedParameterList == null) {
+                        if (parameters == null) {
+                            // this can occur when parsing expressions only (for
+                            // example check constraints)
+                            throw getSyntaxError();
+                        } else if (parameters.size() > 0) {
+                            throw DbException
+                                    .get(ErrorCode.CANNOT_MIX_INDEXED_AND_UNINDEXED_PARAMS);
+                        }
+                        indexedParameterList = New.arrayList();
+                    }
+                    int index = currentValue.getInt() - 1;
+                    if (index < 0 || index >= Constants.MAX_PARAMETER_INDEX) {
+                        throw DbException.getInvalidValueException(
+                                "parameter index", index);
+                    }
+                    if (indexedParameterList.size() <= index) {
+                        indexedParameterList.ensureCapacity(index + 1);
+                        while (indexedParameterList.size() <= index) {
+                            indexedParameterList.add(null);
+                        }
+                    }
+                    p = indexedParameterList.get(index);
+                    if (p == null) {
+                        p = new Parameter(index);
+                        indexedParameterList.set(index, p);
+                    }
+                    read();
+                } else {
+                    if (indexedParameterList != null) {
                         throw DbException
                                 .get(ErrorCode.CANNOT_MIX_INDEXED_AND_UNINDEXED_PARAMS);
                     }
-                    indexedParameterList = New.arrayList();
+                    p = new Parameter(parameters.size());
                 }
-                int index = currentValue.getInt() - 1;
-                if (index < 0 || index >= Constants.MAX_PARAMETER_INDEX) {
-                    throw DbException.getInvalidValueException(
-                            "parameter index", index);
+                parameters.add(p);
+                r = p;
+                break;
+            case KEYWORD:
+                if (isToken("SELECT") || isToken("FROM")) {
+                    Query query = parseSelect();
+                    r = new Subquery(query);
+                } else {
+                    throw getSyntaxError();
                 }
-                if (indexedParameterList.size() <= index) {
-                    indexedParameterList.ensureCapacity(index + 1);
-                    while (indexedParameterList.size() <= index) {
-                        indexedParameterList.add(null);
+                break;
+            case IDENTIFIER:
+                String name = currentToken;
+                if (currentTokenQuoted) {
+                    read();
+                    if (readIf("(")) {
+                        r = readFunction(null, name);
+                    } else if (readIf(".")) {
+                        r = readTermObjectDot(name);
+                    } else {
+                        r = new ExpressionColumn(database, null, null, name);
+                    }
+                } else {
+                    read();
+                    if (readIf(".")) {
+                        r = readTermObjectDot(name);
+                    } else if (equalsToken("CASE", name)) {
+                        // CASE must be processed before (,
+                        // otherwise CASE(3) would be a function call, which it is
+                        // not
+                        r = readCase();
+                    } else if (readIf("(")) {
+                        r = readFunction(null, name);
+                    } else if (equalsToken("CURRENT_USER", name)) {
+                        r = readFunctionWithoutParameters("USER");
+                    } else if (equalsToken("CURRENT", name)) {
+                        if (readIf("TIMESTAMP")) {
+                            r = readFunctionWithoutParameters("CURRENT_TIMESTAMP");
+                        } else if (readIf("TIME")) {
+                            r = readFunctionWithoutParameters("CURRENT_TIME");
+                        } else if (readIf("DATE")) {
+                            r = readFunctionWithoutParameters("CURRENT_DATE");
+                        } else {
+                            r = new ExpressionColumn(database, null, null, name);
+                        }
+                    } else if (equalsToken("NEXT", name) && readIf("VALUE")) {
+                        read("FOR");
+                        Sequence sequence = readSequence();
+                        r = new SequenceValue(sequence);
+                    } else if (currentTokenType == VALUE &&
+                            currentValue.getType() == Value.STRING) {
+                        if (equalsToken("DATE", name)) {
+                            String date = currentValue.getString();
+                            read();
+                            r = ValueExpression.get(ValueDate.parse(date));
+                        } else if (equalsToken("TIME", name)) {
+                            String time = currentValue.getString();
+                            read();
+                            r = ValueExpression.get(ValueTime.parse(time));
+                        } else if (equalsToken("TIMESTAMP", name)) {
+                            String timestamp = currentValue.getString();
+                            read();
+                            r = ValueExpression
+                                    .get(ValueTimestamp.parse(timestamp));
+                        } else if (equalsToken("X", name)) {
+                            read();
+                            byte[] buffer = StringUtils
+                                    .convertHexToBytes(currentValue.getString());
+                            r = ValueExpression.get(ValueBytes.getNoCopy(buffer));
+                        } else if (equalsToken("E", name)) {
+                            String text = currentValue.getString();
+                            // the PostgreSQL ODBC driver uses
+                            // LIKE E'PROJECT\\_DATA' instead of LIKE
+                            // 'PROJECT\_DATA'
+                            // N: SQL-92 "National Language" strings
+                            text = StringUtils.replaceAll(text, "\\\\", "\\");
+                            read();
+                            r = ValueExpression.get(ValueString.get(text));
+                        } else if (equalsToken("N", name)) {
+                            // SQL-92 "National Language" strings
+                            String text = currentValue.getString();
+                            read();
+                            r = ValueExpression.get(ValueString.get(text));
+                        } else {
+                            r = new ExpressionColumn(database, null, null, name);
+                        }
+                    } else {
+                        r = new ExpressionColumn(database, null, null, name);
                     }
                 }
-                p = indexedParameterList.get(index);
-                if (p == null) {
-                    p = new Parameter(index);
-                    indexedParameterList.set(index, p);
-                }
+                break;
+            case MINUS:
                 read();
-            } else {
-                if (indexedParameterList != null) {
-                    throw DbException
-                            .get(ErrorCode.CANNOT_MIX_INDEXED_AND_UNINDEXED_PARAMS);
+                if (currentTokenType == VALUE) {
+                    r = ValueExpression.get(currentValue.negate());
+                    if (r.getType() == Value.LONG &&
+                            r.getValue(session).getLong() == Integer.MIN_VALUE) {
+                        // convert Integer.MIN_VALUE to type 'int'
+                        // (Integer.MAX_VALUE+1 is of type 'long')
+                        r = ValueExpression.get(ValueInt.get(Integer.MIN_VALUE));
+                    } else if (r.getType() == Value.DECIMAL &&
+                            r.getValue(session).getBigDecimal()
+                                    .compareTo(ValueLong.MIN_BD) == 0) {
+                        // convert Long.MIN_VALUE to type 'long'
+                        // (Long.MAX_VALUE+1 is of type 'decimal')
+                        r = ValueExpression.get(ValueLong.get(Long.MIN_VALUE));
+                    }
+                    read();
+                } else {
+                    r = new Operation(Operation.NEGATE, readTerm(), null);
                 }
-                p = new Parameter(parameters.size());
-            }
-            parameters.add(p);
-            r = p;
-            break;
-        case KEYWORD:
-            if (isToken("SELECT") || isToken("FROM")) {
-                Query query = parseSelect();
-                r = new Subquery(query);
-            } else {
-                throw getSyntaxError();
-            }
-            break;
-        case IDENTIFIER:
-            String name = currentToken;
-            if (currentTokenQuoted) {
+                break;
+            case PLUS:
+                read();
+                r = readTerm();
+                break;
+            case OPEN:
+                read();
+                if (readIf(")")) {
+                    r = new ExpressionList(new Expression[0]);
+                } else {
+                    r = readExpression();
+                    if (readIf(",")) {
+                        ArrayList<Expression> list = New.arrayList();
+                        list.add(r);
+                        while (!readIf(")")) {
+                            r = readExpression();
+                            list.add(r);
+                            if (!readIf(",")) {
+                                read(")");
+                                break;
+                            }
+                        }
+                        Expression[] array = new Expression[list.size()];
+                        list.toArray(array);
+                        r = new ExpressionList(array);
+                    } else {
+                        read(")");
+                    }
+                }
+                break;
+            case TRUE:
+                read();
+                r = ValueExpression.get(ValueBoolean.get(true));
+                break;
+            case FALSE:
+                read();
+                r = ValueExpression.get(ValueBoolean.get(false));
+                break;
+            case CURRENT_TIME:
+                read();
+                r = readFunctionWithoutParameters("CURRENT_TIME");
+                break;
+            case CURRENT_DATE:
+                read();
+                r = readFunctionWithoutParameters("CURRENT_DATE");
+                break;
+            case CURRENT_TIMESTAMP: {
+                Function function = Function.getFunction(database,
+                        "CURRENT_TIMESTAMP");
                 read();
                 if (readIf("(")) {
-                    r = readFunction(null, name);
-                } else if (readIf(".")) {
-                    r = readTermObjectDot(name);
-                } else {
-                    r = new ExpressionColumn(database, null, null, name);
-                }
-            } else {
-                read();
-                if (readIf(".")) {
-                    r = readTermObjectDot(name);
-                } else if (equalsToken("CASE", name)) {
-                    // CASE must be processed before (,
-                    // otherwise CASE(3) would be a function call, which it is
-                    // not
-                    r = readCase();
-                } else if (readIf("(")) {
-                    r = readFunction(null, name);
-                } else if (equalsToken("CURRENT_USER", name)) {
-                    r = readFunctionWithoutParameters("USER");
-                } else if (equalsToken("CURRENT", name)) {
-                    if (readIf("TIMESTAMP")) {
-                        r = readFunctionWithoutParameters("CURRENT_TIMESTAMP");
-                    } else if (readIf("TIME")) {
-                        r = readFunctionWithoutParameters("CURRENT_TIME");
-                    } else if (readIf("DATE")) {
-                        r = readFunctionWithoutParameters("CURRENT_DATE");
-                    } else {
-                        r = new ExpressionColumn(database, null, null, name);
+                    if (!readIf(")")) {
+                        function.setParameter(0, readExpression());
+                        read(")");
                     }
-                } else if (equalsToken("NEXT", name) && readIf("VALUE")) {
-                    read("FOR");
-                    Sequence sequence = readSequence();
-                    r = new SequenceValue(sequence);
-                } else if (currentTokenType == VALUE &&
-                        currentValue.getType() == Value.STRING) {
-                    if (equalsToken("DATE", name)) {
-                        String date = currentValue.getString();
-                        read();
-                        r = ValueExpression.get(ValueDate.parse(date));
-                    } else if (equalsToken("TIME", name)) {
-                        String time = currentValue.getString();
-                        read();
-                        r = ValueExpression.get(ValueTime.parse(time));
-                    } else if (equalsToken("TIMESTAMP", name)) {
-                        String timestamp = currentValue.getString();
-                        read();
-                        r = ValueExpression
-                                .get(ValueTimestamp.parse(timestamp));
-                    } else if (equalsToken("X", name)) {
-                        read();
-                        byte[] buffer = StringUtils
-                                .convertHexToBytes(currentValue.getString());
-                        r = ValueExpression.get(ValueBytes.getNoCopy(buffer));
-                    } else if (equalsToken("E", name)) {
-                        String text = currentValue.getString();
-                        // the PostgreSQL ODBC driver uses
-                        // LIKE E'PROJECT\\_DATA' instead of LIKE
-                        // 'PROJECT\_DATA'
-                        // N: SQL-92 "National Language" strings
-                        text = StringUtils.replaceAll(text, "\\\\", "\\");
-                        read();
-                        r = ValueExpression.get(ValueString.get(text));
-                    } else if (equalsToken("N", name)) {
-                        // SQL-92 "National Language" strings
-                        String text = currentValue.getString();
-                        read();
-                        r = ValueExpression.get(ValueString.get(text));
-                    } else {
-                        r = new ExpressionColumn(database, null, null, name);
-                    }
-                } else {
-                    r = new ExpressionColumn(database, null, null, name);
                 }
+                function.doneWithParameters();
+                r = function;
+                break;
             }
-            break;
-        case MINUS:
-            read();
-            if (currentTokenType == VALUE) {
-                r = ValueExpression.get(currentValue.negate());
-                if (r.getType() == Value.LONG &&
-                        r.getValue(session).getLong() == Integer.MIN_VALUE) {
-                    // convert Integer.MIN_VALUE to type 'int'
-                    // (Integer.MAX_VALUE+1 is of type 'long')
-                    r = ValueExpression.get(ValueInt.get(Integer.MIN_VALUE));
-                } else if (r.getType() == Value.DECIMAL &&
-                        r.getValue(session).getBigDecimal()
-                                .compareTo(ValueLong.MIN_BD) == 0) {
-                    // convert Long.MIN_VALUE to type 'long'
-                    // (Long.MAX_VALUE+1 is of type 'decimal')
-                    r = ValueExpression.get(ValueLong.get(Long.MIN_VALUE));
-                }
+            case ROWNUM:
                 read();
-            } else {
-                r = new Operation(Operation.NEGATE, readTerm(), null);
-            }
-            break;
-        case PLUS:
-            read();
-            r = readTerm();
-            break;
-        case OPEN:
-            read();
-            if (readIf(")")) {
-                r = new ExpressionList(new Expression[0]);
-            } else {
-                r = readExpression();
-                if (readIf(",")) {
-                    ArrayList<Expression> list = New.arrayList();
-                    list.add(r);
-                    while (!readIf(")")) {
-                        r = readExpression();
-                        list.add(r);
-                        if (!readIf(",")) {
-                            read(")");
-                            break;
-                        }
-                    }
-                    Expression[] array = new Expression[list.size()];
-                    list.toArray(array);
-                    r = new ExpressionList(array);
-                } else {
+                if (readIf("(")) {
                     read(")");
                 }
-            }
-            break;
-        case TRUE:
-            read();
-            r = ValueExpression.get(ValueBoolean.get(true));
-            break;
-        case FALSE:
-            read();
-            r = ValueExpression.get(ValueBoolean.get(false));
-            break;
-        case CURRENT_TIME:
-            read();
-            r = readFunctionWithoutParameters("CURRENT_TIME");
-            break;
-        case CURRENT_DATE:
-            read();
-            r = readFunctionWithoutParameters("CURRENT_DATE");
-            break;
-        case CURRENT_TIMESTAMP: {
-            Function function = Function.getFunction(database,
-                    "CURRENT_TIMESTAMP");
-            read();
-            if (readIf("(")) {
-                if (!readIf(")")) {
-                    function.setParameter(0, readExpression());
-                    read(")");
-                }
-            }
-            function.doneWithParameters();
-            r = function;
-            break;
-        }
-        case ROWNUM:
-            read();
-            if (readIf("(")) {
-                read(")");
-            }
-            r = new Rownum(currentSelect == null ? currentPrepared
-                    : currentSelect);
-            break;
-        case NULL:
-            read();
-            r = ValueExpression.getNull();
-            break;
-        case VALUE:
-            r = ValueExpression.get(currentValue);
-            read();
-            break;
-        default:
-            throw getSyntaxError();
+                r = new Rownum(currentSelect == null ? currentPrepared
+                        : currentSelect);
+                break;
+            case NULL:
+                read();
+                r = ValueExpression.getNull();
+                break;
+            case VALUE:
+                r = ValueExpression.get(currentValue);
+                read();
+                break;
+            default:
+                throw getSyntaxError();
         }
         if (readIf("[")) {
             Function function = Function.getFunction(database, "ARRAY_GET");
@@ -2889,7 +2785,7 @@ public class Parser {
                 if (f == null) {
                     throw getSyntaxError();
                 }
-                Expression[] args = { r };
+                Expression[] args = {r};
                 JavaFunction func = new JavaFunction(f, args);
                 r = func;
             } else {
@@ -3134,161 +3030,161 @@ public class Parser {
         char c = chars[i++];
         currentToken = "";
         switch (type) {
-        case CHAR_NAME:
-            while (true) {
-                type = types[i];
-                if (type != CHAR_NAME && type != CHAR_VALUE) {
-                    break;
-                }
-                i++;
-            }
-            currentToken = StringUtils.fromCacheOrNew(sqlCommand.substring(
-                    start, i));
-            currentTokenType = getTokenType(currentToken);
-            parseIndex = i;
-            return;
-        case CHAR_QUOTED: {
-            String result = null;
-            while (true) {
-                for (int begin = i;; i++) {
-                    if (chars[i] == '\"') {
-                        if (result == null) {
-                            result = sqlCommand.substring(begin, i);
-                        } else {
-                            result += sqlCommand.substring(begin - 1, i);
-                        }
+            case CHAR_NAME:
+                while (true) {
+                    type = types[i];
+                    if (type != CHAR_NAME && type != CHAR_VALUE) {
                         break;
                     }
+                    i++;
                 }
-                if (chars[++i] != '\"') {
-                    break;
+                currentToken = StringUtils.fromCacheOrNew(sqlCommand.substring(
+                        start, i));
+                currentTokenType = getTokenType(currentToken);
+                parseIndex = i;
+                return;
+            case CHAR_QUOTED: {
+                String result = null;
+                while (true) {
+                    for (int begin = i; ; i++) {
+                        if (chars[i] == '\"') {
+                            if (result == null) {
+                                result = sqlCommand.substring(begin, i);
+                            } else {
+                                result += sqlCommand.substring(begin - 1, i);
+                            }
+                            break;
+                        }
+                    }
+                    if (chars[++i] != '\"') {
+                        break;
+                    }
+                    i++;
                 }
-                i++;
+                currentToken = StringUtils.fromCacheOrNew(result);
+                parseIndex = i;
+                currentTokenQuoted = true;
+                currentTokenType = IDENTIFIER;
+                return;
             }
-            currentToken = StringUtils.fromCacheOrNew(result);
-            parseIndex = i;
-            currentTokenQuoted = true;
-            currentTokenType = IDENTIFIER;
-            return;
-        }
-        case CHAR_SPECIAL_2:
-            if (types[i] == CHAR_SPECIAL_2) {
-                i++;
-            }
-            currentToken = sqlCommand.substring(start, i);
-            currentTokenType = getSpecialType(currentToken);
-            parseIndex = i;
-            return;
-        case CHAR_SPECIAL_1:
-            currentToken = sqlCommand.substring(start, i);
-            currentTokenType = getSpecialType(currentToken);
-            parseIndex = i;
-            return;
-        case CHAR_VALUE:
-            if (c == '0' && chars[i] == 'X') {
-                // hex number
-                long number = 0;
-                start += 2;
-                i++;
+            case CHAR_SPECIAL_2:
+                if (types[i] == CHAR_SPECIAL_2) {
+                    i++;
+                }
+                currentToken = sqlCommand.substring(start, i);
+                currentTokenType = getSpecialType(currentToken);
+                parseIndex = i;
+                return;
+            case CHAR_SPECIAL_1:
+                currentToken = sqlCommand.substring(start, i);
+                currentTokenType = getSpecialType(currentToken);
+                parseIndex = i;
+                return;
+            case CHAR_VALUE:
+                if (c == '0' && chars[i] == 'X') {
+                    // hex number
+                    long number = 0;
+                    start += 2;
+                    i++;
+                    while (true) {
+                        c = chars[i];
+                        if ((c < '0' || c > '9') && (c < 'A' || c > 'F')) {
+                            checkLiterals(false);
+                            currentValue = ValueInt.get((int) number);
+                            currentTokenType = VALUE;
+                            currentToken = "0";
+                            parseIndex = i;
+                            return;
+                        }
+                        number = (number << 4) + c -
+                                (c >= 'A' ? ('A' - 0xa) : ('0'));
+                        if (number > Integer.MAX_VALUE) {
+                            readHexDecimal(start, i);
+                            return;
+                        }
+                        i++;
+                    }
+                }
+                long number = c - '0';
                 while (true) {
                     c = chars[i];
-                    if ((c < '0' || c > '9') && (c < 'A' || c > 'F')) {
+                    if (c < '0' || c > '9') {
+                        if (c == '.' || c == 'E' || c == 'L') {
+                            readDecimal(start, i);
+                            break;
+                        }
                         checkLiterals(false);
                         currentValue = ValueInt.get((int) number);
                         currentTokenType = VALUE;
                         currentToken = "0";
                         parseIndex = i;
-                        return;
+                        break;
                     }
-                    number = (number << 4) + c -
-                            (c >= 'A' ? ('A' - 0xa) : ('0'));
+                    number = number * 10 + (c - '0');
                     if (number > Integer.MAX_VALUE) {
-                        readHexDecimal(start, i);
-                        return;
-                    }
-                    i++;
-                }
-            }
-            long number = c - '0';
-            while (true) {
-                c = chars[i];
-                if (c < '0' || c > '9') {
-                    if (c == '.' || c == 'E' || c == 'L') {
                         readDecimal(start, i);
                         break;
                     }
-                    checkLiterals(false);
-                    currentValue = ValueInt.get((int) number);
-                    currentTokenType = VALUE;
-                    currentToken = "0";
-                    parseIndex = i;
-                    break;
+                    i++;
                 }
-                number = number * 10 + (c - '0');
-                if (number > Integer.MAX_VALUE) {
-                    readDecimal(start, i);
-                    break;
-                }
-                i++;
-            }
-            return;
-        case CHAR_DOT:
-            if (types[i] != CHAR_VALUE) {
-                currentTokenType = KEYWORD;
-                currentToken = ".";
-                parseIndex = i;
                 return;
-            }
-            readDecimal(i - 1, i);
-            return;
-        case CHAR_STRING: {
-            String result = null;
-            while (true) {
-                for (int begin = i;; i++) {
-                    if (chars[i] == '\'') {
-                        if (result == null) {
-                            result = sqlCommand.substring(begin, i);
-                        } else {
-                            result += sqlCommand.substring(begin - 1, i);
+            case CHAR_DOT:
+                if (types[i] != CHAR_VALUE) {
+                    currentTokenType = KEYWORD;
+                    currentToken = ".";
+                    parseIndex = i;
+                    return;
+                }
+                readDecimal(i - 1, i);
+                return;
+            case CHAR_STRING: {
+                String result = null;
+                while (true) {
+                    for (int begin = i; ; i++) {
+                        if (chars[i] == '\'') {
+                            if (result == null) {
+                                result = sqlCommand.substring(begin, i);
+                            } else {
+                                result += sqlCommand.substring(begin - 1, i);
+                            }
+                            break;
                         }
+                    }
+                    if (chars[++i] != '\'') {
                         break;
                     }
+                    i++;
                 }
-                if (chars[++i] != '\'') {
-                    break;
+                currentToken = "'";
+                checkLiterals(true);
+                currentValue = ValueString.get(StringUtils.fromCacheOrNew(result),
+                        database.getMode().treatEmptyStringsAsNull);
+                parseIndex = i;
+                currentTokenType = VALUE;
+                return;
+            }
+            case CHAR_DOLLAR_QUOTED_STRING: {
+                String result = null;
+                int begin = i - 1;
+                while (types[i] == CHAR_DOLLAR_QUOTED_STRING) {
+                    i++;
                 }
-                i++;
+                result = sqlCommand.substring(begin, i);
+                currentToken = "'";
+                checkLiterals(true);
+                currentValue = ValueString.get(StringUtils.fromCacheOrNew(result),
+                        database.getMode().treatEmptyStringsAsNull);
+                parseIndex = i;
+                currentTokenType = VALUE;
+                return;
             }
-            currentToken = "'";
-            checkLiterals(true);
-            currentValue = ValueString.get(StringUtils.fromCacheOrNew(result),
-                    database.getMode().treatEmptyStringsAsNull);
-            parseIndex = i;
-            currentTokenType = VALUE;
-            return;
-        }
-        case CHAR_DOLLAR_QUOTED_STRING: {
-            String result = null;
-            int begin = i - 1;
-            while (types[i] == CHAR_DOLLAR_QUOTED_STRING) {
-                i++;
-            }
-            result = sqlCommand.substring(begin, i);
-            currentToken = "'";
-            checkLiterals(true);
-            currentValue = ValueString.get(StringUtils.fromCacheOrNew(result),
-                    database.getMode().treatEmptyStringsAsNull);
-            parseIndex = i;
-            currentTokenType = VALUE;
-            return;
-        }
-        case CHAR_END:
-            currentToken = "";
-            currentTokenType = END;
-            parseIndex = i;
-            return;
-        default:
-            throw getSyntaxError();
+            case CHAR_END:
+                currentToken = "";
+                currentTokenType = END;
+                parseIndex = i;
+                return;
+            default:
+                throw getSyntaxError();
         }
     }
 
@@ -3389,180 +3285,180 @@ public class Parser {
             char c = command[i];
             int type = 0;
             switch (c) {
-            case '/':
-                if (command[i + 1] == '*') {
-                    // block comment
-                    changed = true;
-                    command[i] = ' ';
-                    command[i + 1] = ' ';
-                    startLoop = i;
-                    i += 2;
-                    checkRunOver(i, len, startLoop);
-                    while (command[i] != '*' || command[i + 1] != '/') {
-                        command[i++] = ' ';
+                case '/':
+                    if (command[i + 1] == '*') {
+                        // block comment
+                        changed = true;
+                        command[i] = ' ';
+                        command[i + 1] = ' ';
+                        startLoop = i;
+                        i += 2;
                         checkRunOver(i, len, startLoop);
-                    }
-                    command[i] = ' ';
-                    command[i + 1] = ' ';
-                    i++;
-                } else if (command[i + 1] == '/') {
-                    // single line comment
-                    changed = true;
-                    startLoop = i;
-                    while (true) {
-                        c = command[i];
-                        if (c == '\n' || c == '\r' || i >= len - 1) {
-                            break;
+                        while (command[i] != '*' || command[i + 1] != '/') {
+                            command[i++] = ' ';
+                            checkRunOver(i, len, startLoop);
                         }
-                        command[i++] = ' ';
-                        checkRunOver(i, len, startLoop);
-                    }
-                } else {
-                    type = CHAR_SPECIAL_1;
-                }
-                break;
-            case '-':
-                if (command[i + 1] == '-') {
-                    // single line comment
-                    changed = true;
-                    startLoop = i;
-                    while (true) {
-                        c = command[i];
-                        if (c == '\n' || c == '\r' || i >= len - 1) {
-                            break;
+                        command[i] = ' ';
+                        command[i + 1] = ' ';
+                        i++;
+                    } else if (command[i + 1] == '/') {
+                        // single line comment
+                        changed = true;
+                        startLoop = i;
+                        while (true) {
+                            c = command[i];
+                            if (c == '\n' || c == '\r' || i >= len - 1) {
+                                break;
+                            }
+                            command[i++] = ' ';
+                            checkRunOver(i, len, startLoop);
                         }
-                        command[i++] = ' ';
-                        checkRunOver(i, len, startLoop);
-                    }
-                } else {
-                    type = CHAR_SPECIAL_1;
-                }
-                break;
-            case '$':
-                if (command[i + 1] == '$' && (i == 0 || command[i - 1] <= ' ')) {
-                    // dollar quoted string
-                    changed = true;
-                    command[i] = ' ';
-                    command[i + 1] = ' ';
-                    startLoop = i;
-                    i += 2;
-                    checkRunOver(i, len, startLoop);
-                    while (command[i] != '$' || command[i + 1] != '$') {
-                        types[i++] = CHAR_DOLLAR_QUOTED_STRING;
-                        checkRunOver(i, len, startLoop);
-                    }
-                    command[i] = ' ';
-                    command[i + 1] = ' ';
-                    i++;
-                } else {
-                    if (lastType == CHAR_NAME || lastType == CHAR_VALUE) {
-                        // $ inside an identifier is supported
-                        type = CHAR_NAME;
                     } else {
-                        // but not at the start, to support PostgreSQL $1
                         type = CHAR_SPECIAL_1;
                     }
-                }
-                break;
-            case '(':
-            case ')':
-            case '{':
-            case '}':
-            case '*':
-            case ',':
-            case ';':
-            case '+':
-            case '%':
-            case '?':
-            case '@':
-            case ']':
-                type = CHAR_SPECIAL_1;
-                break;
-            case '!':
-            case '<':
-            case '>':
-            case '|':
-            case '=':
-            case ':':
-            case '&':
-            case '~':
-                type = CHAR_SPECIAL_2;
-                break;
-            case '.':
-                type = CHAR_DOT;
-                break;
-            case '\'':
-                type = types[i] = CHAR_STRING;
-                startLoop = i;
-                while (command[++i] != '\'') {
-                    checkRunOver(i, len, startLoop);
-                }
-                break;
-            case '[':
-                if (database.getMode().squareBracketQuotedNames) {
-                    // SQL Server alias for "
+                    break;
+                case '-':
+                    if (command[i + 1] == '-') {
+                        // single line comment
+                        changed = true;
+                        startLoop = i;
+                        while (true) {
+                            c = command[i];
+                            if (c == '\n' || c == '\r' || i >= len - 1) {
+                                break;
+                            }
+                            command[i++] = ' ';
+                            checkRunOver(i, len, startLoop);
+                        }
+                    } else {
+                        type = CHAR_SPECIAL_1;
+                    }
+                    break;
+                case '$':
+                    if (command[i + 1] == '$' && (i == 0 || command[i - 1] <= ' ')) {
+                        // dollar quoted string
+                        changed = true;
+                        command[i] = ' ';
+                        command[i + 1] = ' ';
+                        startLoop = i;
+                        i += 2;
+                        checkRunOver(i, len, startLoop);
+                        while (command[i] != '$' || command[i + 1] != '$') {
+                            types[i++] = CHAR_DOLLAR_QUOTED_STRING;
+                            checkRunOver(i, len, startLoop);
+                        }
+                        command[i] = ' ';
+                        command[i + 1] = ' ';
+                        i++;
+                    } else {
+                        if (lastType == CHAR_NAME || lastType == CHAR_VALUE) {
+                            // $ inside an identifier is supported
+                            type = CHAR_NAME;
+                        } else {
+                            // but not at the start, to support PostgreSQL $1
+                            type = CHAR_SPECIAL_1;
+                        }
+                    }
+                    break;
+                case '(':
+                case ')':
+                case '{':
+                case '}':
+                case '*':
+                case ',':
+                case ';':
+                case '+':
+                case '%':
+                case '?':
+                case '@':
+                case ']':
+                    type = CHAR_SPECIAL_1;
+                    break;
+                case '!':
+                case '<':
+                case '>':
+                case '|':
+                case '=':
+                case ':':
+                case '&':
+                case '~':
+                    type = CHAR_SPECIAL_2;
+                    break;
+                case '.':
+                    type = CHAR_DOT;
+                    break;
+                case '\'':
+                    type = types[i] = CHAR_STRING;
+                    startLoop = i;
+                    while (command[++i] != '\'') {
+                        checkRunOver(i, len, startLoop);
+                    }
+                    break;
+                case '[':
+                    if (database.getMode().squareBracketQuotedNames) {
+                        // SQL Server alias for "
+                        command[i] = '"';
+                        changed = true;
+                        type = types[i] = CHAR_QUOTED;
+                        startLoop = i;
+                        while (command[++i] != ']') {
+                            checkRunOver(i, len, startLoop);
+                        }
+                        command[i] = '"';
+                    } else {
+                        type = CHAR_SPECIAL_1;
+                    }
+                    break;
+                case '`':
+                    // MySQL alias for ", but not case sensitive
                     command[i] = '"';
                     changed = true;
                     type = types[i] = CHAR_QUOTED;
                     startLoop = i;
-                    while (command[++i] != ']') {
+                    while (command[++i] != '`') {
                         checkRunOver(i, len, startLoop);
+                        c = command[i];
+                        command[i] = Character.toUpperCase(c);
                     }
                     command[i] = '"';
-                } else {
-                    type = CHAR_SPECIAL_1;
-                }
-                break;
-            case '`':
-                // MySQL alias for ", but not case sensitive
-                command[i] = '"';
-                changed = true;
-                type = types[i] = CHAR_QUOTED;
-                startLoop = i;
-                while (command[++i] != '`') {
-                    checkRunOver(i, len, startLoop);
-                    c = command[i];
-                    command[i] = Character.toUpperCase(c);
-                }
-                command[i] = '"';
-                break;
-            case '\"':
-                type = types[i] = CHAR_QUOTED;
-                startLoop = i;
-                while (command[++i] != '\"') {
-                    checkRunOver(i, len, startLoop);
-                }
-                break;
-            case '_':
-                type = CHAR_NAME;
-                break;
-            default:
-                if (c >= 'a' && c <= 'z') {
-                    if (identifiersToUpper) {
-                        command[i] = (char) (c - ('a' - 'A'));
-                        changed = true;
+                    break;
+                case '\"':
+                    type = types[i] = CHAR_QUOTED;
+                    startLoop = i;
+                    while (command[++i] != '\"') {
+                        checkRunOver(i, len, startLoop);
                     }
+                    break;
+                case '_':
                     type = CHAR_NAME;
-                } else if (c >= 'A' && c <= 'Z') {
-                    type = CHAR_NAME;
-                } else if (c >= '0' && c <= '9') {
-                    type = CHAR_VALUE;
-                } else {
-                    if (c <= ' ' || Character.isSpaceChar(c)) {
-                        // whitespace
-                    } else if (Character.isJavaIdentifierPart(c)) {
-                        type = CHAR_NAME;
+                    break;
+                default:
+                    if (c >= 'a' && c <= 'z') {
                         if (identifiersToUpper) {
-                            char u = Character.toUpperCase(c);
-                            if (u != c) {
-                                command[i] = u;
-                                changed = true;
-                            }
+                            command[i] = (char) (c - ('a' - 'A'));
+                            changed = true;
                         }
+                        type = CHAR_NAME;
+                    } else if (c >= 'A' && c <= 'Z') {
+                        type = CHAR_NAME;
+                    } else if (c >= '0' && c <= '9') {
+                        type = CHAR_VALUE;
                     } else {
-                        type = CHAR_SPECIAL_1;
+                        if (c <= ' ' || Character.isSpaceChar(c)) {
+                            // whitespace
+                        } else if (Character.isJavaIdentifierPart(c)) {
+                            type = CHAR_NAME;
+                            if (identifiersToUpper) {
+                                char u = Character.toUpperCase(c);
+                                if (u != c) {
+                                    command[i] = u;
+                                    changed = true;
+                                }
+                            }
+                        } else {
+                            type = CHAR_SPECIAL_1;
+                        }
                     }
-                }
             }
             types[i] = type;
             lastType = type;
@@ -3587,78 +3483,78 @@ public class Parser {
         char c0 = s.charAt(0);
         if (s.length() == 1) {
             switch (c0) {
-            case '?':
-            case '$':
-                return PARAMETER;
-            case '@':
-                return AT;
-            case '+':
-                return PLUS;
-            case '-':
-                return MINUS;
-            case '{':
-            case '}':
-            case '*':
-            case '/':
-            case '%':
-            case ';':
-            case ',':
-            case ':':
-            case '[':
-            case ']':
-            case '~':
-                return KEYWORD;
-            case '(':
-                return OPEN;
-            case ')':
-                return CLOSE;
-            case '<':
-                return SMALLER;
-            case '>':
-                return BIGGER;
-            case '=':
-                return EQUAL;
-            default:
-                break;
+                case '?':
+                case '$':
+                    return PARAMETER;
+                case '@':
+                    return AT;
+                case '+':
+                    return PLUS;
+                case '-':
+                    return MINUS;
+                case '{':
+                case '}':
+                case '*':
+                case '/':
+                case '%':
+                case ';':
+                case ',':
+                case ':':
+                case '[':
+                case ']':
+                case '~':
+                    return KEYWORD;
+                case '(':
+                    return OPEN;
+                case ')':
+                    return CLOSE;
+                case '<':
+                    return SMALLER;
+                case '>':
+                    return BIGGER;
+                case '=':
+                    return EQUAL;
+                default:
+                    break;
             }
         } else if (s.length() == 2) {
             switch (c0) {
-            case ':':
-                if ("::".equals(s)) {
-                    return KEYWORD;
-                } else if (":=".equals(s)) {
-                    return KEYWORD;
-                }
-                break;
-            case '>':
-                if (">=".equals(s)) {
-                    return BIGGER_EQUAL;
-                }
-                break;
-            case '<':
-                if ("<=".equals(s)) {
-                    return SMALLER_EQUAL;
-                } else if ("<>".equals(s)) {
-                    return NOT_EQUAL;
-                }
-                break;
-            case '!':
-                if ("!=".equals(s)) {
-                    return NOT_EQUAL;
-                } else if ("!~".equals(s)) {
-                    return KEYWORD;
-                }
-                break;
-            case '|':
-                if ("||".equals(s)) {
-                    return STRING_CONCAT;
-                }
-                break;
-            case '&':
-                if ("&&".equals(s)) {
-                    return SPATIAL_INTERSECTS;
-                }
-                break;
+                case ':':
+                    if ("::".equals(s)) {
+                        return KEYWORD;
+                    } else if (":=".equals(s)) {
+                        return KEYWORD;
+                    }
+                    break;
+                case '>':
+                    if (">=".equals(s)) {
+                        return BIGGER_EQUAL;
+                    }
+                    break;
+                case '<':
+                    if ("<=".equals(s)) {
+                        return SMALLER_EQUAL;
+                    } else if ("<>".equals(s)) {
+                        return NOT_EQUAL;
+                    }
+                    break;
+                case '!':
+                    if ("!=".equals(s)) {
+                        return NOT_EQUAL;
+                    } else if ("!~".equals(s)) {
+                        return KEYWORD;
+                    }
+                    break;
+                case '|':
+                    if ("||".equals(s)) {
+                        return STRING_CONCAT;
+                    }
+                    break;
+                case '&':
+                    if ("&&".equals(s)) {
+                        return SPATIAL_INTERSECTS;
+                    }
+                    break;
             }
         }
         throw getSyntaxError();
@@ -3687,7 +3583,7 @@ public class Parser {
     /**
      * Checks if this string is a SQL keyword.
      *
-     * @param s the token to check
+     * @param s                  the token to check
      * @param supportOffsetFetch if OFFSET and FETCH are keywords
      * @return true if it is a keyword
      */
@@ -3700,102 +3596,102 @@ public class Parser {
 
     private static int getSaveTokenType(String s, boolean supportOffsetFetch) {
         switch (s.charAt(0)) {
-        case 'C':
-            if (s.equals("CURRENT_TIMESTAMP")) {
-                return CURRENT_TIMESTAMP;
-            } else if (s.equals("CURRENT_TIME")) {
-                return CURRENT_TIME;
-            } else if (s.equals("CURRENT_DATE")) {
-                return CURRENT_DATE;
-            }
-            return getKeywordOrIdentifier(s, "CROSS", KEYWORD);
-        case 'D':
-            return getKeywordOrIdentifier(s, "DISTINCT", KEYWORD);
-        case 'E':
-            if ("EXCEPT".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "EXISTS", KEYWORD);
-        case 'F':
-            if ("FROM".equals(s)) {
-                return KEYWORD;
-            } else if ("FOR".equals(s)) {
-                return KEYWORD;
-            } else if ("FULL".equals(s)) {
-                return KEYWORD;
-            } else if (supportOffsetFetch && "FETCH".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "FALSE", FALSE);
-        case 'G':
-            return getKeywordOrIdentifier(s, "GROUP", KEYWORD);
-        case 'H':
-            return getKeywordOrIdentifier(s, "HAVING", KEYWORD);
-        case 'I':
-            if ("INNER".equals(s)) {
-                return KEYWORD;
-            } else if ("INTERSECT".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "IS", KEYWORD);
-        case 'J':
-            return getKeywordOrIdentifier(s, "JOIN", KEYWORD);
-        case 'L':
-            if ("LIMIT".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "LIKE", KEYWORD);
-        case 'M':
-            return getKeywordOrIdentifier(s, "MINUS", KEYWORD);
-        case 'N':
-            if ("NOT".equals(s)) {
-                return KEYWORD;
-            } else if ("NATURAL".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "NULL", NULL);
-        case 'O':
-            if ("ON".equals(s)) {
-                return KEYWORD;
-            } else if (supportOffsetFetch && "OFFSET".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "ORDER", KEYWORD);
-        case 'P':
-            return getKeywordOrIdentifier(s, "PRIMARY", KEYWORD);
-        case 'R':
-            return getKeywordOrIdentifier(s, "ROWNUM", ROWNUM);
-        case 'S':
-            if (s.equals("SYSTIMESTAMP")) {
-                return CURRENT_TIMESTAMP;
-            } else if (s.equals("SYSTIME")) {
-                return CURRENT_TIME;
-            } else if (s.equals("SYSDATE")) {
-                return CURRENT_TIMESTAMP;
-            }
-            return getKeywordOrIdentifier(s, "SELECT", KEYWORD);
-        case 'T':
-            if ("TODAY".equals(s)) {
-                return CURRENT_DATE;
-            }
-            return getKeywordOrIdentifier(s, "TRUE", TRUE);
-        case 'U':
-            if ("UNIQUE".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "UNION", KEYWORD);
-        case 'W':
-            if ("WITH".equals(s)) {
-                return KEYWORD;
-            }
-            return getKeywordOrIdentifier(s, "WHERE", KEYWORD);
-        default:
-            return IDENTIFIER;
+            case 'C':
+                if (s.equals("CURRENT_TIMESTAMP")) {
+                    return CURRENT_TIMESTAMP;
+                } else if (s.equals("CURRENT_TIME")) {
+                    return CURRENT_TIME;
+                } else if (s.equals("CURRENT_DATE")) {
+                    return CURRENT_DATE;
+                }
+                return getKeywordOrIdentifier(s, "CROSS", KEYWORD);
+            case 'D':
+                return getKeywordOrIdentifier(s, "DISTINCT", KEYWORD);
+            case 'E':
+                if ("EXCEPT".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "EXISTS", KEYWORD);
+            case 'F':
+                if ("FROM".equals(s)) {
+                    return KEYWORD;
+                } else if ("FOR".equals(s)) {
+                    return KEYWORD;
+                } else if ("FULL".equals(s)) {
+                    return KEYWORD;
+                } else if (supportOffsetFetch && "FETCH".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "FALSE", FALSE);
+            case 'G':
+                return getKeywordOrIdentifier(s, "GROUP", KEYWORD);
+            case 'H':
+                return getKeywordOrIdentifier(s, "HAVING", KEYWORD);
+            case 'I':
+                if ("INNER".equals(s)) {
+                    return KEYWORD;
+                } else if ("INTERSECT".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "IS", KEYWORD);
+            case 'J':
+                return getKeywordOrIdentifier(s, "JOIN", KEYWORD);
+            case 'L':
+                if ("LIMIT".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "LIKE", KEYWORD);
+            case 'M':
+                return getKeywordOrIdentifier(s, "MINUS", KEYWORD);
+            case 'N':
+                if ("NOT".equals(s)) {
+                    return KEYWORD;
+                } else if ("NATURAL".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "NULL", NULL);
+            case 'O':
+                if ("ON".equals(s)) {
+                    return KEYWORD;
+                } else if (supportOffsetFetch && "OFFSET".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "ORDER", KEYWORD);
+            case 'P':
+                return getKeywordOrIdentifier(s, "PRIMARY", KEYWORD);
+            case 'R':
+                return getKeywordOrIdentifier(s, "ROWNUM", ROWNUM);
+            case 'S':
+                if (s.equals("SYSTIMESTAMP")) {
+                    return CURRENT_TIMESTAMP;
+                } else if (s.equals("SYSTIME")) {
+                    return CURRENT_TIME;
+                } else if (s.equals("SYSDATE")) {
+                    return CURRENT_TIMESTAMP;
+                }
+                return getKeywordOrIdentifier(s, "SELECT", KEYWORD);
+            case 'T':
+                if ("TODAY".equals(s)) {
+                    return CURRENT_DATE;
+                }
+                return getKeywordOrIdentifier(s, "TRUE", TRUE);
+            case 'U':
+                if ("UNIQUE".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "UNION", KEYWORD);
+            case 'W':
+                if ("WITH".equals(s)) {
+                    return KEYWORD;
+                }
+                return getKeywordOrIdentifier(s, "WHERE", KEYWORD);
+            default:
+                return IDENTIFIER;
         }
     }
 
     private static int getKeywordOrIdentifier(String s1, String s2,
-            int keywordType) {
+                                              int keywordType) {
         if (s1.equals(s2)) {
             return keywordType;
         }
@@ -3803,7 +3699,7 @@ public class Parser {
     }
 
     private Column parseColumnForTable(String columnName,
-            boolean defaultNullable) {
+                                       boolean defaultNullable) {
         Column column;
         boolean isIdentity = false;
         if (readIf("IDENTITY") || readIf("BIGSERIAL")) {
@@ -5446,7 +5342,7 @@ public class Parser {
     }
 
     private AlterTableAlterColumn parseAlterTableAlterColumnType(Table table,
-            String columnName, Column column) {
+                                                                 String columnName, Column column) {
         Column newColumn = parseColumnForTable(columnName, column.isNullable());
         AlterTableAlterColumn command = new AlterTableAlterColumn(session,
                 table.getSchema());
@@ -5518,7 +5414,7 @@ public class Parser {
     }
 
     private DefineCommand parseAlterTableAddConstraintIf(String tableName,
-            Schema schema) {
+                                                         Schema schema) {
         String constraintName = null, comment = null;
         boolean ifNotExists = false;
         boolean allowIndexDefinition = database.getMode().indexDefinitionInCreateTable;
@@ -5626,7 +5522,7 @@ public class Parser {
     }
 
     private void parseReferences(AlterTableAddConstraint command,
-            Schema schema, String tableName) {
+                                 Schema schema, String tableName) {
         if (readIf("(")) {
             command.setRefTableName(schema, tableName);
             command.setRefIndexColumns(parseIndexColumnList());
@@ -5657,7 +5553,7 @@ public class Parser {
     }
 
     private CreateLinkedTable parseCreateLinkedTable(boolean temp,
-            boolean globalTemp, boolean force) {
+                                                     boolean globalTemp, boolean force) {
         read("TABLE");
         boolean ifNotExists = readIfNoExists();
         String tableName = readIdentifierWithSchema();
@@ -5694,7 +5590,7 @@ public class Parser {
     }
 
     private CreateTable parseCreateTable(boolean temp, boolean globalTemp,
-            boolean persistIndexes) {
+                                         boolean persistIndexes) {
         boolean ifNotExists = readIfNoExists();
         String tableName = readIdentifierWithSchema();
         if (temp && globalTemp && equalsToken("SESSION", schemaName)) {
@@ -5723,7 +5619,7 @@ public class Parser {
                         Column column = parseColumnForTable(columnName, true);
                         if (column.isAutoIncrement() && column.isPrimaryKey()) {
                             column.setPrimaryKey(false);
-                            IndexColumn[] cols = { new IndexColumn() };
+                            IndexColumn[] cols = {new IndexColumn()};
                             cols[0].columnName = column.getName();
                             AlterTableAddConstraint pk = new AlterTableAddConstraint(
                                     session, schema, false);
@@ -5740,7 +5636,7 @@ public class Parser {
                         if (readIf("PRIMARY")) {
                             read("KEY");
                             boolean hash = readIf("HASH");
-                            IndexColumn[] cols = { new IndexColumn() };
+                            IndexColumn[] cols = {new IndexColumn()};
                             cols[0].columnName = column.getName();
                             AlterTableAddConstraint pk = new AlterTableAddConstraint(
                                     session, schema, false);
@@ -5757,7 +5653,7 @@ public class Parser {
                                     session, schema, false);
                             unique.setConstraintName(constraintName);
                             unique.setType(CommandInterface.ALTER_TABLE_ADD_CONSTRAINT_UNIQUE);
-                            IndexColumn[] cols = { new IndexColumn() };
+                            IndexColumn[] cols = {new IndexColumn()};
                             cols[0].columnName = columnName;
                             unique.setIndexColumns(cols);
                             unique.setTableName(tableName);
@@ -5778,7 +5674,7 @@ public class Parser {
                                     session, schema, false);
                             ref.setConstraintName(constraintName);
                             ref.setType(CommandInterface.ALTER_TABLE_ADD_CONSTRAINT_REFERENTIAL);
-                            IndexColumn[] cols = { new IndexColumn() };
+                            IndexColumn[] cols = {new IndexColumn()};
                             cols[0].columnName = columnName;
                             ref.setIndexColumns(cols);
                             ref.setTableName(tableName);
@@ -5870,22 +5766,22 @@ public class Parser {
 
     private static int getCompareType(int tokenType) {
         switch (tokenType) {
-        case EQUAL:
-            return Comparison.EQUAL;
-        case BIGGER_EQUAL:
-            return Comparison.BIGGER_EQUAL;
-        case BIGGER:
-            return Comparison.BIGGER;
-        case SMALLER:
-            return Comparison.SMALLER;
-        case SMALLER_EQUAL:
-            return Comparison.SMALLER_EQUAL;
-        case NOT_EQUAL:
-            return Comparison.NOT_EQUAL;
-        case SPATIAL_INTERSECTS:
-            return Comparison.SPATIAL_INTERSECTS;
-        default:
-            return -1;
+            case EQUAL:
+                return Comparison.EQUAL;
+            case BIGGER_EQUAL:
+                return Comparison.BIGGER_EQUAL;
+            case BIGGER:
+                return Comparison.BIGGER;
+            case SMALLER:
+                return Comparison.SMALLER;
+            case SMALLER_EQUAL:
+                return Comparison.SMALLER_EQUAL;
+            case NOT_EQUAL:
+                return Comparison.NOT_EQUAL;
+            case SPATIAL_INTERSECTS:
+                return Comparison.SPATIAL_INTERSECTS;
+            default:
+                return -1;
         }
     }
 

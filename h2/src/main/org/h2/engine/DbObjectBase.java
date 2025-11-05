@@ -6,9 +6,10 @@
  */
 package org.h2.engine;
 
-import java.util.ArrayList;
 import org.h2.command.Parser;
 import org.h2.message.Trace;
+
+import java.util.ArrayList;
 
 /**
  * The base class for all database objects.
@@ -38,13 +39,13 @@ public abstract class DbObjectBase implements DbObject {
     /**
      * Initialize some attributes of this object.
      *
-     * @param db the database
-     * @param objectId the object id
-     * @param name the name
+     * @param db          the database
+     * @param objectId    the object id
+     * @param name        the name
      * @param traceModule the trace module name
      */
     protected void initDbObjectBase(Database db, int objectId, String name,
-            String traceModule) {
+                                    String traceModule) {
         this.database = db;
         this.trace = db.getTrace(traceModule);
         this.id = objectId;

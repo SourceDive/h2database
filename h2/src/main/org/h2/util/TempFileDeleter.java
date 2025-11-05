@@ -6,14 +6,14 @@
  */
 package org.h2.util;
 
+import org.h2.engine.SysProperties;
+import org.h2.message.DbException;
+import org.h2.store.fs.FileUtils;
+
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.HashMap;
-
-import org.h2.engine.SysProperties;
-import org.h2.message.DbException;
-import org.h2.store.fs.FileUtils;
 
 /**
  * This class deletes temporary files when they are not used any longer.
@@ -36,7 +36,7 @@ public class TempFileDeleter {
      * the file object is garbage collected.
      *
      * @param fileName the file name
-     * @param file the object to monitor
+     * @param file     the object to monitor
      * @return the reference that can be used to stop deleting the file
      */
     public synchronized Reference<?> addFile(String fileName, Object file) {
@@ -50,7 +50,7 @@ public class TempFileDeleter {
     /**
      * Delete the given file now. This will remove the reference from the list.
      *
-     * @param ref the reference as returned by addFile
+     * @param ref      the reference as returned by addFile
      * @param fileName the file name
      */
     public synchronized void deleteFile(Reference<?> ref, String fileName) {
@@ -102,7 +102,7 @@ public class TempFileDeleter {
      * This method is called if a file should no longer be deleted if the object
      * is garbage collected.
      *
-     * @param ref the reference as returned by addFile
+     * @param ref      the reference as returned by addFile
      * @param fileName the file name
      */
     public void stopAutoDelete(Reference<?> ref, String fileName) {

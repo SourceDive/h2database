@@ -6,23 +6,6 @@
  */
 package org.h2.test.db;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.SysProperties;
 import org.h2.store.fs.FileUtils;
@@ -31,6 +14,11 @@ import org.h2.tools.Csv;
 import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * CSVREAD and CSVWRITE tests.
@@ -237,7 +225,7 @@ public class TestCsv extends TestBase {
 
         createClassProxy(Csv.class);
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, csv).
-            setOptions("escape=a error=b");
+                setOptions("escape=a error=b");
         assertEquals('a', csv.getEscapeCharacter());
     }
 
@@ -269,7 +257,7 @@ public class TestCsv extends TestBase {
         assertEquals("A", rs.getMetaData().getColumnName(1));
         assertEquals("A1", rs.getMetaData().getColumnName(2));
 
-        rs = new Csv().read(new StringReader("1,2"), new String[] { "", null });
+        rs = new Csv().read(new StringReader("1,2"), new String[]{"", null});
         assertEquals("C1", rs.getMetaData().getColumnName(1));
         assertEquals("C2", rs.getMetaData().getColumnName(2));
     }
@@ -287,12 +275,12 @@ public class TestCsv extends TestBase {
         stat.execute("call csvwrite('" + getBaseDir() +
                 "/test.tsv','select * from test',null,' ')");
         ResultSet rs1 = stat.executeQuery("select * from test");
-        assertResultSetOrdered(rs1, new String[][] {
-                new String[] { "1", "2", "3" }, new String[] { "4", null, "5" } });
+        assertResultSetOrdered(rs1, new String[][]{
+                new String[]{"1", "2", "3"}, new String[]{"4", null, "5"}});
         ResultSet rs2 = stat.executeQuery("select * from csvread('" +
                 getBaseDir() + "/test.tsv',null,null,' ')");
-        assertResultSetOrdered(rs2, new String[][] {
-                new String[] { "1", "2", "3" }, new String[] { "4", null, "5" } });
+        assertResultSetOrdered(rs2, new String[][]{
+                new String[]{"1", "2", "3"}, new String[]{"4", null, "5"}});
         conn.close();
         FileUtils.delete(f.getAbsolutePath());
         FileUtils.delete(getBaseDir() + "/test.tsv");
@@ -361,7 +349,7 @@ public class TestCsv extends TestBase {
             String a = randomData(random), b = randomData(random);
             prep.setString(1, a);
             prep.setString(2, b);
-            list.add(new String[] { a, b });
+            list.add(new String[]{a, b});
             prep.execute();
         }
         stat.execute("CALL CSVWRITE('" + getBaseDir() +

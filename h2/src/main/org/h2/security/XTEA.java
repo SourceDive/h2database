@@ -26,24 +26,48 @@ public class XTEA implements BlockCipher {
     @Override
     public void setKey(byte[] b) {
         int[] key = new int[4];
-        for (int i = 0; i < 16;) {
+        for (int i = 0; i < 16; ) {
             key[i / 4] = (b[i++] << 24) + ((b[i++] & 255) << 16)
                     + ((b[i++] & 255) << 8) + (b[i++] & 255);
         }
         int[] r = new int[32];
-        for (int i = 0, sum = 0; i < 32;) {
+        for (int i = 0, sum = 0; i < 32; ) {
             r[i++] = sum + key[sum & 3];
             sum += DELTA;
-            r[i++] = sum + key[ (sum >>> 11) & 3];
+            r[i++] = sum + key[(sum >>> 11) & 3];
         }
-        k0 = r[0]; k1 = r[1]; k2 = r[2]; k3 = r[3];
-        k4 = r[4]; k5 = r[5]; k6 = r[6]; k7 = r[7];
-        k8 = r[8]; k9 = r[9]; k10 = r[10]; k11 = r[11];
-        k12 = r[12]; k13 = r[13]; k14 = r[14]; k15 = r[15];
-        k16 = r[16]; k17 = r[17]; k18 = r[18]; k19 = r[19];
-        k20 = r[20]; k21 = r[21]; k22 = r[22]; k23 = r[23];
-        k24 = r[24]; k25 = r[25]; k26 = r[26]; k27 = r[27];
-        k28 = r[28]; k29 = r[29]; k30 = r[30]; k31 = r[31];
+        k0 = r[0];
+        k1 = r[1];
+        k2 = r[2];
+        k3 = r[3];
+        k4 = r[4];
+        k5 = r[5];
+        k6 = r[6];
+        k7 = r[7];
+        k8 = r[8];
+        k9 = r[9];
+        k10 = r[10];
+        k11 = r[11];
+        k12 = r[12];
+        k13 = r[13];
+        k14 = r[14];
+        k15 = r[15];
+        k16 = r[16];
+        k17 = r[17];
+        k18 = r[18];
+        k19 = r[19];
+        k20 = r[20];
+        k21 = r[21];
+        k22 = r[22];
+        k23 = r[23];
+        k24 = r[24];
+        k25 = r[25];
+        k26 = r[26];
+        k27 = r[27];
+        k28 = r[28];
+        k29 = r[29];
+        k30 = r[30];
+        k31 = r[31];
     }
 
     @Override

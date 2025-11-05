@@ -6,11 +6,7 @@
  */
 package org.h2.samples;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +19,8 @@ public class CachedPreparedStatements {
     private Connection conn;
     private Statement stat;
     private final Map<String, PreparedStatement> prepared =
-        Collections.synchronizedMap(
-                new HashMap<String, PreparedStatement>());
+            Collections.synchronizedMap(
+                    new HashMap<String, PreparedStatement>());
 
     /**
      * This method is called when executing this sample application from the

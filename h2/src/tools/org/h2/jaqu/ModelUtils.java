@@ -6,6 +6,9 @@
  */
 package org.h2.jaqu;
 
+import org.h2.jaqu.TableDefinition.FieldDefinition;
+import org.h2.util.StringUtils;
+
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -13,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.h2.jaqu.TableDefinition.FieldDefinition;
-import org.h2.util.StringUtils;
 
 /**
  * Utility methods for models related to type mapping, default value validation,
@@ -116,7 +117,7 @@ public class ModelUtils {
     /**
      * Returns a SQL type mapping for a Java class.
      *
-     * @param fieldDef the field to map
+     * @param fieldDef          the field to map
      * @param strictTypeMapping throws a RuntimeException if type is unsupported
      * @return SQL type
      */
@@ -135,13 +136,13 @@ public class ModelUtils {
     /**
      * Returns the Java class for a given SQL type.
      *
-     * @param sqlType the SQL type
+     * @param sqlType       the SQL type
      * @param dateTimeClass the preferred date class (java.util.Date or
-     *            java.sql.Timestamp)
+     *                      java.sql.Timestamp)
      * @return Class of type
      */
     static Class<?> getClassForSqlType(String sqlType,
-            Class<? extends java.util.Date> dateTimeClass) {
+                                       Class<? extends java.util.Date> dateTimeClass) {
         sqlType = sqlType.toUpperCase();
         // TODO dropping "UNSIGNED" or parts like that could be trouble
         sqlType = sqlType.split(" ")[0].trim();
@@ -214,18 +215,18 @@ public class ModelUtils {
         Pattern literalDefault = Pattern.compile("'.*'");
         Pattern functionDefault = Pattern.compile("[^'].*[^']");
         return literalDefault.matcher(defaultValue).matches()
-            || functionDefault.matcher(defaultValue).matches();
+                || functionDefault.matcher(defaultValue).matches();
     }
 
     /**
      * Checks to see if the default value matches the class.
      *
-     * @param modelClass the class
+     * @param modelClass   the class
      * @param defaultValue the value
      * @return true if it does
      */
     static boolean isValidDefaultValue(Class<?> modelClass,
-            String defaultValue) {
+                                       String defaultValue) {
 
         if (defaultValue == null) {
             // NULL

@@ -38,7 +38,7 @@ public interface SearchRow {
      * Set the value for given column
      *
      * @param index the column number (starting with 0)
-     * @param v the new value
+     * @param v     the new value
      */
     void setValue(int index, Value v);
 

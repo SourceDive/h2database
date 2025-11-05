@@ -6,10 +6,11 @@
  */
 package org.h2.test.unit;
 
-import java.io.StringReader;
-import java.util.Random;
 import org.h2.test.TestBase;
 import org.h2.util.ScriptReader;
+
+import java.io.StringReader;
+import java.util.Random;
 
 /**
  * Tests the script reader tool that breaks up SQL scripts in statements.
@@ -65,97 +66,97 @@ public class TestScriptReader extends TestBase {
         int len = random.nextInt(5);
         for (int i = 0; i < len; i++) {
             switch (random.nextInt(10)) {
-            case 0: {
-                int l = random.nextInt(4);
-                String[] ch = { "\n", "\r", " ", "*", "a", "0", "$ " };
-                for (int j = 0; j < l; j++) {
-                    buff.append(ch[random.nextInt(ch.length)]);
-                }
-                break;
-            }
-            case 1: {
-                buff.append('\'');
-                int l = random.nextInt(4);
-                String[] ch = { ";", "\n", "\r", "--", "//", "/", "-", "*",
-                        "/*", "*/", "\"", "$ " };
-                for (int j = 0; j < l; j++) {
-                    buff.append(ch[random.nextInt(ch.length)]);
-                }
-                buff.append('\'');
-                break;
-            }
-            case 2: {
-                buff.append('"');
-                int l = random.nextInt(4);
-                String[] ch = { ";", "\n", "\r", "--", "//", "/", "-", "*",
-                        "/*", "*/", "\'", "$" };
-                for (int j = 0; j < l; j++) {
-                    buff.append(ch[random.nextInt(ch.length)]);
-                }
-                buff.append('"');
-                break;
-            }
-            case 3: {
-                buff.append('-');
-                if (random.nextBoolean()) {
-                    String[] ch = { "\n", "\r", "*", "a", " ", "$ " };
-                    int l = 1 + random.nextInt(4);
+                case 0: {
+                    int l = random.nextInt(4);
+                    String[] ch = {"\n", "\r", " ", "*", "a", "0", "$ "};
                     for (int j = 0; j < l; j++) {
                         buff.append(ch[random.nextInt(ch.length)]);
                     }
-                } else {
+                    break;
+                }
+                case 1: {
+                    buff.append('\'');
+                    int l = random.nextInt(4);
+                    String[] ch = {";", "\n", "\r", "--", "//", "/", "-", "*",
+                            "/*", "*/", "\"", "$ "};
+                    for (int j = 0; j < l; j++) {
+                        buff.append(ch[random.nextInt(ch.length)]);
+                    }
+                    buff.append('\'');
+                    break;
+                }
+                case 2: {
+                    buff.append('"');
+                    int l = random.nextInt(4);
+                    String[] ch = {";", "\n", "\r", "--", "//", "/", "-", "*",
+                            "/*", "*/", "\'", "$"};
+                    for (int j = 0; j < l; j++) {
+                        buff.append(ch[random.nextInt(ch.length)]);
+                    }
+                    buff.append('"');
+                    break;
+                }
+                case 3: {
                     buff.append('-');
-                    String[] ch = { ";", "-", "//", "/*", "*/", "a", "$" };
-                    int l = random.nextInt(4);
-                    for (int j = 0; j < l; j++) {
-                        buff.append(ch[random.nextInt(ch.length)]);
+                    if (random.nextBoolean()) {
+                        String[] ch = {"\n", "\r", "*", "a", " ", "$ "};
+                        int l = 1 + random.nextInt(4);
+                        for (int j = 0; j < l; j++) {
+                            buff.append(ch[random.nextInt(ch.length)]);
+                        }
+                    } else {
+                        buff.append('-');
+                        String[] ch = {";", "-", "//", "/*", "*/", "a", "$"};
+                        int l = random.nextInt(4);
+                        for (int j = 0; j < l; j++) {
+                            buff.append(ch[random.nextInt(ch.length)]);
+                        }
+                        buff.append('\n');
                     }
-                    buff.append('\n');
+                    break;
                 }
-                break;
-            }
-            case 4: {
-                buff.append('/');
-                if (random.nextBoolean()) {
-                    String[] ch = { "\n", "\r", "a", " ", "- ", "$ " };
-                    int l = 1 + random.nextInt(4);
-                    for (int j = 0; j < l; j++) {
-                        buff.append(ch[random.nextInt(ch.length)]);
+                case 4: {
+                    buff.append('/');
+                    if (random.nextBoolean()) {
+                        String[] ch = {"\n", "\r", "a", " ", "- ", "$ "};
+                        int l = 1 + random.nextInt(4);
+                        for (int j = 0; j < l; j++) {
+                            buff.append(ch[random.nextInt(ch.length)]);
+                        }
+                    } else {
+                        buff.append('*');
+                        String[] ch = {";", "-", "//", "/* ", "--", "\n", "\r", "a", "$"};
+                        int l = random.nextInt(4);
+                        for (int j = 0; j < l; j++) {
+                            buff.append(ch[random.nextInt(ch.length)]);
+                        }
+                        buff.append("*/");
                     }
-                } else {
-                    buff.append('*');
-                    String[] ch = { ";", "-", "//", "/* ", "--", "\n", "\r", "a", "$" };
-                    int l = random.nextInt(4);
-                    for (int j = 0; j < l; j++) {
-                        buff.append(ch[random.nextInt(ch.length)]);
-                    }
-                    buff.append("*/");
+                    break;
                 }
-                break;
-            }
-            case 5: {
-                if (buff.length() > 0) {
-                    buff.append(" ");
-                }
-                buff.append("$");
-                if (random.nextBoolean()) {
-                    String[] ch = { "\n", "\r", "a", " ", "- ", "/ " };
-                    int l = 1 + random.nextInt(4);
-                    for (int j = 0; j < l; j++) {
-                        buff.append(ch[random.nextInt(ch.length)]);
+                case 5: {
+                    if (buff.length() > 0) {
+                        buff.append(" ");
                     }
-                } else {
                     buff.append("$");
-                    String[] ch = { ";", "-", "//", "/* ", "--", "\n", "\r", "a", "$ " };
-                    int l = random.nextInt(4);
-                    for (int j = 0; j < l; j++) {
-                        buff.append(ch[random.nextInt(ch.length)]);
+                    if (random.nextBoolean()) {
+                        String[] ch = {"\n", "\r", "a", " ", "- ", "/ "};
+                        int l = 1 + random.nextInt(4);
+                        for (int j = 0; j < l; j++) {
+                            buff.append(ch[random.nextInt(ch.length)]);
+                        }
+                    } else {
+                        buff.append("$");
+                        String[] ch = {";", "-", "//", "/* ", "--", "\n", "\r", "a", "$ "};
+                        int l = random.nextInt(4);
+                        for (int j = 0; j < l; j++) {
+                            buff.append(ch[random.nextInt(ch.length)]);
+                        }
+                        buff.append("$$");
                     }
-                    buff.append("$$");
+                    break;
                 }
-                break;
-            }
-            default:
+                default:
             }
         }
         return buff.toString();

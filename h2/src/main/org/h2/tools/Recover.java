@@ -6,29 +6,6 @@
  */
 package org.h2.tools;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.SequenceInputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.zip.CRC32;
 import org.h2.api.JavaObjectSerializer;
 import org.h2.compress.CompressLZF;
 import org.h2.engine.Constants;
@@ -46,38 +23,23 @@ import org.h2.mvstore.db.ValueDataType;
 import org.h2.result.Row;
 import org.h2.result.SimpleRow;
 import org.h2.security.SHA256;
-import org.h2.store.Data;
-import org.h2.store.DataHandler;
-import org.h2.store.DataReader;
-import org.h2.store.FileLister;
-import org.h2.store.FileStore;
-import org.h2.store.FileStoreInputStream;
-import org.h2.store.LobStorageBackend;
-import org.h2.store.LobStorageFrontend;
-import org.h2.store.Page;
-import org.h2.store.PageFreeList;
-import org.h2.store.PageLog;
-import org.h2.store.PageStore;
+import org.h2.store.*;
 import org.h2.store.fs.FileUtils;
-import org.h2.util.BitField;
-import org.h2.util.IOUtils;
-import org.h2.util.IntArray;
-import org.h2.util.MathUtils;
-import org.h2.util.New;
-import org.h2.util.SmallLRUCache;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
-import org.h2.util.TempFileDeleter;
-import org.h2.util.Tool;
-import org.h2.util.Utils;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueLob;
-import org.h2.value.ValueLobDb;
-import org.h2.value.ValueLong;
+import org.h2.util.*;
+import org.h2.value.*;
+
+import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.zip.CRC32;
 
 /**
  * Helps recovering a corrupted database.
+ *
  * @h2.resource
  */
 public class Recover extends Tool implements DataHandler {
@@ -148,9 +110,9 @@ public class Recover extends Tool implements DataHandler {
      * <td>Print the transaction log</td></tr>
      * </table>
      * Encrypted databases need to be decrypted first.
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new Recover().runTool(args);
@@ -212,7 +174,7 @@ public class Recover extends Tool implements DataHandler {
      * INTERNAL
      */
     public static Value.ValueBlob readBlobDb(Connection conn, long lobId,
-            long precision) {
+                                             long precision) {
         DataHandler h = ((JdbcConnection) conn).getSession().getDataHandler();
         return ValueLobDb.create(Value.BLOB, h, LobStorageFrontend.TABLE_TEMP,
                 lobId, null, precision);
@@ -222,7 +184,7 @@ public class Recover extends Tool implements DataHandler {
      * INTERNAL
      */
     public static Value.ValueClob readClobDb(Connection conn, long lobId,
-            long precision) {
+                                             long precision) {
         DataHandler h = ((JdbcConnection) conn).getSession().getDataHandler();
         return ValueLobDb.create(Value.CLOB, h, LobStorageFrontend.TABLE_TEMP,
                 lobId, null, precision);
@@ -232,45 +194,45 @@ public class Recover extends Tool implements DataHandler {
      * INTERNAL
      */
     public static InputStream readBlobMap(Connection conn, long lobId,
-            long precision) throws SQLException {
+                                          long precision) throws SQLException {
         final PreparedStatement prep = conn.prepareStatement(
                 "SELECT DATA FROM INFORMATION_SCHEMA.LOB_BLOCKS " +
-                "WHERE LOB_ID = ? AND SEQ = ? AND ? > 0");
+                        "WHERE LOB_ID = ? AND SEQ = ? AND ? > 0");
         prep.setLong(1, lobId);
         // precision is currently not really used,
         // it is just to improve readability of the script
         prep.setLong(3, precision);
         return new SequenceInputStream(
-            new Enumeration<InputStream>() {
+                new Enumeration<InputStream>() {
 
-                private int seq;
-                private byte[] data = fetch();
+                    private int seq;
+                    private byte[] data = fetch();
 
-                private byte[] fetch() {
-                    try {
-                        prep.setInt(2, seq++);
-                        ResultSet rs = prep.executeQuery();
-                        if (rs.next()) {
-                            return rs.getBytes(1);
+                    private byte[] fetch() {
+                        try {
+                            prep.setInt(2, seq++);
+                            ResultSet rs = prep.executeQuery();
+                            if (rs.next()) {
+                                return rs.getBytes(1);
+                            }
+                            return null;
+                        } catch (SQLException e) {
+                            throw DbException.convert(e);
                         }
-                        return null;
-                    } catch (SQLException e) {
-                        throw DbException.convert(e);
+                    }
+
+                    @Override
+                    public boolean hasMoreElements() {
+                        return data != null;
+                    }
+
+                    @Override
+                    public InputStream nextElement() {
+                        ByteArrayInputStream in = new ByteArrayInputStream(data);
+                        data = fetch();
+                        return in;
                     }
                 }
-
-                @Override
-                public boolean hasMoreElements() {
-                    return data != null;
-                }
-
-                @Override
-                public InputStream nextElement() {
-                    ByteArrayInputStream in = new ByteArrayInputStream(data);
-                    data = fetch();
-                    return in;
-                }
-            }
         );
     }
 
@@ -300,7 +262,7 @@ public class Recover extends Tool implements DataHandler {
      * Dumps the contents of a database to a SQL script file.
      *
      * @param dir the directory
-     * @param db the database name (null for all databases)
+     * @param db  the database name (null for all databases)
      */
     public static void execute(String dir, String db) throws SQLException {
         try {
@@ -495,7 +457,7 @@ public class Recover extends Tool implements DataHandler {
             }
             int logKey = 0, logFirstTrunkPage = 0, logFirstDataPage = 0;
             s = Data.create(this, pageSize);
-            for (long i = 1;; i++) {
+            for (long i = 1; ; i++) {
                 if (i == 3) {
                     break;
                 }
@@ -519,7 +481,7 @@ public class Recover extends Tool implements DataHandler {
                         ": writeCounter: " + writeCounter +
                         " log " + key + ":" + firstTrunkPage + "/" + firstDataPage +
                         " crc " + got + " (" + (expected == got ?
-                                "ok" : ("expected: " + expected)) + ")");
+                        "ok" : ("expected: " + expected)) + ")");
             }
             writer.println("-- log " + logKey + ":" + logFirstTrunkPage +
                     "/" + logFirstDataPage);
@@ -674,7 +636,7 @@ public class Recover extends Tool implements DataHandler {
             int len = 8 * 1024;
             byte[] block = new byte[len];
             try {
-                for (int seq = 0;; seq++) {
+                for (int seq = 0; ; seq++) {
                     int l = IOUtils.readFully(in, block, block.length);
                     String x = StringUtils.convertBytesToHex(block, l);
                     if (l > 0) {
@@ -693,24 +655,24 @@ public class Recover extends Tool implements DataHandler {
 
     private static String getPageType(int type) {
         switch (type) {
-        case 0:
-            return "free";
-        case Page.TYPE_DATA_LEAF:
-            return "data leaf";
-        case Page.TYPE_DATA_NODE:
-            return "data node";
-        case Page.TYPE_DATA_OVERFLOW:
-            return "data overflow";
-        case Page.TYPE_BTREE_LEAF:
-            return "btree leaf";
-        case Page.TYPE_BTREE_NODE:
-            return "btree node";
-        case Page.TYPE_FREE_LIST:
-            return "free list";
-        case Page.TYPE_STREAM_TRUNK:
-            return "stream trunk";
-        case Page.TYPE_STREAM_DATA:
-            return "stream data";
+            case 0:
+                return "free";
+            case Page.TYPE_DATA_LEAF:
+                return "data leaf";
+            case Page.TYPE_DATA_NODE:
+                return "data node";
+            case Page.TYPE_DATA_OVERFLOW:
+                return "data overflow";
+            case Page.TYPE_BTREE_LEAF:
+                return "btree leaf";
+            case Page.TYPE_BTREE_NODE:
+                return "btree node";
+            case Page.TYPE_FREE_LIST:
+                return "free list";
+            case Page.TYPE_STREAM_TRUNK:
+                return "stream trunk";
+            case Page.TYPE_STREAM_DATA:
+                return "stream data";
         }
         return "[" + type + "]";
     }
@@ -729,9 +691,9 @@ public class Recover extends Tool implements DataHandler {
         try {
             int type = s.readByte();
             switch (type) {
-            case Page.TYPE_EMPTY:
-                stat.pageTypeCount[type]++;
-                return;
+                case Page.TYPE_EMPTY:
+                    stat.pageTypeCount[type]++;
+                    return;
             }
             boolean last = (type & Page.FLAG_LAST) != 0;
             type &= ~Page.FLAG_LAST;
@@ -740,83 +702,83 @@ public class Recover extends Tool implements DataHandler {
             }
             s.readShortInt();
             switch (type) {
-            // type 1
-            case Page.TYPE_DATA_LEAF: {
-                stat.pageTypeCount[type]++;
-                int parentPageId = s.readInt();
-                setStorage(s.readVarInt());
-                int columnCount = s.readVarInt();
-                int entries = s.readShortInt();
-                writer.println("-- page " + page + ": data leaf " +
-                        (last ? "(last) " : "") + "parent: " + parentPageId +
-                        " table: " + storageId + " entries: " + entries +
-                        " columns: " + columnCount);
-                dumpPageDataLeaf(writer, s, last, page, columnCount, entries);
-                break;
-            }
-            // type 2
-            case Page.TYPE_DATA_NODE: {
-                stat.pageTypeCount[type]++;
-                int parentPageId = s.readInt();
-                setStorage(s.readVarInt());
-                int rowCount = s.readInt();
-                int entries = s.readShortInt();
-                writer.println("-- page " + page + ": data node " +
-                        (last ? "(last) " : "") + "parent: " + parentPageId +
-                        " table: " + storageId + " entries: " + entries +
-                        " rowCount: " + rowCount);
-                dumpPageDataNode(writer, s, page, entries);
-                break;
-            }
-            // type 3
-            case Page.TYPE_DATA_OVERFLOW:
-                stat.pageTypeCount[type]++;
-                writer.println("-- page " + page + ": data overflow " +
-                        (last ? "(last) " : ""));
-                break;
-            // type 4
-            case Page.TYPE_BTREE_LEAF: {
-                stat.pageTypeCount[type]++;
-                int parentPageId = s.readInt();
-                setStorage(s.readVarInt());
-                int entries = s.readShortInt();
-                writer.println("-- page " + page + ": b-tree leaf " +
-                        (last ? "(last) " : "") + "parent: " + parentPageId +
-                        " index: " + storageId + " entries: " + entries);
-                if (trace) {
-                    dumpPageBtreeLeaf(writer, s, entries, !last);
+                // type 1
+                case Page.TYPE_DATA_LEAF: {
+                    stat.pageTypeCount[type]++;
+                    int parentPageId = s.readInt();
+                    setStorage(s.readVarInt());
+                    int columnCount = s.readVarInt();
+                    int entries = s.readShortInt();
+                    writer.println("-- page " + page + ": data leaf " +
+                            (last ? "(last) " : "") + "parent: " + parentPageId +
+                            " table: " + storageId + " entries: " + entries +
+                            " columns: " + columnCount);
+                    dumpPageDataLeaf(writer, s, last, page, columnCount, entries);
+                    break;
                 }
-                break;
-            }
-            // type 5
-            case Page.TYPE_BTREE_NODE:
-                stat.pageTypeCount[type]++;
-                int parentPageId = s.readInt();
-                setStorage(s.readVarInt());
-                writer.println("-- page " + page + ": b-tree node " +
-                        (last ? "(last) " : "") +  "parent: " + parentPageId +
-                        " index: " + storageId);
-                dumpPageBtreeNode(writer, s, page, !last);
-                break;
-            // type 6
-            case Page.TYPE_FREE_LIST:
-                stat.pageTypeCount[type]++;
-                writer.println("-- page " + page + ": free list " + (last ? "(last)" : ""));
-                stat.free += dumpPageFreeList(writer, s, page, pageCount);
-                break;
-            // type 7
-            case Page.TYPE_STREAM_TRUNK:
-                stat.pageTypeCount[type]++;
-                writer.println("-- page " + page + ": log trunk");
-                break;
-            // type 8
-            case Page.TYPE_STREAM_DATA:
-                stat.pageTypeCount[type]++;
-                writer.println("-- page " + page + ": log data");
-                break;
-            default:
-                writer.println("-- ERROR page " + page + " unknown type " + type);
-                break;
+                // type 2
+                case Page.TYPE_DATA_NODE: {
+                    stat.pageTypeCount[type]++;
+                    int parentPageId = s.readInt();
+                    setStorage(s.readVarInt());
+                    int rowCount = s.readInt();
+                    int entries = s.readShortInt();
+                    writer.println("-- page " + page + ": data node " +
+                            (last ? "(last) " : "") + "parent: " + parentPageId +
+                            " table: " + storageId + " entries: " + entries +
+                            " rowCount: " + rowCount);
+                    dumpPageDataNode(writer, s, page, entries);
+                    break;
+                }
+                // type 3
+                case Page.TYPE_DATA_OVERFLOW:
+                    stat.pageTypeCount[type]++;
+                    writer.println("-- page " + page + ": data overflow " +
+                            (last ? "(last) " : ""));
+                    break;
+                // type 4
+                case Page.TYPE_BTREE_LEAF: {
+                    stat.pageTypeCount[type]++;
+                    int parentPageId = s.readInt();
+                    setStorage(s.readVarInt());
+                    int entries = s.readShortInt();
+                    writer.println("-- page " + page + ": b-tree leaf " +
+                            (last ? "(last) " : "") + "parent: " + parentPageId +
+                            " index: " + storageId + " entries: " + entries);
+                    if (trace) {
+                        dumpPageBtreeLeaf(writer, s, entries, !last);
+                    }
+                    break;
+                }
+                // type 5
+                case Page.TYPE_BTREE_NODE:
+                    stat.pageTypeCount[type]++;
+                    int parentPageId = s.readInt();
+                    setStorage(s.readVarInt());
+                    writer.println("-- page " + page + ": b-tree node " +
+                            (last ? "(last) " : "") + "parent: " + parentPageId +
+                            " index: " + storageId);
+                    dumpPageBtreeNode(writer, s, page, !last);
+                    break;
+                // type 6
+                case Page.TYPE_FREE_LIST:
+                    stat.pageTypeCount[type]++;
+                    writer.println("-- page " + page + ": free list " + (last ? "(last)" : ""));
+                    stat.free += dumpPageFreeList(writer, s, page, pageCount);
+                    break;
+                // type 7
+                case Page.TYPE_STREAM_TRUNK:
+                    stat.pageTypeCount[type]++;
+                    writer.println("-- page " + page + ": log trunk");
+                    break;
+                // type 8
+                case Page.TYPE_STREAM_DATA:
+                    stat.pageTypeCount[type]++;
+                    writer.println("-- page " + page + ": log data");
+                    break;
+                default:
+                    writer.println("-- ERROR page " + page + " unknown type " + type);
+                    break;
             }
         } catch (Exception e) {
             writeError(writer, e);
@@ -824,12 +786,12 @@ public class Recover extends Tool implements DataHandler {
     }
 
     private void dumpPageLogStream(PrintWriter writer, int logKey,
-            int logFirstTrunkPage, int logFirstDataPage, long pageCount)
+                                   int logFirstTrunkPage, int logFirstDataPage, long pageCount)
             throws IOException {
         Data s = Data.create(this, pageSize);
         DataReader in = new DataReader(
                 new PageInputStream(writer, this, store, logKey,
-                logFirstTrunkPage, logFirstDataPage, pageSize)
+                        logFirstTrunkPage, logFirstDataPage, pageSize)
         );
         writer.println("---- Transaction log ----");
         CompressLZF compress = new CompressLZF();
@@ -862,36 +824,36 @@ public class Recover extends Tool implements DataHandler {
                 boolean last = (type & Page.FLAG_LAST) != 0;
                 type &= ~Page.FLAG_LAST;
                 switch (type) {
-                case Page.TYPE_EMPTY:
-                    typeName = "empty";
-                    break;
-                case Page.TYPE_DATA_LEAF:
-                    typeName = "data leaf " + (last ? "(last)" : "");
-                    break;
-                case Page.TYPE_DATA_NODE:
-                    typeName = "data node " + (last ? "(last)" : "");
-                    break;
-                case Page.TYPE_DATA_OVERFLOW:
-                    typeName = "data overflow " + (last ? "(last)" : "");
-                    break;
-                case Page.TYPE_BTREE_LEAF:
-                    typeName = "b-tree leaf " + (last ? "(last)" : "");
-                    break;
-                case Page.TYPE_BTREE_NODE:
-                    typeName = "b-tree node " + (last ? "(last)" : "");
-                    break;
-                case Page.TYPE_FREE_LIST:
-                    typeName = "free list " + (last ? "(last)" : "");
-                    break;
-                case Page.TYPE_STREAM_TRUNK:
-                    typeName = "log trunk";
-                    break;
-                case Page.TYPE_STREAM_DATA:
-                    typeName = "log data";
-                    break;
-                default:
-                    typeName = "ERROR: unknown type " + type;
-                    break;
+                    case Page.TYPE_EMPTY:
+                        typeName = "empty";
+                        break;
+                    case Page.TYPE_DATA_LEAF:
+                        typeName = "data leaf " + (last ? "(last)" : "");
+                        break;
+                    case Page.TYPE_DATA_NODE:
+                        typeName = "data node " + (last ? "(last)" : "");
+                        break;
+                    case Page.TYPE_DATA_OVERFLOW:
+                        typeName = "data overflow " + (last ? "(last)" : "");
+                        break;
+                    case Page.TYPE_BTREE_LEAF:
+                        typeName = "b-tree leaf " + (last ? "(last)" : "");
+                        break;
+                    case Page.TYPE_BTREE_NODE:
+                        typeName = "b-tree node " + (last ? "(last)" : "");
+                        break;
+                    case Page.TYPE_FREE_LIST:
+                        typeName = "free list " + (last ? "(last)" : "");
+                        break;
+                    case Page.TYPE_STREAM_TRUNK:
+                        typeName = "log trunk";
+                        break;
+                    case Page.TYPE_STREAM_DATA:
+                        typeName = "log data";
+                        break;
+                    default:
+                        typeName = "ERROR: unknown type " + type;
+                        break;
                 }
                 writer.println("-- undo page " + pageId + " " + typeName);
                 if (trace) {
@@ -1013,8 +975,8 @@ public class Recover extends Tool implements DataHandler {
         private int logKey;
 
         public PageInputStream(PrintWriter writer, DataHandler handler,
-                FileStore store, int logKey, long firstTrunkPage,
-                long firstDataPage, int pageSize) {
+                               FileStore store, int logKey, long firstTrunkPage,
+                               long firstDataPage, int pageSize) {
             this.writer = writer;
             this.store = store;
             this.pageSize = pageSize;
@@ -1026,7 +988,7 @@ public class Recover extends Tool implements DataHandler {
 
         @Override
         public int read() {
-            byte[] b = { 0 };
+            byte[] b = {0};
             int len = read(b);
             return len < 0 ? -1 : (b[0] & 255);
         }
@@ -1079,7 +1041,7 @@ public class Recover extends Tool implements DataHandler {
                 store.readFully(page.getBytes(), 0, pageSize);
                 page.reset();
                 if (!PageStore.checksumTest(page.getBytes(), (int) trunkPage, pageSize)) {
-                    writer.println("-- ERROR: checksum mismatch page: " +trunkPage);
+                    writer.println("-- ERROR: checksum mismatch page: " + trunkPage);
                     endOfFile = true;
                     return;
                 }
@@ -1125,7 +1087,7 @@ public class Recover extends Tool implements DataHandler {
                 int t = page.readByte();
                 if (t != 0 && !PageStore.checksumTest(page.getBytes(),
                         (int) nextPage, pageSize)) {
-                    writer.println("-- ERROR: checksum mismatch page: " +nextPage);
+                    writer.println("-- ERROR: checksum mismatch page: " + nextPage);
                     endOfFile = true;
                     return;
                 }
@@ -1134,12 +1096,12 @@ public class Recover extends Tool implements DataHandler {
                 int k = page.readInt();
                 writer.println("-- log " + k + ":" + trunkPage + "/" + nextPage);
                 if (t != Page.TYPE_STREAM_DATA) {
-                    writer.println("-- log eof " +nextPage+ " type: " + t + " parent: " + p +
+                    writer.println("-- log eof " + nextPage + " type: " + t + " parent: " + p +
                             " expected type: " + Page.TYPE_STREAM_DATA);
                     endOfFile = true;
                     return;
                 } else if (k != logKey) {
-                    writer.println("-- log eof " +nextPage+ " type: " + t + " parent: " + p +
+                    writer.println("-- log eof " + nextPage + " type: " + t + " parent: " + p +
                             " expected key: " + logKey + " got: " + k);
                     endOfFile = true;
                     return;
@@ -1150,7 +1112,7 @@ public class Recover extends Tool implements DataHandler {
     }
 
     private void dumpPageBtreeNode(PrintWriter writer, Data s, long pageId,
-            boolean positionOnly) {
+                                   boolean positionOnly) {
         int rowCount = s.readInt();
         int entryCount = s.readShortInt();
         int[] children = new int[entryCount + 1];
@@ -1193,7 +1155,7 @@ public class Recover extends Tool implements DataHandler {
     }
 
     private int dumpPageFreeList(PrintWriter writer, Data s, long pageId,
-            long pageCount) {
+                                 long pageCount) {
         int pagesAddressed = PageFreeList.getPagesAddressed(pageSize);
         BitField used = new BitField();
         for (int i = 0; i < pagesAddressed; i += 8) {
@@ -1226,7 +1188,7 @@ public class Recover extends Tool implements DataHandler {
     }
 
     private void dumpPageBtreeLeaf(PrintWriter writer, Data s, int entryCount,
-            boolean positionOnly) {
+                                   boolean positionOnly) {
         int[] offsets = new int[entryCount];
         int empty = Integer.MAX_VALUE;
         for (int i = 0; i < entryCount; i++) {
@@ -1256,7 +1218,7 @@ public class Recover extends Tool implements DataHandler {
     }
 
     private void checkParent(PrintWriter writer, long pageId, int[] children,
-            int index) {
+                             int index) {
         int child = children[index];
         if (child < 0 || child >= parents.length) {
             writer.println("-- ERROR [" + pageId + "] child[" +
@@ -1268,7 +1230,7 @@ public class Recover extends Tool implements DataHandler {
     }
 
     private void dumpPageDataNode(PrintWriter writer, Data s, long pageId,
-            int entryCount) {
+                                  int entryCount) {
         int[] children = new int[entryCount + 1];
         long[] keys = new long[entryCount];
         children[entryCount] = s.readInt();
@@ -1288,7 +1250,7 @@ public class Recover extends Tool implements DataHandler {
     }
 
     private void dumpPageDataLeaf(PrintWriter writer, Data s, boolean last,
-            long pageId, int columnCount, int entryCount) {
+                                  long pageId, int columnCount, int entryCount) {
         long[] keys = new long[entryCount];
         int[] offsets = new int[entryCount];
         long next = 0;
@@ -1381,10 +1343,10 @@ public class Recover extends Tool implements DataHandler {
                                     userPasswordHash, salt);
                             StringBuilder buff = new StringBuilder();
                             buff.append("SALT '").
-                                append(StringUtils.convertBytesToHex(salt)).
-                                append("' HASH '").
-                                append(StringUtils.convertBytesToHex(passwordHash)).
-                                append('\'');
+                                    append(StringUtils.convertBytesToHex(salt)).
+                                    append("' HASH '").
+                                    append(StringUtils.convertBytesToHex(passwordHash)).
+                                    append('\'');
                             byte[] replacement = buff.toString().getBytes();
                             System.arraycopy(replacement, 0, s.getBytes(),
                                     saltIndex, replacement.length);
@@ -1531,10 +1493,10 @@ public class Recover extends Tool implements DataHandler {
 
     private static boolean isSchemaObjectTypeDelayed(MetaRecord m) {
         switch (m.getObjectType()) {
-        case DbObject.INDEX:
-        case DbObject.CONSTRAINT:
-        case DbObject.TRIGGER:
-            return true;
+            case DbObject.INDEX:
+            case DbObject.CONSTRAINT:
+            case DbObject.TRIGGER:
+                return true;
         }
         return false;
     }
@@ -1692,7 +1654,7 @@ public class Recover extends Tool implements DataHandler {
      */
     @Override
     public int readLob(long lobId, byte[] hmac, long offset, byte[] buff,
-            int off, int length) {
+                       int off, int length) {
         throw DbException.throwInternalError();
     }
 

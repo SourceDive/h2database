@@ -131,7 +131,7 @@ public class TestSpinLock extends TestBase {
          * Create a copy of the data.
          *
          * @param version the new version
-         * @param old the old data or null
+         * @param old     the old data or null
          */
         Data(int version, Data old) {
             this.version = version;

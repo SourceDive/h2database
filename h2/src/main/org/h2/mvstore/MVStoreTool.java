@@ -6,14 +6,14 @@
  */
 package org.h2.mvstore;
 
+import org.h2.mvstore.type.StringDataType;
+import org.h2.store.fs.FilePath;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-
-import org.h2.mvstore.type.StringDataType;
-import org.h2.store.fs.FilePath;
 
 /**
  * Utility methods used in combination with the MVStore.
@@ -53,7 +53,7 @@ public class MVStoreTool {
      * format.
      *
      * @param fileName the name of the file
-     * @param writer the print writer
+     * @param writer   the print writer
      */
     public static void dump(String fileName, Writer writer) {
         PrintWriter pw = new PrintWriter(writer, true);
@@ -68,7 +68,7 @@ public class MVStoreTool {
             long fileSize = file.size();
             int len = Long.toHexString(fileSize).length();
             ByteBuffer block = ByteBuffer.allocate(4096);
-            for (long pos = 0; pos < fileSize;) {
+            for (long pos = 0; pos < fileSize; ) {
                 block.rewind();
                 DataUtils.readFully(file, pos, block);
                 block.rewind();
@@ -106,10 +106,10 @@ public class MVStoreTool {
                     boolean node = (type & 1) != 0;
                     pw.printf(
                             "+%0" + len +
-                            "x %s, map %x, %d entries, %d bytes%n",
+                                    "x %s, map %x, %d entries, %d bytes%n",
                             p,
                             (node ? "node" : "leaf") +
-                            (compressed ? " compressed" : ""),
+                                    (compressed ? " compressed" : ""),
                             mapId,
                             node ? entries + 1 : entries,
                             pageSize);
@@ -141,8 +141,8 @@ public class MVStoreTool {
                             for (int i = 0; i < entries; i++) {
                                 long cp = children[i];
                                 pw.printf("    %d children < %s @ " +
-                                        "chunk %x +%0" +
-                                        len + "x%n",
+                                                "chunk %x +%0" +
+                                                len + "x%n",
                                         counts[i],
                                         keys[i],
                                         DataUtils.getPageChunkId(cp),
@@ -150,7 +150,7 @@ public class MVStoreTool {
                             }
                             long cp = children[entries];
                             pw.printf("    %d children >= %s @ chunk %x +%0" +
-                                    len + "x%n",
+                                            len + "x%n",
                                     counts[entries],
                                     keys[entries],
                                     DataUtils.getPageChunkId(cp),
@@ -172,7 +172,7 @@ public class MVStoreTool {
                             for (int i = 0; i <= entries; i++) {
                                 long cp = children[i];
                                 pw.printf("    %d children @ chunk %x +%0" +
-                                        len + "x%n",
+                                                len + "x%n",
                                         counts[i],
                                         DataUtils.getPageChunkId(cp),
                                         DataUtils.getPageOffset(cp));

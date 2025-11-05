@@ -6,15 +6,11 @@
  */
 package org.h2.test.synth;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Random;
-
 import org.h2.test.TestBase;
 import org.h2.test.utils.SelfDestructor;
+
+import java.sql.*;
+import java.util.Random;
 
 /**
  * A random recovery test. This test starts a process that executes random
@@ -53,9 +49,9 @@ public class TestKill extends TestBase {
                 "java", selfDestruct,
                 "-cp", getClassPath(),
                 "org.h2.test.synth.TestKillProcess", url, user,
-                password, getBaseDir(), "" + ACCOUNTS };
+                password, getBaseDir(), "" + ACCOUNTS};
 
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             printTime("TestKill " + i);
             if (i % 10 == 0) {
                 trace("deleting db...");
@@ -90,12 +86,12 @@ public class TestKill extends TestBase {
         stat.execute("CREATE TABLE IF NOT EXISTS ACCOUNT" +
                 "(ID INT PRIMARY KEY, SUM INT)");
         stat.execute("CREATE TABLE IF NOT EXISTS LOG(" +
-                        "ID IDENTITY, ACCOUNTID INT, AMOUNT INT, " +
-                        "FOREIGN KEY(ACCOUNTID) REFERENCES ACCOUNT(ID))");
+                "ID IDENTITY, ACCOUNTID INT, AMOUNT INT, " +
+                "FOREIGN KEY(ACCOUNTID) REFERENCES ACCOUNT(ID))");
         stat.execute("CREATE TABLE IF NOT EXISTS TEST_A" +
-                        "(ID INT PRIMARY KEY, DATA VARCHAR)");
+                "(ID INT PRIMARY KEY, DATA VARCHAR)");
         stat.execute("CREATE TABLE IF NOT EXISTS TEST_B" +
-                        "(ID INT PRIMARY KEY, DATA VARCHAR)");
+                "(ID INT PRIMARY KEY, DATA VARCHAR)");
     }
 
     private void initData() throws SQLException {

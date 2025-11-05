@@ -44,49 +44,49 @@ public class SetComment extends DefineCommand {
             schemaName = session.getCurrentSchemaName();
         }
         switch (objectType) {
-        case DbObject.CONSTANT:
-            object = db.getSchema(schemaName).getConstant(objectName);
-            break;
-        case DbObject.CONSTRAINT:
-            object = db.getSchema(schemaName).getConstraint(objectName);
-            break;
-        case DbObject.FUNCTION_ALIAS:
-            object = db.getSchema(schemaName).findFunction(objectName);
-            errorCode = ErrorCode.FUNCTION_ALIAS_NOT_FOUND_1;
-            break;
-        case DbObject.INDEX:
-            object = db.getSchema(schemaName).getIndex(objectName);
-            break;
-        case DbObject.ROLE:
-            schemaName = null;
-            object = db.findRole(objectName);
-            errorCode = ErrorCode.ROLE_NOT_FOUND_1;
-            break;
-        case DbObject.SCHEMA:
-            schemaName = null;
-            object = db.findSchema(objectName);
-            errorCode = ErrorCode.SCHEMA_NOT_FOUND_1;
-            break;
-        case DbObject.SEQUENCE:
-            object = db.getSchema(schemaName).getSequence(objectName);
-            break;
-        case DbObject.TABLE_OR_VIEW:
-            object = db.getSchema(schemaName).getTableOrView(session, objectName);
-            break;
-        case DbObject.TRIGGER:
-            object = db.getSchema(schemaName).findTrigger(objectName);
-            errorCode = ErrorCode.TRIGGER_NOT_FOUND_1;
-            break;
-        case DbObject.USER:
-            schemaName = null;
-            object = db.getUser(objectName);
-            break;
-        case DbObject.USER_DATATYPE:
-            schemaName = null;
-            object = db.findUserDataType(objectName);
-            errorCode = ErrorCode.USER_DATA_TYPE_ALREADY_EXISTS_1;
-            break;
-        default:
+            case DbObject.CONSTANT:
+                object = db.getSchema(schemaName).getConstant(objectName);
+                break;
+            case DbObject.CONSTRAINT:
+                object = db.getSchema(schemaName).getConstraint(objectName);
+                break;
+            case DbObject.FUNCTION_ALIAS:
+                object = db.getSchema(schemaName).findFunction(objectName);
+                errorCode = ErrorCode.FUNCTION_ALIAS_NOT_FOUND_1;
+                break;
+            case DbObject.INDEX:
+                object = db.getSchema(schemaName).getIndex(objectName);
+                break;
+            case DbObject.ROLE:
+                schemaName = null;
+                object = db.findRole(objectName);
+                errorCode = ErrorCode.ROLE_NOT_FOUND_1;
+                break;
+            case DbObject.SCHEMA:
+                schemaName = null;
+                object = db.findSchema(objectName);
+                errorCode = ErrorCode.SCHEMA_NOT_FOUND_1;
+                break;
+            case DbObject.SEQUENCE:
+                object = db.getSchema(schemaName).getSequence(objectName);
+                break;
+            case DbObject.TABLE_OR_VIEW:
+                object = db.getSchema(schemaName).getTableOrView(session, objectName);
+                break;
+            case DbObject.TRIGGER:
+                object = db.getSchema(schemaName).findTrigger(objectName);
+                errorCode = ErrorCode.TRIGGER_NOT_FOUND_1;
+                break;
+            case DbObject.USER:
+                schemaName = null;
+                object = db.getUser(objectName);
+                break;
+            case DbObject.USER_DATATYPE:
+                schemaName = null;
+                object = db.findUserDataType(objectName);
+                errorCode = ErrorCode.USER_DATA_TYPE_ALREADY_EXISTS_1;
+                break;
+            default:
         }
         if (object == null) {
             throw DbException.get(errorCode, objectName);

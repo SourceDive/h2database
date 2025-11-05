@@ -6,23 +6,16 @@
  */
 package org.h2.test.db;
 
-import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
-import java.util.StringTokenizer;
-import java.util.UUID;
 import org.h2.fulltext.FullText;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.util.Task;
+
+import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Fulltext search tests.
@@ -32,8 +25,8 @@ public class TestFullText extends TestBase {
     /**
      * The words used in this test.
      */
-    static final String[] KNOWN_WORDS = { "skiing", "balance", "storage",
-            "water", "train" };
+    static final String[] KNOWN_WORDS = {"skiing", "balance", "storage",
+            "water", "train"};
     private static final String LUCENE_FULLTEXT_CLASS_NAME =
             "org.h2.fulltext.FullTextLucene";
 
@@ -387,12 +380,12 @@ public class TestFullText extends TestBase {
         stat.execute("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR)");
         Method createIndexMethod = Class.forName(
                 LUCENE_FULLTEXT_CLASS_NAME).getMethod("createIndex",
-                new Class[] { java.sql.Connection.class,
-                        String.class, String.class, String.class });
+                new Class[]{java.sql.Connection.class,
+                        String.class, String.class, String.class});
         Method dropIndexMethod = Class.forName(
                 LUCENE_FULLTEXT_CLASS_NAME).getMethod("dropIndex",
-                new Class[] { java.sql.Connection.class,
-                        String.class, String.class });
+                new Class[]{java.sql.Connection.class,
+                        String.class, String.class});
         for (int i = 0; i < 10; i++) {
             createIndexMethod.invoke(null, conn, "PUBLIC", "TEST", null);
             dropIndexMethod.invoke(null, conn, "PUBLIC", "TEST");
@@ -459,7 +452,7 @@ public class TestFullText extends TestBase {
         while (rs.next()) {
             String text = rs.getString(1);
             StringTokenizer tokenizer = new StringTokenizer(
-                        text, " ()[].,;:-+*/!?=<>{}#@'\"~$_%&|");
+                    text, " ()[].,;:-+*/!?=<>{}#@'\"~$_%&|");
             while (tokenizer.hasMoreTokens()) {
                 String word = tokenizer.nextToken();
                 if (word.length() < 10) {

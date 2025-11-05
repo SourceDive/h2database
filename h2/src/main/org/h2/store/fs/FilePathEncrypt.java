@@ -6,6 +6,13 @@
  */
 package org.h2.store.fs;
 
+import org.h2.engine.Constants;
+import org.h2.mvstore.DataUtils;
+import org.h2.security.AES;
+import org.h2.security.BlockCipher;
+import org.h2.security.SHA256;
+import org.h2.util.MathUtils;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,13 +21,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.Arrays;
-
-import org.h2.engine.Constants;
-import org.h2.mvstore.DataUtils;
-import org.h2.security.AES;
-import org.h2.security.BlockCipher;
-import org.h2.security.SHA256;
-import org.h2.util.MathUtils;
 
 /**
  * An encrypted file.
@@ -100,7 +100,7 @@ public class FilePathEncrypt extends FilePathWrapper {
         }
         password = fileName.substring(0, idx);
         fileName = fileName.substring(idx + 1);
-        return new String[] { password, fileName };
+        return new String[]{password, fileName};
     }
 
     /**
@@ -346,7 +346,7 @@ public class FilePathEncrypt extends FilePathWrapper {
         }
 
         private static void writeFully(FileChannel file, long pos,
-                ByteBuffer src) throws IOException {
+                                       ByteBuffer src) throws IOException {
             int off = 0;
             do {
                 int len = file.write(src, pos + off);
@@ -434,9 +434,9 @@ public class FilePathEncrypt extends FilePathWrapper {
         /**
          * Encrypt the data.
          *
-         * @param id the (sector) id
-         * @param len the number of bytes
-         * @param data the data
+         * @param id     the (sector) id
+         * @param len    the number of bytes
+         * @param data   the data
          * @param offset the offset within the data
          */
         void encrypt(long id, int len, byte[] data, int offset) {
@@ -462,9 +462,9 @@ public class FilePathEncrypt extends FilePathWrapper {
         /**
          * Decrypt the data.
          *
-         * @param id the (sector) id
-         * @param len the number of bytes
-         * @param data the data
+         * @param id     the (sector) id
+         * @param len    the number of bytes
+         * @param data   the data
          * @param offset the offset within the data
          */
         void decrypt(long id, int len, byte[] data, int offset) {
@@ -485,7 +485,7 @@ public class FilePathEncrypt extends FilePathWrapper {
             }
             if (i < len) {
                 swap(data, i, i - CIPHER_BLOCK_SIZE + offset, len - i + offset);
-                xorTweak(data, i - CIPHER_BLOCK_SIZE  + offset, tweakEnd);
+                xorTweak(data, i - CIPHER_BLOCK_SIZE + offset, tweakEnd);
                 cipher.decrypt(data, i - CIPHER_BLOCK_SIZE + offset, CIPHER_BLOCK_SIZE);
                 xorTweak(data, i - CIPHER_BLOCK_SIZE + offset, tweakEnd);
             }

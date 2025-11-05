@@ -6,12 +6,6 @@
  */
 package org.h2.mvstore.db;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
@@ -33,6 +27,12 @@ import org.h2.value.Value;
 import org.h2.value.ValueArray;
 import org.h2.value.ValueLong;
 import org.h2.value.ValueNull;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * A table stored in a MVStore.
@@ -61,7 +61,7 @@ public class MVPrimaryIndex extends BaseIndex {
     private int mainIndexColumn = -1;
 
     public MVPrimaryIndex(Database db, MVTable table, int id,
-            IndexColumn[] columns, IndexType indexType) {
+                          IndexColumn[] columns, IndexType indexType) {
         this.mvTable = table;
         initBaseIndex(table, id, table.getName() + "_DATA", columns, indexType);
         int[] sortTypes = new int[columns.length];
@@ -213,7 +213,7 @@ public class MVPrimaryIndex extends BaseIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         try {
             long cost = 10 * (dataMap.sizeAsLongMax() + Constants.COST_ROW_OFFSET);
             return cost;
@@ -257,7 +257,7 @@ public class MVPrimaryIndex extends BaseIndex {
         ValueLong v = (ValueLong) (first ? map.firstKey() : map.lastKey());
         if (v == null) {
             return new MVStoreCursor(Collections
-                    .<Entry<Value, Value>> emptyList().iterator(), null);
+                    .<Entry<Value, Value>>emptyList().iterator(), null);
         }
         Value value = map.get(v);
         Entry<Value, Value> e = new DataUtils.MapEntry<Value, Value>(v, value);
@@ -315,9 +315,9 @@ public class MVPrimaryIndex extends BaseIndex {
     /**
      * Get the key from the row.
      *
-     * @param row the row
+     * @param row     the row
      * @param ifEmpty the value to use if the row is empty
-     * @param ifNull the value to use if the column is NULL
+     * @param ifNull  the value to use if the column is NULL
      * @return the key
      */
     ValueLong getKey(SearchRow row, ValueLong ifEmpty, ValueLong ifNull) {
@@ -337,8 +337,8 @@ public class MVPrimaryIndex extends BaseIndex {
      * Search for a specific row or a set of rows.
      *
      * @param session the session
-     * @param first the key of the first row
-     * @param last the key of the last row
+     * @param first   the key of the first row
+     * @param last    the key of the last row
      * @return the cursor
      */
     Cursor find(Session session, ValueLong first, ValueLong last) {

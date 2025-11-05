@@ -6,15 +6,11 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.DatabaseEventListener;
 import org.h2.test.TestBase;
 import org.h2.util.JdbcUtils;
+
+import java.sql.*;
 
 /**
  * Tests the DatabaseEventListener.
@@ -86,18 +82,18 @@ public class TestListener extends TestBase implements DatabaseEventListener {
         lastState = state;
         String stateName;
         switch (state) {
-        case STATE_SCAN_FILE:
-            stateName = "Scan " + name;
-            break;
-        case STATE_CREATE_INDEX:
-            stateName = "Create Index " + name;
-            break;
-        case STATE_RECOVER:
-            stateName = "Recover";
-            break;
-        default:
-            TestBase.logError("unknown state: " + state, null);
-            stateName = "? " + name;
+            case STATE_SCAN_FILE:
+                stateName = "Scan " + name;
+                break;
+            case STATE_CREATE_INDEX:
+                stateName = "Create Index " + name;
+                break;
+            case STATE_RECOVER:
+                stateName = "Recover";
+                break;
+            default:
+                TestBase.logError("unknown state: " + state, null);
+                stateName = "? " + name;
         }
         try {
             Thread.sleep(1);

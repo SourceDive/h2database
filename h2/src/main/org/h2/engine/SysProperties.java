@@ -23,7 +23,7 @@ import org.h2.util.Utils;
  * <pre>
  * java -Dh2.baseDir=/temp
  * </pre>
- *
+ * <p>
  * They can be set within the application, but this must be done before loading
  * any classes of this database (before loading the JDBC driver):
  *
@@ -450,7 +450,7 @@ public class SysProperties {
      * current thread-context class loader will be used.
      */
     public static final boolean USE_THREAD_CONTEXT_CLASS_LOADER =
-        Utils.getProperty("h2.useThreadContextClassLoader", false);
+            Utils.getProperty("h2.useThreadContextClassLoader", false);
 
     /**
      * System property <code>h2.serializeJavaObject</code>

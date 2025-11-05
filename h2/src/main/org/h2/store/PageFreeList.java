@@ -40,8 +40,8 @@ public class PageFreeList extends Page {
     /**
      * Read a free-list page.
      *
-     * @param store the page store
-     * @param data the data
+     * @param store  the page store
+     * @param data   the data
      * @param pageId the page id
      * @return the page
      */
@@ -55,7 +55,7 @@ public class PageFreeList extends Page {
     /**
      * Create a new free-list page.
      *
-     * @param store the page store
+     * @param store  the page store
      * @param pageId the page id
      * @return the page
      */
@@ -67,7 +67,7 @@ public class PageFreeList extends Page {
      * Allocate a page from the free list.
      *
      * @param exclude the exclude list or null
-     * @param first the first page to look for
+     * @param first   the first page to look for
      * @return the page, or -1 if all pages are used
      */
     int allocate(BitField exclude, int first) {

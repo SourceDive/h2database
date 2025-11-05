@@ -6,14 +6,6 @@
  */
 package org.h2.test.db;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
@@ -21,6 +13,10 @@ import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.tools.Restore;
 import org.h2.util.Task;
+
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.sql.*;
 
 /**
  * Tests opening and closing a database.
@@ -79,7 +75,7 @@ public class TestOpenClose extends TestBase {
         conn.createStatement().execute("create table test(id int, name varchar) " +
                 "as select 1, space(1000000)");
         conn.close();
-        FileChannel c = FileUtils.open(fn+".1.part", "rw");
+        FileChannel c = FileUtils.open(fn + ".1.part", "rw");
         c.position(c.size() * 2 - 1);
         c.write(ByteBuffer.wrap(new byte[1]));
         c.close();
@@ -236,25 +232,25 @@ public class TestOpenClose extends TestBase {
         public void setProgress(int state, String name, int current, int max) {
             String stateName;
             switch (state) {
-            case STATE_SCAN_FILE:
-                stateName = "Scan " + name + " " + current + "/" + max;
-                if (current > 0) {
-                    throw new AssertionError("unexpected: " + stateName);
-                }
-                break;
-            case STATE_STATEMENT_START:
-                break;
-            case STATE_CREATE_INDEX:
-                stateName = "Create Index " + name + " " + current + "/" + max;
-                if (!"SYS:SYS_ID".equals(name)) {
-                    throw new AssertionError("unexpected: " + stateName);
-                }
-                break;
-            case STATE_RECOVER:
-                stateName = "Recover " + current + "/" + max;
-                break;
-            default:
-                stateName = "?";
+                case STATE_SCAN_FILE:
+                    stateName = "Scan " + name + " " + current + "/" + max;
+                    if (current > 0) {
+                        throw new AssertionError("unexpected: " + stateName);
+                    }
+                    break;
+                case STATE_STATEMENT_START:
+                    break;
+                case STATE_CREATE_INDEX:
+                    stateName = "Create Index " + name + " " + current + "/" + max;
+                    if (!"SYS:SYS_ID".equals(name)) {
+                        throw new AssertionError("unexpected: " + stateName);
+                    }
+                    break;
+                case STATE_RECOVER:
+                    stateName = "Recover " + current + "/" + max;
+                    break;
+                default:
+                    stateName = "?";
             }
             // System.out.println(": " + stateName);
         }

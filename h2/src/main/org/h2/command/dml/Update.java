@@ -6,9 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.api.Trigger;
 import org.h2.command.CommandInterface;
@@ -32,6 +29,9 @@ import org.h2.util.StringUtils;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * This class represents the statement
  * UPDATE
@@ -41,11 +41,13 @@ public class Update extends Prepared {
     private Expression condition;
     private TableFilter tableFilter;
 
-    /** The limit expression as specified in the LIMIT clause. */
+    /**
+     * The limit expression as specified in the LIMIT clause.
+     */
     private Expression limitExpr;
 
     private final ArrayList<Column> columns = New.arrayList();
-    private final HashMap<Column, Expression> expressionMap  = New.hashMap();
+    private final HashMap<Column, Expression> expressionMap = New.hashMap();
 
     public Update(Session session) {
         super(session);
@@ -62,7 +64,7 @@ public class Update extends Prepared {
     /**
      * Add an assignment of the form column = expression.
      *
-     * @param column the column
+     * @param column     the column
      * @param expression the expression
      */
     public void setAssignment(Column column, Expression expression) {
@@ -101,7 +103,7 @@ public class Update extends Prepared {
                 }
             }
             while (tableFilter.next()) {
-                setCurrentRowNumber(count+1);
+                setCurrentRowNumber(count + 1);
                 if (limitRows >= 0 && count >= limitRows) {
                     break;
                 }
@@ -146,7 +148,7 @@ public class Update extends Prepared {
             table.updateRows(this, session, rows);
             if (table.fireRow()) {
                 rows.invalidateCache();
-                for (rows.reset(); rows.hasNext();) {
+                for (rows.reset(); rows.hasNext(); ) {
                     Row o = rows.next();
                     Row n = rows.next();
                     table.fireAfterRow(session, o, n, false);

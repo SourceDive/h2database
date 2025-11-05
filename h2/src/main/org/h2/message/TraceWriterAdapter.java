@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * jdbc:h2:&tilde;/test;TRACE_LEVEL_FILE=4
  * </pre>
- *
+ * <p>
  * The logger name is 'h2database'.
  */
 public class TraceWriterAdapter implements TraceWriter {
@@ -35,14 +35,14 @@ public class TraceWriterAdapter implements TraceWriter {
     @Override
     public boolean isEnabled(int level) {
         switch (level) {
-        case TraceSystem.DEBUG:
-            return logger.isDebugEnabled();
-        case TraceSystem.INFO:
-            return logger.isInfoEnabled();
-        case TraceSystem.ERROR:
-            return logger.isErrorEnabled();
-        default:
-            return false;
+            case TraceSystem.DEBUG:
+                return logger.isDebugEnabled();
+            case TraceSystem.INFO:
+                return logger.isInfoEnabled();
+            case TraceSystem.ERROR:
+                return logger.isErrorEnabled();
+            default:
+                return false;
         }
     }
 
@@ -55,16 +55,16 @@ public class TraceWriterAdapter implements TraceWriter {
                 s = module + " " + s;
             }
             switch (level) {
-            case TraceSystem.DEBUG:
-                logger.debug(s, t);
-                break;
-            case TraceSystem.INFO:
-                logger.info(s, t);
-                break;
-            case TraceSystem.ERROR:
-                logger.error(s, t);
-                break;
-            default:
+                case TraceSystem.DEBUG:
+                    logger.debug(s, t);
+                    break;
+                case TraceSystem.INFO:
+                    logger.info(s, t);
+                    break;
+                case TraceSystem.ERROR:
+                    logger.error(s, t);
+                    break;
+                default:
             }
         }
     }

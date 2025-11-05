@@ -6,12 +6,6 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
@@ -19,6 +13,8 @@ import org.h2.tools.CreateCluster;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.h2.util.JdbcUtils;
+
+import java.sql.*;
 
 /**
  * Test for the cluster feature.
@@ -69,7 +65,7 @@ public class TestCluster extends TestBase {
 
         String url2 = getURL("jdbc:h2:tcp://localhost:" + port2 + "/test", false);
         Server n2 = org.h2.tools.Server.createTcpServer("-tcpPort",
-                "" + port2 , "-baseDir", getBaseDir() + "/node2").start();
+                "" + port2, "-baseDir", getBaseDir() + "/node2").start();
 
         String urlCluster = getURL("jdbc:h2:tcp://" + serverList + "/test", true);
         CreateCluster.main("-urlSource", url1, "-urlTarget", url2,
@@ -105,7 +101,7 @@ public class TestCluster extends TestBase {
         Server server1 = org.h2.tools.Server.createTcpServer(
                 "-tcpPort", "" + port1, "-baseDir", getBaseDir() + "/node1").start();
         Server server2 = org.h2.tools.Server.createTcpServer(
-                "-tcpPort", "" + port2 , "-baseDir", getBaseDir() + "/node2").start();
+                "-tcpPort", "" + port2, "-baseDir", getBaseDir() + "/node2").start();
 
         CreateCluster.main("-urlSource", url1, "-urlTarget", url2,
                 "-user", user, "-password", password, "-serverList",
@@ -128,7 +124,7 @@ public class TestCluster extends TestBase {
         assertEquals(5, rs.getInt(1));
 
         server2 = org.h2.tools.Server.createTcpServer("-tcpPort",
-                "" + port2 , "-baseDir", getBaseDir() + "/node2").start();
+                "" + port2, "-baseDir", getBaseDir() + "/node2").start();
         CreateCluster.main("-urlSource", url1, "-urlTarget", url2,
                 "-user", user, "-password", password, "-serverList",
                 serverList);
@@ -168,7 +164,7 @@ public class TestCluster extends TestBase {
         Server n1 = org.h2.tools.Server.createTcpServer("-tcpPort",
                 "" + port1, "-baseDir", getBaseDir() + "/node1").start();
         Server n2 = org.h2.tools.Server.createTcpServer("-tcpPort",
-                "" + port2 , "-baseDir", getBaseDir() + "/node2").start();
+                "" + port2, "-baseDir", getBaseDir() + "/node2").start();
 
         CreateCluster.main("-urlSource", url1, "-urlTarget", url2,
                 "-user", user, "-password", password, "-serverList",
@@ -216,7 +212,7 @@ public class TestCluster extends TestBase {
         Server n1 = org.h2.tools.Server.createTcpServer("-tcpPort",
                 "" + port1, "-baseDir", getBaseDir() + "/node1").start();
         Server n2 = org.h2.tools.Server.createTcpServer("-tcpPort",
-                "" + port2 , "-baseDir", getBaseDir() + "/node2").start();
+                "" + port2, "-baseDir", getBaseDir() + "/node2").start();
 
         CreateCluster.main("-urlSource", url1, "-urlTarget", url2,
                 "-user", user, "-password", password, "-serverList",
@@ -251,6 +247,7 @@ public class TestCluster extends TestBase {
         n1.stop();
         deleteFiles();
     }
+
     private void testCreateClusterAtRuntime() throws SQLException {
         if (config.memory || config.networked || config.cipher != null) {
             return;
@@ -280,7 +277,7 @@ public class TestCluster extends TestBase {
 
         // start the second server
         Server n2 = org.h2.tools.Server.createTcpServer("-tcpPort",
-                "" + port2 , "-baseDir", getBaseDir() + "/node2").start();
+                "" + port2, "-baseDir", getBaseDir() + "/node2").start();
 
         // copy the database and initialize the cluster
         CreateCluster.main("-urlSource", url1, "-urlTarget", url2,
@@ -389,13 +386,13 @@ public class TestCluster extends TestBase {
         // try to connect in standalone mode - should fail
         // should not be able to connect in standalone mode
         assertThrows(ErrorCode.CLUSTER_ERROR_DATABASE_RUNS_CLUSTERED_1, this).
-                getConnection("jdbc:h2:tcp://localhost:"+port1+"/test", user, password);
+                getConnection("jdbc:h2:tcp://localhost:" + port1 + "/test", user, password);
         assertThrows(ErrorCode.CLUSTER_ERROR_DATABASE_RUNS_CLUSTERED_1, this).
-                getConnection("jdbc:h2:tcp://localhost:"+port2+"/test", user, password);
+                getConnection("jdbc:h2:tcp://localhost:" + port2 + "/test", user, password);
 
         // test a cluster connection
         conn = getConnection("jdbc:h2:tcp://" + serverList + "/test", user, password);
-        check(conn, len, "'"+serverList+"'");
+        check(conn, len, "'" + serverList + "'");
         conn.close();
 
         // stop server 2, and test if only one server is available
@@ -408,8 +405,8 @@ public class TestCluster extends TestBase {
         conn.close();
 
         // disable the cluster
-        conn = getConnection("jdbc:h2:tcp://localhost:"+
-                port1+"/test;CLUSTER=''", user, password);
+        conn = getConnection("jdbc:h2:tcp://localhost:" +
+                port1 + "/test;CLUSTER=''", user, password);
         conn.close();
         n1.stop();
 
@@ -435,8 +432,8 @@ public class TestCluster extends TestBase {
 
         n1 = org.h2.tools.Server.createTcpServer("-tcpPort", "" +
                 port1, "-baseDir", getBaseDir() + "/node1").start();
-        conn = getConnection("jdbc:h2:tcp://localhost:"+
-                port1+"/test;CLUSTER=''", user, password);
+        conn = getConnection("jdbc:h2:tcp://localhost:" +
+                port1 + "/test;CLUSTER=''", user, password);
         check(conn, len, "''");
         conn.close();
         n1.stop();

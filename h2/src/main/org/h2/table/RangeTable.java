@@ -6,7 +6,6 @@
  */
 package org.h2.table;
 
-import java.util.ArrayList;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
 import org.h2.index.Index;
@@ -16,6 +15,8 @@ import org.h2.message.DbException;
 import org.h2.result.Row;
 import org.h2.schema.Schema;
 import org.h2.value.Value;
+
+import java.util.ArrayList;
 
 /**
  * The table SYSTEM_RANGE is a virtual table that generates incrementing numbers
@@ -34,16 +35,16 @@ public class RangeTable extends Table {
     /**
      * Create a new range with the given start and end expressions.
      *
-     * @param schema the schema (always the main schema)
-     * @param min the start expression
-     * @param max the end expression
+     * @param schema    the schema (always the main schema)
+     * @param min       the start expression
+     * @param max       the end expression
      * @param noColumns whether this table has no columns
      */
     public RangeTable(Schema schema, Expression min, Expression max,
-            boolean noColumns) {
+                      boolean noColumns) {
         super(schema, 0, NAME, true, true);
-        Column[] cols = noColumns ? new Column[0] : new Column[] { new Column(
-                "X", Value.LONG) };
+        Column[] cols = noColumns ? new Column[0] : new Column[]{new Column(
+                "X", Value.LONG)};
         this.min = min;
         this.max = max;
         setColumns(cols);
@@ -86,8 +87,8 @@ public class RangeTable extends Table {
 
     @Override
     public Index addIndex(Session session, String indexName,
-            int indexId, IndexColumn[] cols, IndexType indexType,
-            boolean create, String indexComment) {
+                          int indexId, IndexColumn[] cols, IndexType indexType,
+                          boolean create, String indexComment) {
         throw DbException.getUnsupportedException("SYSTEM_RANGE");
     }
 

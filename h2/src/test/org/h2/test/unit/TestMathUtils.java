@@ -6,11 +6,12 @@
  */
 package org.h2.test.unit;
 
-import java.math.BigInteger;
-import java.util.Random;
 import org.h2.test.TestBase;
 import org.h2.test.utils.AssertThrows;
 import org.h2.util.MathUtils;
+
+import java.math.BigInteger;
+import java.util.Random;
 
 /**
  * Tests math utility methods.
@@ -91,10 +92,12 @@ public class TestMathUtils extends TestBase {
     }
 
     private void testFactorial() {
-        new AssertThrows(IllegalArgumentException.class) { @Override
-        public void test() {
-            factorial(-1);
-        }};
+        new AssertThrows(IllegalArgumentException.class) {
+            @Override
+            public void test() {
+                factorial(-1);
+            }
+        };
         assertEquals("1", factorial(0).toString());
         assertEquals("1", factorial(1).toString());
         assertEquals("2", factorial(2).toString());

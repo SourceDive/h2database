@@ -6,6 +6,13 @@
  */
 package org.h2.test.unit;
 
+import org.h2.engine.Constants;
+import org.h2.store.fs.FileUtils;
+import org.h2.test.TestBase;
+import org.h2.tools.DeleteDbFiles;
+import org.h2.tools.Recover;
+import org.h2.util.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -15,12 +22,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.h2.engine.Constants;
-import org.h2.store.fs.FileUtils;
-import org.h2.test.TestBase;
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.Recover;
-import org.h2.util.IOUtils;
 
 /**
  * Tests database recovery.
@@ -76,7 +77,7 @@ public class TestRecovery extends TestBase {
         DeleteDbFiles.execute(getBaseDir(), "recovery", true);
         conn = getConnection(
                 "recovery;init=runscript from '" +
-                getBaseDir() + "/recovery.h2.sql'");
+                        getBaseDir() + "/recovery.h2.sql'");
         stat = conn.createStatement();
         stat.execute("select * from test");
         conn.close();
@@ -97,7 +98,7 @@ public class TestRecovery extends TestBase {
         DeleteDbFiles.execute(getBaseDir(), "recovery", true);
         conn = getConnection(
                 "recovery;init=runscript from '" +
-                getBaseDir() + "/recovery.h2.sql'");
+                        getBaseDir() + "/recovery.h2.sql'");
         conn.close();
     }
 
@@ -170,7 +171,7 @@ public class TestRecovery extends TestBase {
         Recover.main("-dir", getBaseDir(), "-db", "recovery");
         String script = IOUtils.readStringAndClose(
                 new InputStreamReader(
-                FileUtils.newInputStream(getBaseDir() + "/recovery.h2.sql")), -1);
+                        FileUtils.newInputStream(getBaseDir() + "/recovery.h2.sql")), -1);
         assertContains(script, "checksum mismatch");
         assertContains(script, "dump:");
         assertContains(script, "Hello World2");
@@ -198,8 +199,8 @@ public class TestRecovery extends TestBase {
         long base = 0;
         while (true) {
             ResultSet rs = stat.executeQuery(
-                        "select value from information_schema.settings " +
-                        "where name = 'info.FILE_WRITE'");
+                    "select value from information_schema.settings " +
+                            "where name = 'info.FILE_WRITE'");
             rs.next();
             long count = rs.getLong(1);
             if (base == 0) {

@@ -6,24 +6,8 @@
  */
 package org.h2.dev.fs;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -71,24 +55,24 @@ public class ArchiveTool {
         long start = System.currentTimeMillis();
         long size = getSize(new File(fromDir));
         System.out.println("Compressing " + size / MB + " MB");
-            InputStream in = getDirectoryInputStream(fromDir);
-            String temp = toFile + ".temp";
-            OutputStream out =
-                    new BufferedOutputStream(
-                                    new FileOutputStream(toFile), 32 * 1024);
-            Deflater def = new Deflater();
-            // def.setLevel(Deflater.BEST_SPEED);
-            out = new BufferedOutputStream(
-                    new DeflaterOutputStream(out, def));
-            sort(in, out, temp, size);
-            in.close();
-            out.close();
-            System.out.println();
-            System.out.println("Compressed to " +
-                    new File(toFile).length() / MB + " MB in " +
-                    (System.currentTimeMillis() - start) / 1000 +
-                    " seconds");
-            System.out.println();
+        InputStream in = getDirectoryInputStream(fromDir);
+        String temp = toFile + ".temp";
+        OutputStream out =
+                new BufferedOutputStream(
+                        new FileOutputStream(toFile), 32 * 1024);
+        Deflater def = new Deflater();
+        // def.setLevel(Deflater.BEST_SPEED);
+        out = new BufferedOutputStream(
+                new DeflaterOutputStream(out, def));
+        sort(in, out, temp, size);
+        in.close();
+        out.close();
+        System.out.println();
+        System.out.println("Compressed to " +
+                new File(toFile).length() / MB + " MB in " +
+                (System.currentTimeMillis() - start) / 1000 +
+                " seconds");
+        System.out.println();
     }
 
     private static void extract(String fromFile, String toDir) throws IOException {
@@ -341,7 +325,7 @@ public class ArchiveTool {
     }
 
     private static void sort(InputStream in, OutputStream out,
-            String tempFileName, long size) throws IOException {
+                             String tempFileName, long size) throws IOException {
         long lastTime = System.currentTimeMillis();
         int bufferSize = 16 * 1024 * 1024;
         DataOutputStream tempOut = new DataOutputStream(new BufferedOutputStream(
@@ -364,7 +348,7 @@ public class ArchiveTool {
             inPos += len;
             lastTime = printProgress(lastTime, 0, 50, inPos, size);
             TreeMap<Chunk, Chunk> map = new TreeMap<Chunk, Chunk>();
-            for (int pos = 0; pos < len;) {
+            for (int pos = 0; pos < len; ) {
                 int[] key = getKey(bytes, pos, len);
                 int l = key[3];
                 byte[] buff = new byte[l];
@@ -445,9 +429,9 @@ public class ArchiveTool {
      * Read a number of bytes. This method repeats reading until
      * either the bytes have been read, or EOF.
      *
-     * @param in the input stream
+     * @param in     the input stream
      * @param buffer the target buffer
-     * @param max the number of bytes to read
+     * @param max    the number of bytes to read
      * @return the number of bytes read (max unless EOF has been reached)
      */
     private static int readFully(InputStream in, byte[] buffer, int max)
@@ -525,7 +509,7 @@ public class ArchiveTool {
     }
 
     private static void combine(InputStream in, OutputStream out,
-            String tempFileName) throws IOException {
+                                String tempFileName) throws IOException {
         long lastTime = System.currentTimeMillis();
         int bufferSize = 16 * 1024 * 1024;
         DataOutputStream tempOut =
@@ -657,7 +641,7 @@ public class ArchiveTool {
         /**
          * Read a chunk.
          *
-         * @param in the input stream
+         * @param in      the input stream
          * @param readKey whether to read the sort key
          * @return the chunk, or null if 0 has been read
          */
@@ -690,7 +674,7 @@ public class ArchiveTool {
         /**
          * Write a chunk.
          *
-         * @param out the output stream
+         * @param out      the output stream
          * @param writeKey whether to write the sort key
          * @return the number of bytes written
          */
@@ -753,7 +737,7 @@ public class ArchiveTool {
      * Write a variable size long value.
      *
      * @param out the output stream
-     * @param x the value
+     * @param x   the value
      * @return the number of bytes written
      */
     static int writeVarLong(OutputStream out, long x)
@@ -799,7 +783,7 @@ public class ArchiveTool {
     }
 
     private static long printProgress(long lastTime, int low, int high,
-            long current, long total) {
+                                      long current, long total) {
         long now = System.currentTimeMillis();
         if (now - lastTime > 3000) {
             System.out.print((low + (high - low) * current / total) + "% ");

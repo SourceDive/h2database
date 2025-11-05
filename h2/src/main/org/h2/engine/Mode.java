@@ -6,9 +6,10 @@
  */
 package org.h2.engine;
 
-import java.util.HashMap;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.util.HashMap;
 
 /**
  * The compatibility modes. There is a fixed set of modes (for example

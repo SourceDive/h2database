@@ -6,25 +6,15 @@
  */
 package org.h2.test.db;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.h2.test.TestAll;
 import org.h2.test.TestBase;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * This test runs a SQL script file and compares the output with the expected
@@ -150,7 +140,7 @@ public class TestScript extends TestBase {
 
     private boolean containsTempTables() throws SQLException {
         ResultSet rs = conn.getMetaData().getTables(null, null, null,
-                new String[] { "TABLE" });
+                new String[]{"TABLE"});
         while (rs.next()) {
             String sql = rs.getString("SQL");
             if (sql != null) {

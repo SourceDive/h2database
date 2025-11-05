@@ -6,16 +6,13 @@
  */
 package org.h2.java;
 
+import org.h2.util.New;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import org.h2.util.New;
+import java.util.*;
 
 /**
  * Converts Java to C.
@@ -73,7 +70,7 @@ public class JavaParser {
     }
 
     private void addBuiltInTypes() {
-        String[] list = { "abstract", "continue", "for", "new", "switch",
+        String[] list = {"abstract", "continue", "for", "new", "switch",
                 "assert", "default", "if", "package", "synchronized",
                 "boolean", "do", "goto", "private", "this", "break", "double",
                 "implements", "protected", "throw", "byte", "else", "import",
@@ -81,7 +78,7 @@ public class JavaParser {
                 "transient", "catch", "extends", "int", "short", "try", "char",
                 "final", "interface", "static", "void", "class", "finally",
                 "long", "strictfp", "volatile", "const", "float", "native",
-                "super", "while", "true", "false", "null" };
+                "super", "while", "true", "false", "null"};
         for (String s : list) {
             RESERVED.add(s);
         }
@@ -95,11 +92,11 @@ public class JavaParser {
         addBuiltInType(id++, true, 6, "long");
         addBuiltInType(id++, true, 7, "float");
         addBuiltInType(id++, true, 8, "double");
-        String[] java = { "Boolean", "Byte", "Character", "Class",
+        String[] java = {"Boolean", "Byte", "Character", "Class",
                 "ClassLoader", "Double", "Float", "Integer", "Long", "Math",
                 "Number", "Object", "Runtime", "Short", "String",
                 "StringBuffer", "StringBuilder", "System", "Thread",
-                "ThreadGroup", "ThreadLocal", "Throwable", "Void" };
+                "ThreadGroup", "ThreadLocal", "Throwable", "Void"};
         for (String s : java) {
             JAVA_IMPORT_MAP.put(s, "java.lang." + s);
             addBuiltInType(id++, false, 0, "java.lang." + s);
@@ -115,28 +112,28 @@ public class JavaParser {
      */
     ClassObj getWrapper(ClassObj c) {
         switch (c.id) {
-        case 1:
-            return getClass("java.lang.Boolean");
-        case 2:
-            return getClass("java.lang.Byte");
-        case 3:
-            return getClass("java.lang.Short");
-        case 4:
-            return getClass("java.lang.Character");
-        case 5:
-            return getClass("java.lang.Integer");
-        case 6:
-            return getClass("java.lang.Long");
-        case 7:
-            return getClass("java.lang.Float");
-        case 8:
-            return getClass("java.lang.Double");
+            case 1:
+                return getClass("java.lang.Boolean");
+            case 2:
+                return getClass("java.lang.Byte");
+            case 3:
+                return getClass("java.lang.Short");
+            case 4:
+                return getClass("java.lang.Character");
+            case 5:
+                return getClass("java.lang.Integer");
+            case 6:
+                return getClass("java.lang.Long");
+            case 7:
+                return getClass("java.lang.Float");
+            case 8:
+                return getClass("java.lang.Double");
         }
         throw new RuntimeException("not a primitive type: " + classObj);
     }
 
     private void addBuiltInType(int id, boolean primitive, int primitiveType,
-            String type) {
+                                String type) {
         ClassObj c = new ClassObj();
         c.id = id;
         c.className = type;
@@ -157,7 +154,7 @@ public class JavaParser {
     /**
      * Parse the source code.
      *
-     * @param baseDir the base directory
+     * @param baseDir   the base directory
      * @param className the fully qualified name of the class to parse
      */
     void parse(String baseDir, String className) {
@@ -1043,7 +1040,7 @@ public class JavaParser {
                     c = "X";
                 }
                 int i = 2;
-                for (;; i++) {
+                for (; ; i++) {
                     String c2 = c + "_" + i;
                     if (!stringConstantToStringMap.containsKey(c2)) {
                         c = c2;
@@ -1349,7 +1346,7 @@ public class JavaParser {
             return;
         } else if (Character.isDigit(ch)
                 || (ch == '.' && Character.isDigit(source
-                        .charAt(current.index + 1)))) {
+                .charAt(current.index + 1)))) {
             String s = source.substring(current.index);
             current.token = "0" + readNumber(s);
             current.index += current.token.length() - 1;
@@ -1358,116 +1355,116 @@ public class JavaParser {
         }
         current.index++;
         switch (ch) {
-        case '\'': {
-            while (true) {
-                if (source.charAt(current.index) == '\\') {
+            case '\'': {
+                while (true) {
+                    if (source.charAt(current.index) == '\\') {
+                        current.index++;
+                    } else if (source.charAt(current.index) == '\'') {
+                        break;
+                    }
                     current.index++;
-                } else if (source.charAt(current.index) == '\'') {
-                    break;
                 }
                 current.index++;
+                current.token = source.substring(start + 1, current.index);
+                current.token = "\'" + javaDecode(current.token, '\'');
+                current.type = TOKEN_LITERAL_CHAR;
+                return;
             }
-            current.index++;
-            current.token = source.substring(start + 1, current.index);
-            current.token = "\'" + javaDecode(current.token, '\'');
-            current.type = TOKEN_LITERAL_CHAR;
-            return;
-        }
-        case '\"': {
-            while (true) {
-                if (source.charAt(current.index) == '\\') {
+            case '\"': {
+                while (true) {
+                    if (source.charAt(current.index) == '\\') {
+                        current.index++;
+                    } else if (source.charAt(current.index) == '\"') {
+                        break;
+                    }
                     current.index++;
-                } else if (source.charAt(current.index) == '\"') {
-                    break;
                 }
                 current.index++;
+                current.token = source.substring(start + 1, current.index);
+                current.token = "\"" + javaDecode(current.token, '\"');
+                current.type = TOKEN_LITERAL_STRING;
+                return;
             }
-            current.index++;
-            current.token = source.substring(start + 1, current.index);
-            current.token = "\"" + javaDecode(current.token, '\"');
-            current.type = TOKEN_LITERAL_STRING;
-            return;
-        }
-        case '(':
-        case ')':
-        case '[':
-        case ']':
-        case '{':
-        case '}':
-        case ';':
-        case ',':
-        case '?':
-        case ':':
-        case '@':
-            break;
-        case '.':
-            if (source.charAt(current.index) == '.'
-                    && source.charAt(current.index + 1) == '.') {
-                current.index += 2;
-            }
-            break;
-        case '+':
-            if (source.charAt(current.index) == '='
-                    || source.charAt(current.index) == '+') {
-                current.index++;
-            }
-            break;
-        case '-':
-            if (source.charAt(current.index) == '='
-                    || source.charAt(current.index) == '-') {
-                current.index++;
-            }
-            break;
-        case '>':
-            if (source.charAt(current.index) == '>') {
-                current.index++;
+            case '(':
+            case ')':
+            case '[':
+            case ']':
+            case '{':
+            case '}':
+            case ';':
+            case ',':
+            case '?':
+            case ':':
+            case '@':
+                break;
+            case '.':
+                if (source.charAt(current.index) == '.'
+                        && source.charAt(current.index + 1) == '.') {
+                    current.index += 2;
+                }
+                break;
+            case '+':
+                if (source.charAt(current.index) == '='
+                        || source.charAt(current.index) == '+') {
+                    current.index++;
+                }
+                break;
+            case '-':
+                if (source.charAt(current.index) == '='
+                        || source.charAt(current.index) == '-') {
+                    current.index++;
+                }
+                break;
+            case '>':
                 if (source.charAt(current.index) == '>') {
                     current.index++;
+                    if (source.charAt(current.index) == '>') {
+                        current.index++;
+                    }
                 }
-            }
-            if (source.charAt(current.index) == '=') {
-                current.index++;
-            }
-            break;
-        case '<':
-            if (source.charAt(current.index) == '<') {
-                current.index++;
-            }
-            if (source.charAt(current.index) == '=') {
-                current.index++;
-            }
-            break;
-        case '/':
-            if (source.charAt(current.index) == '*'
-                    || source.charAt(current.index) == '/'
-                    || source.charAt(current.index) == '=') {
-                current.index++;
-            }
-            break;
-        case '*':
-        case '~':
-        case '!':
-        case '=':
-        case '%':
-        case '^':
-            if (source.charAt(current.index) == '=') {
-                current.index++;
-            }
-            break;
-        case '&':
-            if (source.charAt(current.index) == '&') {
-                current.index++;
-            } else if (source.charAt(current.index) == '=') {
-                current.index++;
-            }
-            break;
-        case '|':
-            if (source.charAt(current.index) == '|') {
-                current.index++;
-            } else if (source.charAt(current.index) == '=') {
-                current.index++;
-            }
-            break;
+                if (source.charAt(current.index) == '=') {
+                    current.index++;
+                }
+                break;
+            case '<':
+                if (source.charAt(current.index) == '<') {
+                    current.index++;
+                }
+                if (source.charAt(current.index) == '=') {
+                    current.index++;
+                }
+                break;
+            case '/':
+                if (source.charAt(current.index) == '*'
+                        || source.charAt(current.index) == '/'
+                        || source.charAt(current.index) == '=') {
+                    current.index++;
+                }
+                break;
+            case '*':
+            case '~':
+            case '!':
+            case '=':
+            case '%':
+            case '^':
+                if (source.charAt(current.index) == '=') {
+                    current.index++;
+                }
+                break;
+            case '&':
+                if (source.charAt(current.index) == '&') {
+                    current.index++;
+                } else if (source.charAt(current.index) == '=') {
+                    current.index++;
+                }
+                break;
+            case '|':
+                if (source.charAt(current.index) == '|') {
+                    current.index++;
+                } else if (source.charAt(current.index) == '=') {
+                    current.index++;
+                }
+                break;
         }
         current.type = TOKEN_OTHER;
         current.token = source.substring(start, current.index);
@@ -1536,54 +1533,54 @@ public class JavaParser {
                 }
                 c = s.charAt(++i);
                 switch (c) {
-                case 't':
-                    buff.append('\t');
-                    break;
-                case 'r':
-                    buff.append('\r');
-                    break;
-                case 'n':
-                    buff.append('\n');
-                    break;
-                case 'b':
-                    buff.append('\b');
-                    break;
-                case 'f':
-                    buff.append('\f');
-                    break;
-                case '"':
-                    buff.append('"');
-                    break;
-                case '\'':
-                    buff.append('\'');
-                    break;
-                case '\\':
-                    buff.append('\\');
-                    break;
-                case 'u': {
-                    try {
-                        c = (char) (Integer.parseInt(s.substring(i + 1, i + 5),
-                                16));
-                    } catch (NumberFormatException e) {
-                        throw getFormatException(s, i);
-                    }
-                    i += 4;
-                    buff.append(c);
-                    break;
-                }
-                default:
-                    if (c >= '0' && c <= '9') {
+                    case 't':
+                        buff.append('\t');
+                        break;
+                    case 'r':
+                        buff.append('\r');
+                        break;
+                    case 'n':
+                        buff.append('\n');
+                        break;
+                    case 'b':
+                        buff.append('\b');
+                        break;
+                    case 'f':
+                        buff.append('\f');
+                        break;
+                    case '"':
+                        buff.append('"');
+                        break;
+                    case '\'':
+                        buff.append('\'');
+                        break;
+                    case '\\':
+                        buff.append('\\');
+                        break;
+                    case 'u': {
                         try {
-                            c = (char) (Integer.parseInt(s.substring(i, i + 3),
-                                    8));
+                            c = (char) (Integer.parseInt(s.substring(i + 1, i + 5),
+                                    16));
                         } catch (NumberFormatException e) {
                             throw getFormatException(s, i);
                         }
-                        i += 2;
+                        i += 4;
                         buff.append(c);
-                    } else {
-                        throw getFormatException(s, i);
+                        break;
                     }
+                    default:
+                        if (c >= '0' && c <= '9') {
+                            try {
+                                c = (char) (Integer.parseInt(s.substring(i, i + 3),
+                                        8));
+                            } catch (NumberFormatException e) {
+                                throw getFormatException(s, i);
+                            }
+                            i += 2;
+                            buff.append(c);
+                        } else {
+                            throw getFormatException(s, i);
+                        }
                 }
             } else {
                 buff.append(c);
@@ -1772,7 +1769,7 @@ public class JavaParser {
 
     private static String indent(String s, int spaces) {
         StringBuilder buff = new StringBuilder(s.length() + spaces);
-        for (int i = 0; i < s.length();) {
+        for (int i = 0; i < s.length(); ) {
             for (int j = 0; j < spaces; j++) {
                 buff.append(' ');
             }

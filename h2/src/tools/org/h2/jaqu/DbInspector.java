@@ -6,16 +6,17 @@
  */
 package org.h2.jaqu;
 
+import org.h2.jaqu.Table.JQTable;
+import org.h2.util.JdbcUtils;
+import org.h2.util.New;
+import org.h2.util.StringUtils;
+
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import org.h2.jaqu.Table.JQTable;
-import org.h2.util.JdbcUtils;
-import org.h2.util.New;
-import org.h2.util.StringUtils;
 
 /**
  * Class to inspect a model and a database for the purposes of model validation
@@ -49,15 +50,15 @@ public class DbInspector {
      * specified schema. Additionally, if no schema is defined, models will be
      * generated for all schemas and all tables.
      *
-     * @param schema the schema name (optional)
-     * @param table the table name (optional)
-     * @param packageName the package name (optional)
+     * @param schema         the schema name (optional)
+     * @param table          the table name (optional)
+     * @param packageName    the package name (optional)
      * @param annotateSchema (includes schema name in annotation)
-     * @param trimStrings (trims strings to maxLength of column)
+     * @param trimStrings    (trims strings to maxLength of column)
      * @return a list of complete model classes as strings, each element a class
      */
     public List<String> generateModel(String schema, String table,
-            String packageName, boolean annotateSchema, boolean trimStrings) {
+                                      String packageName, boolean annotateSchema, boolean trimStrings) {
         try {
             List<String> models = New.arrayList();
             List<TableInspector> tables = getTables(schema, table);
@@ -76,13 +77,13 @@ public class DbInspector {
     /**
      * Validates a model.
      *
-     * @param <T> the model class
-     * @param model an instance of the model class
+     * @param <T>          the model class
+     * @param model        an instance of the model class
      * @param throwOnError if errors should cause validation to fail
      * @return a list of validation remarks
      */
     public <T> List<ValidationRemark> validateModel(T model,
-            boolean throwOnError) {
+                                                    boolean throwOnError) {
         try {
             TableInspector inspector = getTable(model);
             inspector.read(metaData);
@@ -105,7 +106,7 @@ public class DbInspector {
     /**
      * Get the table in the database based on the model definition.
      *
-     * @param <T> the model class
+     * @param <T>   the model class
      * @param model an instance of the model class
      * @return the table inspector
      */
@@ -127,7 +128,7 @@ public class DbInspector {
      * element. If no table is found, an exception is thrown.
      *
      * @param schema the schema name
-     * @param table the table name
+     * @param table  the table name
      * @return a list of table inspectors (always contains at least one element)
      */
     private List<TableInspector> getTables(String schema, String table)
@@ -150,7 +151,7 @@ public class DbInspector {
             }
             for (String s : schemaList) {
                 rs = getMetaData().getTables(null, s, null,
-                        new String[] { "TABLE" });
+                        new String[]{"TABLE"});
                 while (rs.next()) {
                     String t = rs.getString("TABLE_NAME");
                     if (!t.equalsIgnoreCase(jaquTables)) {

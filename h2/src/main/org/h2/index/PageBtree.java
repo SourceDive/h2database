@@ -99,9 +99,9 @@ public abstract class PageBtree extends Page {
     /**
      * Find an entry.
      *
-     * @param compare the row
-     * @param bigger if looking for a larger row
-     * @param add if the row should be added (check for duplicate keys)
+     * @param compare     the row
+     * @param bigger      if looking for a larger row
+     * @param add         if the row should be added (check for duplicate keys)
      * @param compareKeys compare the row keys as well
      * @return the index of the found row
      */
@@ -150,7 +150,7 @@ public abstract class PageBtree extends Page {
      * Find the first row.
      *
      * @param cursor the cursor
-     * @param first the row to find
+     * @param first  the row to find
      * @param bigger if the row should be bigger
      */
     abstract void find(PageBtreeCursor cursor, SearchRow first, boolean bigger);
@@ -248,8 +248,8 @@ public abstract class PageBtree extends Page {
      *
      * @param row the row to remove
      * @return null if the last row didn't change,
-     *          the deleted row if the page is now empty,
-     *          otherwise the new last row of this page
+     * the deleted row if the page is now empty,
+     * otherwise the new last row of this page
      */
     abstract SearchRow remove(SearchRow row);
 

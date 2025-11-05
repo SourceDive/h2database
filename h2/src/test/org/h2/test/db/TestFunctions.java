@@ -6,34 +6,6 @@
  */
 package org.h2.test.db;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.TimeZone;
-import java.util.UUID;
-
 import org.h2.api.Aggregate;
 import org.h2.api.AggregateFunction;
 import org.h2.api.ErrorCode;
@@ -44,6 +16,15 @@ import org.h2.tools.SimpleResultSet;
 import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.value.Value;
+
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
 
 /**
  * Tests for user defined functions and aggregates.
@@ -131,7 +112,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
         stat.execute("create alias varargs_function_table for \"" + TestFunctions.class.getName()
                 + ".varArgsFunctionTable\"");
         ResultSet rs = stat.executeQuery("select * from varargs_function_table(1,2,3,5,8,13)");
-        for (int i : new int[] { 1, 2, 3, 5, 8, 13 }) {
+        for (int i : new int[]{1, 2, 3, 5, 8, 13}) {
             assertTrue(rs.next());
             assertEquals(i, rs.getInt(1));
         }
@@ -309,8 +290,8 @@ public class TestFunctions extends TestBase implements AggregateFunction {
     private void testDefaultConnection() throws SQLException {
         Connection conn = getConnection("functions;DEFAULT_CONNECTION=TRUE");
         Statement stat = conn.createStatement();
-        stat.execute("create alias test for \""+
-                TestFunctions.class.getName()+".testDefaultConn\"");
+        stat.execute("create alias test for \"" +
+                TestFunctions.class.getName() + ".testDefaultConn\"");
         stat.execute("call test()");
         stat.execute("drop alias test");
         conn.close();
@@ -411,8 +392,8 @@ public class TestFunctions extends TestBase implements AggregateFunction {
         Statement stat = conn.createStatement();
         ResultSet rs;
 
-        stat.execute("create alias xorUUID for \""+
-                getClass().getName()+".xorUUID\"");
+        stat.execute("create alias xorUUID for \"" +
+                getClass().getName() + ".xorUUID\"");
         setCount(0);
         rs = stat.executeQuery("call xorUUID(random_uuid(), random_uuid())");
         rs.next();
@@ -428,8 +409,8 @@ public class TestFunctions extends TestBase implements AggregateFunction {
         Statement stat = conn.createStatement();
         ResultSet rs;
 
-        stat.execute("create alias getCount for \""+
-                getClass().getName()+".getCount\"");
+        stat.execute("create alias getCount for \"" +
+                getClass().getName() + ".getCount\"");
         setCount(0);
         rs = stat.executeQuery("select getCount() from system_range(1, 2)");
         rs.next();
@@ -438,8 +419,8 @@ public class TestFunctions extends TestBase implements AggregateFunction {
         assertEquals(1, rs.getInt(1));
         stat.execute("drop alias getCount");
 
-        stat.execute("create alias getCount deterministic for \""+
-                getClass().getName()+".getCount\"");
+        stat.execute("create alias getCount deterministic for \"" +
+                getClass().getName() + ".getCount\"");
         setCount(0);
         rs = stat.executeQuery("select getCount() from system_range(1, 2)");
         rs.next();
@@ -451,8 +432,8 @@ public class TestFunctions extends TestBase implements AggregateFunction {
                 "INFORMATION_SCHEMA.FUNCTION_ALIASES " +
                 "WHERE UPPER(ALIAS_NAME) = 'GET' || 'COUNT'");
         assertFalse(rs.next());
-        stat.execute("create alias reverse deterministic for \""+
-                getClass().getName()+".reverse\"");
+        stat.execute("create alias reverse deterministic for \"" +
+                getClass().getName() + ".reverse\"");
         rs = stat.executeQuery("select reverse(x) from system_range(700, 700)");
         rs.next();
         assertEquals("007", rs.getString(1));
@@ -488,14 +469,14 @@ public class TestFunctions extends TestBase implements AggregateFunction {
     private void testPrecision() throws SQLException {
         Connection conn = getConnection("functions");
         Statement stat = conn.createStatement();
-        stat.execute("create alias no_op for \""+getClass().getName()+".noOp\"");
+        stat.execute("create alias no_op for \"" + getClass().getName() + ".noOp\"");
         PreparedStatement prep = conn.prepareStatement(
                 "select * from dual where no_op(1.6)=?");
         prep.setBigDecimal(1, new BigDecimal("1.6"));
         ResultSet rs = prep.executeQuery();
         assertTrue(rs.next());
 
-        stat.execute("create aggregate agg_sum for \""+getClass().getName()+"\"");
+        stat.execute("create aggregate agg_sum for \"" + getClass().getName() + "\"");
         rs = stat.executeQuery("select agg_sum(1), sum(1.6) from dual");
         rs.next();
         assertEquals(1, rs.getMetaData().getScale(2));
@@ -570,7 +551,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
                 getClass().getName() + ".printMean\"");
         rs = stat.executeQuery(
                 "select printMean('A'), printMean('A', 10), " +
-                "printMean('BB', 10, 20), printMean ('CCC', 10, 20, 30)");
+                        "printMean('BB', 10, 20), printMean ('CCC', 10, 20, 30)");
         rs.next();
         assertEquals("A: 0", rs.getString(1));
         assertEquals("A: 10", rs.getString(2));
@@ -1020,7 +1001,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
         assertFalse(rs.next());
 
         stat.execute("CREATE ALIAS RESULT_WITH_NULL FOR \"" +
-        getClass().getName() + ".resultSetWithNull\"");
+                getClass().getName() + ".resultSetWithNull\"");
         rs = stat.executeQuery("CALL RESULT_WITH_NULL()");
         assertEquals(1, rs.getMetaData().getColumnCount());
         rs.next();
@@ -1096,19 +1077,19 @@ public class TestFunctions extends TestBase implements AggregateFunction {
 
         PreparedStatement stmt = conn.prepareStatement(
                 "select array_test(?) from dual");
-        stmt.setObject(1, new Integer[] { 1, 2 });
+        stmt.setObject(1, new Integer[]{1, 2});
         rs = stmt.executeQuery();
         rs.next();
         assertEquals(Integer[].class.getName(), rs.getObject(1).getClass()
                 .getName());
 
         CallableStatement call = conn.prepareCall("{ ? = call array_test(?) }");
-        call.setObject(2, new Integer[] { 2, 1 });
+        call.setObject(2, new Integer[]{2, 1});
         call.registerOutParameter(1, Types.ARRAY);
         call.execute();
         assertEquals(Integer[].class.getName(), call.getArray(1).getArray()
                 .getClass().getName());
-        assertEquals(new Integer[] { 2, 1 }, (Integer[]) call.getObject(1));
+        assertEquals(new Integer[]{2, 1}, (Integer[]) call.getObject(1));
 
         stat.execute("drop alias array_test");
 
@@ -1126,7 +1107,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
 
         rs = stat.executeQuery(
                 "SELECT CURRENT_TIMESTAMP(), " +
-                "TRUNCATE(CURRENT_TIMESTAMP()) FROM dual");
+                        "TRUNCATE(CURRENT_TIMESTAMP()) FROM dual");
         rs.next();
         Calendar c = Calendar.getInstance();
         c.setTime(rs.getTimestamp(1));
@@ -1672,7 +1653,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
      * This method is called via reflection from the database.
      *
      * @param conn the connection
-     * @param id the test id
+     * @param id   the test id
      * @param name the text
      * @return the count
      */
@@ -1692,7 +1673,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
      * This method is called via reflection from the database.
      *
      * @param conn the connection
-     * @param sql the SQL statement
+     * @param sql  the SQL statement
      * @return the result set
      */
     public static ResultSet select(Connection conn, String sql)
@@ -1719,7 +1700,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
      * @return the test array
      */
     public static Object[] getArray() {
-        return new Object[] { 0, "Hello" };
+        return new Object[]{0, "Hello"};
     }
 
     /**
@@ -1748,17 +1729,17 @@ public class TestFunctions extends TestBase implements AggregateFunction {
      * Test method to create a simple result set.
      *
      * @param rowCount the number of rows
-     * @param ip an int
-     * @param bp a boolean
-     * @param fp a float
-     * @param dp a double
-     * @param lp a long
-     * @param byParam a byte
-     * @param sp a short
+     * @param ip       an int
+     * @param bp       a boolean
+     * @param fp       a float
+     * @param dp       a double
+     * @param lp       a long
+     * @param byParam  a byte
+     * @param sp       a short
      * @return a result set
      */
     public static ResultSet simpleResultSet(Integer rowCount, int ip,
-            boolean bp, float fp, double dp, long lp, byte byParam, short sp) {
+                                            boolean bp, float fp, double dp, long lp, byte byParam, short sp) {
         SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("ID", Types.INTEGER, 10, 0);
         rs.addColumn("NAME", Types.VARCHAR, 255, 0);
@@ -1855,7 +1836,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
     /**
      * This method is called via reflection from the database.
      *
-     * @param conn the connection
+     * @param conn   the connection
      * @param values the values
      * @return the mean value
      */
@@ -1906,7 +1887,7 @@ public class TestFunctions extends TestBase implements AggregateFunction {
         for (Object a : args) {
             buff.append(a);
         }
-        return new Object[] { buff.toString() };
+        return new Object[]{buff.toString()};
     }
 
     @Override

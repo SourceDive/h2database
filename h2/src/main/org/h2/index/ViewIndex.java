@@ -6,8 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.dml.Query;
 import org.h2.command.dml.SelectUnion;
@@ -16,21 +14,15 @@ import org.h2.engine.Session;
 import org.h2.expression.Comparison;
 import org.h2.expression.Parameter;
 import org.h2.message.DbException;
-import org.h2.result.LocalResult;
-import org.h2.result.ResultInterface;
-import org.h2.result.Row;
-import org.h2.result.SearchRow;
-import org.h2.result.SortOrder;
+import org.h2.result.*;
 import org.h2.table.Column;
 import org.h2.table.IndexColumn;
 import org.h2.table.TableFilter;
 import org.h2.table.TableView;
-import org.h2.util.IntArray;
-import org.h2.util.New;
-import org.h2.util.SmallLRUCache;
-import org.h2.util.SynchronizedVerifier;
-import org.h2.util.Utils;
+import org.h2.util.*;
 import org.h2.value.Value;
+
+import java.util.ArrayList;
 
 /**
  * This object represents a virtual index for a query.
@@ -42,14 +34,14 @@ public class ViewIndex extends BaseIndex implements SpatialIndex {
     private final String querySQL;
     private final ArrayList<Parameter> originalParameters;
     private final SmallLRUCache<IntArray, CostElement> costCache =
-        SmallLRUCache.newInstance(Constants.VIEW_INDEX_CACHE_SIZE);
+            SmallLRUCache.newInstance(Constants.VIEW_INDEX_CACHE_SIZE);
     private boolean recursive;
     private final int[] indexMasks;
     private Query query;
     private final Session createSession;
 
     public ViewIndex(TableView view, String querySQL,
-            ArrayList<Parameter> originalParameters, boolean recursive) {
+                     ArrayList<Parameter> originalParameters, boolean recursive) {
         initBaseIndex(view, 0, null, null, IndexType.createNonUnique(false));
         this.view = view;
         this.querySQL = querySQL;
@@ -61,7 +53,7 @@ public class ViewIndex extends BaseIndex implements SpatialIndex {
     }
 
     public ViewIndex(TableView view, ViewIndex index, Session session,
-            int[] masks) {
+                     int[] masks) {
         initBaseIndex(view, 0, null, null, IndexType.createNonUnique(false));
         this.view = view;
         this.querySQL = index.querySQL;
@@ -117,7 +109,7 @@ public class ViewIndex extends BaseIndex implements SpatialIndex {
 
     @Override
     public synchronized double getCost(Session session, int[] masks,
-            TableFilter filter, SortOrder sortOrder) {
+                                       TableFilter filter, SortOrder sortOrder) {
         if (recursive) {
             return 1000;
         }
@@ -185,7 +177,7 @@ public class ViewIndex extends BaseIndex implements SpatialIndex {
     }
 
     private Cursor find(Session session, SearchRow first, SearchRow last,
-            SearchRow intersection) {
+                        SearchRow intersection) {
         if (recursive) {
             ResultInterface recResult = view.getRecursiveResult();
             if (recResult != null) {
@@ -285,7 +277,7 @@ public class ViewIndex extends BaseIndex implements SpatialIndex {
     }
 
     private static void setParameter(ArrayList<Parameter> paramList, int x,
-            Value v) {
+                                     Value v) {
         if (x >= paramList.size()) {
             // the parameter may be optimized away as in
             // select * from (select null as x) where x=1;
@@ -322,7 +314,7 @@ public class ViewIndex extends BaseIndex implements SpatialIndex {
         }
         int len = paramIndex.size();
         ArrayList<Column> columnList = New.arrayList();
-        for (int i = 0; i < len;) {
+        for (int i = 0; i < len; ) {
             int idx = paramIndex.get(i);
             columnList.add(table.getColumn(idx));
             int mask = masks[idx];

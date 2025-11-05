@@ -24,7 +24,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     private static final int MAX_LOAD = 90;
     private static final WeakReference<Object> DELETED_KEY =
-        new WeakReference<Object>(null);
+            new WeakReference<Object>(null);
     private int mask, len, size, deletedCount, level;
     private int maxSize, minSize, maxDeleted;
     private WeakReference<K>[] keys;
@@ -109,7 +109,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
                 }
             }
             index = (index + plus++) & mask;
-        } while(plus <= len);
+        } while (plus <= len);
         throw new RuntimeException("Hashmap is full");
     }
 
@@ -138,7 +138,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
             }
             index = (index + plus++) & mask;
             k = keys[index];
-        } while(plus <= len);
+        } while (plus <= len);
         // not found
         return null;
     }
@@ -185,7 +185,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
                 }
             }
             index = (index + plus++) & mask;
-        } while(plus <= len);
+        } while (plus <= len);
         return null;
     }
 
@@ -204,7 +204,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         if (value == null) {
             return false;
         }
-        for (V item: values) {
+        for (V item : values) {
             if (value.equals(item)) {
                 return true;
             }

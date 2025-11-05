@@ -6,13 +6,6 @@
  */
 package org.h2.engine;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Properties;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.dml.SetTypes;
 import org.h2.message.DbException;
@@ -24,6 +17,9 @@ import org.h2.util.New;
 import org.h2.util.SortedProperties;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Encapsulates the connection settings, including user name and password.
@@ -53,7 +49,7 @@ public class ConnectionInfo implements Cloneable {
      * Create a connection info object.
      *
      * @param name the database name (including tags), but without the
-     *            "jdbc:h2:" prefix
+     *             "jdbc:h2:" prefix
      */
     public ConnectionInfo(String name) {
         this.name = name;
@@ -64,7 +60,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Create a connection info object.
      *
-     * @param u the database URL (must start with jdbc:h2:)
+     * @param u    the database URL (must start with jdbc:h2:)
      * @param info the connection properties
      */
     public ConnectionInfo(String u, Properties info) {
@@ -96,11 +92,11 @@ public class ConnectionInfo implements Cloneable {
         ArrayList<String> list = SetTypes.getTypes();
         HashSet<String> set = KNOWN_SETTINGS;
         set.addAll(list);
-        String[] connectionTime = { "ACCESS_MODE_DATA", "AUTOCOMMIT", "CIPHER",
+        String[] connectionTime = {"ACCESS_MODE_DATA", "AUTOCOMMIT", "CIPHER",
                 "CREATE", "CACHE_TYPE", "FILE_LOCK", "IGNORE_UNKNOWN_SETTINGS",
                 "IFEXISTS", "INIT", "PASSWORD", "RECOVER", "RECOVER_TEST",
                 "USER", "AUTO_SERVER", "AUTO_SERVER_PORT", "NO_UPGRADE",
-                "AUTO_RECONNECT", "OPEN_NEW", "PAGE_SIZE", "PASSWORD_HASH", "JMX" };
+                "AUTO_RECONNECT", "OPEN_NEW", "PAGE_SIZE", "PASSWORD_HASH", "JMX"};
         for (String key : connectionTime) {
             if (SysProperties.CHECK && set.contains(key)) {
                 DbException.throwInternalError(key);
@@ -172,7 +168,7 @@ public class ConnectionInfo implements Cloneable {
             if (absolute) {
                 n = name;
             } else {
-                n  = FileUtils.unwrap(name);
+                n = FileUtils.unwrap(name);
                 prefix = name.substring(0, name.length() - n.length());
                 n = dir + SysProperties.FILE_SEPARATOR + n;
             }
@@ -319,7 +315,7 @@ public class ConnectionInfo implements Cloneable {
     }
 
     private static byte[] hashPassword(boolean passwordHash, String userName,
-            char[] password) {
+                                       char[] password) {
         if (passwordHash) {
             return StringUtils.convertHexToBytes(new String(password));
         }
@@ -332,7 +328,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Get a boolean property if it is set and return the value.
      *
-     * @param key the property name
+     * @param key          the property name
      * @param defaultValue the default value
      * @return the value
      */
@@ -351,7 +347,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Remove a boolean property if it is set and return the value.
      *
-     * @param key the property name
+     * @param key          the property name
      * @param defaultValue the default value
      * @return the value
      */
@@ -363,7 +359,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Remove a String property if it is set and return the value.
      *
-     * @param key the property name
+     * @param key          the property name
      * @param defaultValue the default value
      * @return the value
      */
@@ -473,7 +469,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Get the value of the given property.
      *
-     * @param key the property key
+     * @param key          the property key
      * @param defaultValue the default value
      * @return the value as a String
      */
@@ -488,7 +484,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Get the value of the given property.
      *
-     * @param key the property key
+     * @param key          the property key
      * @param defaultValue the default value
      * @return the value as a String
      */
@@ -503,7 +499,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Get the value of the given property.
      *
-     * @param setting the setting id
+     * @param setting      the setting id
      * @param defaultValue the default value
      * @return the value as a String
      */
@@ -516,7 +512,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Get the value of the given property.
      *
-     * @param setting the setting id
+     * @param setting      the setting id
      * @param defaultValue the default value
      * @return the value as an integer
      */
@@ -574,7 +570,7 @@ public class ConnectionInfo implements Cloneable {
     /**
      * Overwrite a property.
      *
-     * @param key the property name
+     * @param key   the property name
      * @param value the value
      */
     public void setProperty(String key, String value) {

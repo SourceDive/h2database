@@ -6,21 +6,9 @@
  */
 package org.h2.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.lang.instrument.Instrumentation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A simple CPU profiling tool similar to java -Xrunhprof. It can be used
@@ -43,34 +31,34 @@ public class Profiler implements Runnable {
 
     private final String[] ignoreLines = (
             "java," +
-            "sun," +
-            "com.sun.," +
-            "com.google.common.," +
-            "com.mongodb."
-            ).split(",");
+                    "sun," +
+                    "com.sun.," +
+                    "com.google.common.," +
+                    "com.mongodb."
+    ).split(",");
     private final String[] ignorePackages = (
             "java," +
-            "sun," +
-            "com.sun.," +
-            "com.google.common.," +
-            "com.mongodb."
-            ).split(",");
+                    "sun," +
+                    "com.sun.," +
+                    "com.google.common.," +
+                    "com.mongodb."
+    ).split(",");
     private final String[] ignoreThreads = (
             "java.lang.Object.wait," +
-            "java.lang.Thread.dumpThreads," +
-            "java.lang.Thread.getThreads," +
-            "java.lang.Thread.sleep," +
-            "java.lang.UNIXProcess.waitForProcessExit," +
-            "java.net.PlainDatagramSocketImpl.receive0," +
-            "java.net.PlainSocketImpl.accept," +
-            "java.net.PlainSocketImpl.socketAccept," +
-            "java.net.SocketInputStream.socketRead," +
-            "java.net.SocketOutputStream.socketWrite," +
-            "sun.awt.windows.WToolkit.eventLoop," +
-            "sun.misc.Unsafe.park," +
-            "dalvik.system.VMStack.getThreadStackTrace," +
-            "dalvik.system.NativeStart.run"
-            ).split(",");
+                    "java.lang.Thread.dumpThreads," +
+                    "java.lang.Thread.getThreads," +
+                    "java.lang.Thread.sleep," +
+                    "java.lang.UNIXProcess.waitForProcessExit," +
+                    "java.net.PlainDatagramSocketImpl.receive0," +
+                    "java.net.PlainSocketImpl.accept," +
+                    "java.net.PlainSocketImpl.socketAccept," +
+                    "java.net.SocketInputStream.socketRead," +
+                    "java.net.SocketOutputStream.socketWrite," +
+                    "sun.awt.windows.WToolkit.eventLoop," +
+                    "sun.misc.Unsafe.park," +
+                    "dalvik.system.VMStack.getThreadStackTrace," +
+                    "dalvik.system.NativeStart.run"
+    ).split(",");
 
     private volatile boolean stop;
     private final HashMap<String, Integer> counts =
@@ -93,7 +81,7 @@ public class Profiler implements Runnable {
      * This method is called when the agent is installed.
      *
      * @param agentArgs the agent arguments
-     * @param inst the instrumentation object
+     * @param inst      the instrumentation object
      */
     public static void premain(String agentArgs, Instrumentation inst) {
         instrumentation = inst;
@@ -113,7 +101,7 @@ public class Profiler implements Runnable {
      * need to be in the path.
      *
      * @param args the process id of the process - if not set the java processes
-     *        are listed
+     *             are listed
      */
     public static void main(String... args) {
         new Profiler().run(args);
@@ -263,7 +251,7 @@ public class Profiler implements Runnable {
     }
 
     private static void copyInThread(final InputStream in,
-            final OutputStream out) {
+                                     final OutputStream out) {
         new Thread("Profiler stream copy") {
             @Override
             public void run() {
@@ -401,7 +389,7 @@ public class Profiler implements Runnable {
     }
 
     private static int increment(HashMap<String, Integer> map, String trace,
-            int minCount) {
+                                 int minCount) {
         Integer oldCount = map.get(trace);
         if (oldCount == null) {
             map.put(trace, 1);
@@ -410,7 +398,7 @@ public class Profiler implements Runnable {
         }
         while (map.size() > MAX_ELEMENTS) {
             for (Iterator<Map.Entry<String, Integer>> ei =
-                    map.entrySet().iterator(); ei.hasNext();) {
+                 map.entrySet().iterator(); ei.hasNext(); ) {
                 Map.Entry<String, Integer> e = ei.next();
                 if (e.getValue() <= minCount) {
                     ei.remove();
@@ -457,8 +445,8 @@ public class Profiler implements Runnable {
     }
 
     private static void appendTop(StringBuilder buff,
-            HashMap<String, Integer> map, int count, int total, boolean table) {
-        for (int x = 0, min = 0;;) {
+                                  HashMap<String, Integer> map, int count, int total, boolean table) {
+        for (int x = 0, min = 0; ; ) {
             int highest = 0;
             Map.Entry<String, Integer> best = null;
             for (Map.Entry<String, Integer> el : map.entrySet()) {
@@ -482,15 +470,15 @@ public class Profiler implements Runnable {
             if (table) {
                 if (percent > 1) {
                     buff.append(percent).
-                        append("%: ").append(best.getKey()).
-                        append(LINE_SEPARATOR);
+                            append("%: ").append(best.getKey()).
+                            append(LINE_SEPARATOR);
                 }
             } else {
                 buff.append(c).append('/').append(total).append(" (").
-                    append(percent).
-                    append("%):").append(LINE_SEPARATOR).
-                    append(best.getKey()).
-                    append(LINE_SEPARATOR);
+                        append(percent).
+                        append("%):").append(LINE_SEPARATOR).
+                        append(best.getKey()).
+                        append(LINE_SEPARATOR);
             }
         }
     }

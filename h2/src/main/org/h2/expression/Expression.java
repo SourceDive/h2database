@@ -6,9 +6,6 @@
  */
 package org.h2.expression;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
 import org.h2.message.DbException;
@@ -19,6 +16,10 @@ import org.h2.util.StringUtils;
 import org.h2.value.DataType;
 import org.h2.value.Value;
 import org.h2.value.ValueArray;
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 /**
  * An expression is a operation, a value, or a function in a query.
@@ -47,7 +48,7 @@ public abstract class Expression {
      * Map the columns of the resolver to expression columns.
      *
      * @param resolver the column resolver
-     * @param level the subquery nesting level
+     * @param level    the subquery nesting level
      */
     public abstract void mapColumns(ColumnResolver resolver, int level);
 
@@ -64,7 +65,7 @@ public abstract class Expression {
      * now. This is used when optimizing the query.
      *
      * @param tableFilter the table filter
-     * @param value true if the table filter can return value
+     * @param value       true if the table filter can return value
      */
     public abstract void setEvaluatable(TableFilter tableFilter, boolean value);
 
@@ -183,7 +184,7 @@ public abstract class Expression {
      * Create index conditions if possible and attach them to the table filter.
      *
      * @param session the session
-     * @param filter the table filter
+     * @param filter  the table filter
      */
     public void createIndexConditions(Session session, TableFilter filter) {
         // default is do nothing
@@ -266,7 +267,7 @@ public abstract class Expression {
     /**
      * Add conditions to a table filter if they can be evaluated.
      *
-     * @param filter the table filter
+     * @param filter    the table filter
      * @param outerJoin if the expression is part of an outer join
      */
     public void addFilterConditions(TableFilter filter, boolean outerJoin) {
@@ -301,7 +302,7 @@ public abstract class Expression {
      * Extracts expression columns from ValueArray
      *
      * @param session the current session
-     * @param value the value to extract columns from
+     * @param value   the value to extract columns from
      * @return array of expression columns
      */
     static Expression[] getExpressionColumns(Session session, ValueArray value) {
@@ -321,7 +322,7 @@ public abstract class Expression {
      * Extracts expression columns from the given result set.
      *
      * @param session the session
-     * @param rs the result set
+     * @param rs      the result set
      * @return an array of expression columns
      */
     public static Expression[] getExpressionColumns(Session session, ResultSet rs) {

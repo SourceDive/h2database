@@ -6,24 +6,19 @@
  */
 package org.h2.test.bench;
 
+import org.h2.test.TestBase;
+import org.h2.tools.Server;
+import org.h2.util.JdbcUtils;
+import org.h2.util.StringUtils;
+
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.h2.test.TestBase;
-import org.h2.tools.Server;
-import org.h2.util.JdbcUtils;
-import org.h2.util.StringUtils;
 
 /**
  * Represents a database in the benchmark test application.
@@ -98,7 +93,7 @@ class Database {
             serverDerby = Class.forName(
                     "org.apache.derby.drda.NetworkServerControl").newInstance();
             Method m = serverDerby.getClass().getMethod("start", PrintWriter.class);
-            m.invoke(serverDerby, new Object[] { null });
+            m.invoke(serverDerby, new Object[]{null});
             // serverDerby = new NetworkServerControl();
             // serverDerby.start(null);
             Thread.sleep(100);
@@ -111,8 +106,8 @@ class Database {
                     c = Class.forName("org.hsqldb.Server");
                 }
                 Method m = c.getMethod("main", String[].class);
-                m.invoke(null, new Object[] { new String[] { "-database.0",
-                        "data/mydb;hsqldb.default_table_type=cached", "-dbname.0", "xdb" } });
+                m.invoke(null, new Object[]{new String[]{"-database.0",
+                        "data/mydb;hsqldb.default_table_type=cached", "-dbname.0", "xdb"}});
                 // org.hsqldb.Server.main(new String[]{"-database.0", "mydb",
                 // "-dbname.0", "xdb"});
                 serverHSQLDB = true;
@@ -147,14 +142,14 @@ class Database {
     /**
      * Parse a database configuration and create a database object from it.
      *
-     * @param test the test application
-     * @param id the database id
-     * @param dbString the configuration string
+     * @param test        the test application
+     * @param id          the database id
+     * @param dbString    the configuration string
      * @param threadCount the number of threads to use
      * @return a new database object with the given settings
      */
     static Database parse(DatabaseTest test, int id, String dbString,
-            int threadCount) {
+                          int threadCount) {
         try {
             StringTokenizer tokenizer = new StringTokenizer(dbString, ",");
             Database db = new Database();
@@ -275,7 +270,7 @@ class Database {
     /**
      * Start the benchmark.
      *
-     * @param bench the benchmark
+     * @param bench  the benchmark
      * @param action the action
      */
     void start(Bench bench, String action) {
@@ -311,7 +306,7 @@ class Database {
     /**
      * Execute an SQL statement.
      *
-     * @param prep the prepared statement
+     * @param prep         the prepared statement
      * @param traceMessage the trace message
      */
     void update(PreparedStatement prep, String traceMessage) throws SQLException {
@@ -366,8 +361,8 @@ class Database {
      * Print trace information if trace is enabled.
      *
      * @param action the action
-     * @param i the current value
-     * @param max the maximum value
+     * @param i      the current value
+     * @param max    the maximum value
      */
     void trace(String action, int i, int max) {
         if (TRACE) {
@@ -385,7 +380,7 @@ class Database {
      * If data collection is enabled, add the currently used memory size to the
      * log.
      *
-     * @param bench the benchmark
+     * @param bench  the benchmark
      * @param action the action
      */
     void logMemory(Bench bench, String action) {
@@ -396,12 +391,12 @@ class Database {
      * If data collection is enabled, add this information to the log.
      *
      * @param action the action
-     * @param scale the scale
-     * @param value the value
+     * @param scale  the scale
+     * @param value  the value
      */
     void log(String action, String scale, int value) {
         if (test.isCollect()) {
-            results.add(new Object[] { action, scale, Integer.valueOf(value) });
+            results.add(new Object[]{action, scale, Integer.valueOf(value)});
         }
     }
 

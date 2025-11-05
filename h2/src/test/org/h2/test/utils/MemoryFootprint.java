@@ -6,14 +6,15 @@
  */
 package org.h2.test.utils;
 
-import java.lang.instrument.Instrumentation;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import org.h2.engine.Constants;
 import org.h2.result.Row;
 import org.h2.store.Data;
 import org.h2.util.Profiler;
 import org.h2.value.Value;
+
+import java.lang.instrument.Instrumentation;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * Calculate the memory footprint of various objects.
@@ -40,23 +41,23 @@ public class MemoryFootprint {
         for (int i = 1; i < 128; i += i) {
 
             System.out.println(getArraySize(1, i) + " bytes per p1[]");
-            print("boolean[" + i +"]", new boolean[i]);
+            print("boolean[" + i + "]", new boolean[i]);
 
             System.out.println(getArraySize(2, i) + " bytes per p2[]");
-            print("char[" + i +"]", new char[i]);
-            print("short[" + i +"]", new short[i]);
+            print("char[" + i + "]", new char[i]);
+            print("short[" + i + "]", new short[i]);
 
             System.out.println(getArraySize(4, i) + " bytes per p4[]");
-            print("int[" + i +"]", new int[i]);
-            print("float[" + i +"]", new float[i]);
+            print("int[" + i + "]", new int[i]);
+            print("float[" + i + "]", new float[i]);
 
             System.out.println(getArraySize(8, i) + " bytes per p8[]");
-            print("long[" + i +"]", new long[i]);
-            print("double[" + i +"]", new double[i]);
+            print("long[" + i + "]", new long[i]);
+            print("double[" + i + "]", new double[i]);
 
             System.out.println(getArraySize(Constants.MEMORY_POINTER, i) +
                     " bytes per obj[]");
-            print("Object[" + i +"]", new Object[i]);
+            print("Object[" + i + "]", new Object[i]);
 
             System.out.println();
         }

@@ -6,32 +6,6 @@
  */
 package org.h2.test.synth;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.BatchUpdateException;
-import java.sql.Blob;
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ParameterMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.h2.api.ErrorCode;
 import org.h2.jdbc.JdbcConnection;
 import org.h2.store.FileLister;
@@ -46,6 +20,15 @@ import org.h2.tools.Restore;
 import org.h2.util.MathUtils;
 import org.h2.util.New;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.*;
+import java.util.*;
+
 /**
  * A test that calls random methods with random parameters from JDBC objects.
  * This is sometimes called 'Fuzz Testing'.
@@ -54,15 +37,15 @@ public class TestCrashAPI extends TestBase implements Runnable {
 
     private static final boolean RECOVER_ALL = false;
 
-    private static final Class<?>[] INTERFACES = { Connection.class,
+    private static final Class<?>[] INTERFACES = {Connection.class,
             PreparedStatement.class, Statement.class, ResultSet.class,
             ResultSetMetaData.class, Savepoint.class, ParameterMetaData.class,
-            Clob.class, Blob.class, Array.class, CallableStatement.class };
+            Clob.class, Blob.class, Array.class, CallableStatement.class};
 
     private static final String DIR = "synth";
 
     private final ArrayList<Object> objects = New.arrayList();
-    private final HashMap<Class <?>, ArrayList<Method>> classMethods =
+    private final HashMap<Class<?>, ArrayList<Method>> classMethods =
             New.hashMap();
     private RandomGen random = new RandomGen();
     private final ArrayList<String> statements = New.arrayList();
@@ -132,7 +115,7 @@ public class TestCrashAPI extends TestBase implements Runnable {
                 // ignore
             }
             ArrayList<String> dbFiles = FileLister.getDatabaseFiles("data", null, false);
-            for (String name: dbFiles) {
+            for (String name : dbFiles) {
                 if (!name.endsWith(".h2.db")) {
                     continue;
                 }
@@ -309,12 +292,12 @@ public class TestCrashAPI extends TestBase implements Runnable {
                             break;
                         }
                         try {
-long start = System.currentTimeMillis();
+                            long start = System.currentTimeMillis();
                             conn = getConnection(seed, false);
-long connectTime = System.currentTimeMillis() - start;
-if (connectTime > 2000) {
-    System.out.println("??? connected2 in " + connectTime);
-}
+                            long connectTime = System.currentTimeMillis() - start;
+                            if (connectTime > 2000) {
+                                System.out.println("??? connected2 in " + connectTime);
+                            }
                         } catch (Throwable t) {
                             printIfBad(seed, -i, -1, t);
                         }
@@ -499,7 +482,7 @@ if (connectTime > 2000) {
     }
 
     private Class<?> getJdbcInterface(Object o) {
-        for (Class <?> in : o.getClass().getInterfaces()) {
+        for (Class<?> in : o.getClass().getInterfaces()) {
             if (classMethods.get(in) != null) {
                 return in;
             }

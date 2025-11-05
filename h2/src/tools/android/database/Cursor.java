@@ -272,7 +272,7 @@ public interface Cursor {
     /**
      * TODO
      *
-     * @param cr TODO
+     * @param cr  TODO
      * @param uri TODO
      */
     void setNotificationUri(ContentResolver cr, Uri uri);

@@ -6,24 +6,20 @@
  */
 package org.h2.dev.fs;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.h2.mvstore.Cursor;
 import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.store.fs.FileUtils;
 import org.h2.util.New;
+
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * An archive tool to compress directories, using the MVStore backend.
@@ -185,7 +181,7 @@ public class ArchiveToolStore {
 
                 @Override
                 public int compare(Cursor<int[], byte[]> o1,
-                        Cursor<int[], byte[]> o2) {
+                                   Cursor<int[], byte[]> o2) {
                     int[] k1 = o1.getKey();
                     int[] k2 = o2.getKey();
                     int comp = 0;
@@ -322,7 +318,7 @@ public class ArchiveToolStore {
         FileUtils.delete(tempFileName);
         long totalSize = 0;
         int lastSegment = 0;
-        for (int i = 1;; i++) {
+        for (int i = 1; ; i++) {
             if (!store.hasMap("data" + i)) {
                 lastSegment = i - 1;
                 break;
@@ -367,7 +363,7 @@ public class ArchiveToolStore {
                     dk[3] = keys[i + 3];
                     byte[] bytes = segmentData.get(dk);
                     if (bytes != null) {
-                        int[] k = new int[] { fileId, i / 4 };
+                        int[] k = new int[]{fileId, i / 4};
                         fileData.put(k, bytes);
                         chunkSize += bytes.length;
                         if (chunkSize > tempSize) {
@@ -403,7 +399,7 @@ public class ArchiveToolStore {
 
                 @Override
                 public int compare(Cursor<int[], byte[]> o1,
-                        Cursor<int[], byte[]> o2) {
+                                   Cursor<int[], byte[]> o2) {
                     int[] k1 = o1.getKey();
                     int[] k2 = o2.getKey();
                     int comp = 0;

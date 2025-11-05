@@ -6,30 +6,6 @@
  */
 package org.h2.tools;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.NClob;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Map;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.util.MathUtils;
@@ -37,13 +13,22 @@ import org.h2.util.New;
 import org.h2.util.Utils;
 import org.h2.value.DataType;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Map;
+
 /**
  * This class is a simple result set and meta data implementation.
  * It can be used in Java functions that return a result set.
  * Only the most basic methods are implemented, the others throw an exception.
  * This implementation is standalone, and only relies on standard classes.
  * It can be extended easily if required.
- *
+ * <p>
  * An application can create a result set using the following code:
  *
  * <pre>
@@ -88,10 +73,10 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData {
      * All columns must be added before adding rows.
      * This method uses the default SQL type names.
      *
-     * @param name null is replaced with C1, C2,...
-     * @param sqlType the value returned in getColumnType(..)
+     * @param name      null is replaced with C1, C2,...
+     * @param sqlType   the value returned in getColumnType(..)
      * @param precision the precision
-     * @param scale the scale
+     * @param scale     the scale
      */
     public void addColumn(String name, int sqlType, int precision, int scale) {
         int valueType = DataType.convertSQLTypeToValueType(sqlType);
@@ -103,14 +88,14 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData {
      * Adds a column to the result set.
      * All columns must be added before adding rows.
      *
-     * @param name null is replaced with C1, C2,...
-     * @param sqlType the value returned in getColumnType(..)
+     * @param name        null is replaced with C1, C2,...
+     * @param sqlType     the value returned in getColumnType(..)
      * @param sqlTypeName the type name return in getColumnTypeName(..)
-     * @param precision the precision
-     * @param scale the scale
+     * @param precision   the precision
+     * @param scale       the scale
      */
     public void addColumn(String name, int sqlType, String sqlTypeName,
-            int precision, int scale) {
+                          int precision, int scale) {
         if (rows != null && rows.size() > 0) {
             throw new IllegalStateException(
                     "Cannot add a column after adding rows");
@@ -269,7 +254,7 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData {
      * @param columnLabel the column label
      * @return the column index (1,2,...)
      * @throws SQLException if the column is not found or if the result set is
-     *             closed
+     *                      closed
      */
     @Override
     public int findColumn(String columnLabel) throws SQLException {
@@ -820,7 +805,7 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData {
      * INTERNAL
      *
      * @param columnIndex the column index (1, 2, ...)
-     * @param type the class of the returned value
+     * @param type        the class of the returned value
      */
 //## Java 1.7 ##
     @Override
@@ -833,7 +818,7 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData {
      * INTERNAL
      *
      * @param columnName the column name
-     * @param type the class of the returned value
+     * @param type       the class of the returned value
      */
 //## Java 1.7 ##
     @Override
@@ -947,9 +932,9 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData {
             return null;
         }
         switch (columns.get(columnIndex - 1).sqlType) {
-        case Types.CLOB:
-            Clob c = (Clob) o;
-            return c.getSubString(1, MathUtils.convertLongToInt(c.length()));
+            case Types.CLOB:
+                Clob c = (Clob) o;
+                return c.getSubString(1, MathUtils.convertLongToInt(c.length()));
         }
         return o.toString();
     }
@@ -2416,7 +2401,7 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData {
          */
         @Override
         public ResultSet getResultSet(long index, int count,
-                Map<String, Class<?>> map) throws SQLException {
+                                      Map<String, Class<?>> map) throws SQLException {
             throw getUnsupportedException();
         }
 

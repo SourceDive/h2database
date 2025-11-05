@@ -6,14 +6,14 @@
  */
 package org.h2.mode;
 
+import org.h2.util.StringUtils;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import org.h2.util.StringUtils;
 
 /**
  * This class implements some MySQL-specific functions.
@@ -69,16 +69,16 @@ public class FunctionsMySQL {
      */
     public static void register(Connection conn) throws SQLException {
         String[] init = {
-            "UNIX_TIMESTAMP", "unixTimestamp",
-            "FROM_UNIXTIME", "fromUnixTime",
-            "DATE", "date",
+                "UNIX_TIMESTAMP", "unixTimestamp",
+                "FROM_UNIXTIME", "fromUnixTime",
+                "DATE", "date",
         };
         Statement stat = conn.createStatement();
         for (int i = 0; i < init.length; i += 2) {
             String alias = init[i], method = init[i + 1];
             stat.execute(
                     "CREATE ALIAS IF NOT EXISTS " + alias +
-                    " FOR \"" + FunctionsMySQL.class.getName() + "." + method + "\"");
+                            " FOR \"" + FunctionsMySQL.class.getName() + "." + method + "\"");
         }
     }
 
@@ -123,7 +123,7 @@ public class FunctionsMySQL {
      * http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_from-unixtime
      *
      * @param seconds The current timestamp in seconds.
-     * @param format The format of the date/time String to return.
+     * @param format  The format of the date/time String to return.
      * @return a formatted date/time String in the given format.
      */
     public static String fromUnixTime(int seconds, String format) {
@@ -147,7 +147,7 @@ public class FunctionsMySQL {
      * string.
      *
      * @param dateTime The date/time String from which to extract just the date
-     *            part.
+     *                 part.
      * @return the date part of the given date/time String argument.
      */
     public static String date(String dateTime) {

@@ -6,11 +6,12 @@
  */
 package org.h2.expression;
 
-import java.util.HashSet;
 import org.h2.engine.DbObject;
 import org.h2.table.Column;
 import org.h2.table.ColumnResolver;
 import org.h2.table.Table;
+
+import java.util.HashSet;
 
 /**
  * The visitor pattern is used to iterate through all expressions of a query
@@ -115,11 +116,11 @@ public class ExpressionVisitor {
     private final ColumnResolver resolver;
 
     private ExpressionVisitor(int type,
-            int queryLevel,
-            HashSet<DbObject> dependencies,
-            HashSet<Column> columns,
-            Table table, ColumnResolver resolver,
-            long[] maxDataModificationId) {
+                              int queryLevel,
+                              HashSet<DbObject> dependencies,
+                              HashSet<Column> columns,
+                              Table table, ColumnResolver resolver,
+                              long[] maxDataModificationId) {
         this.type = type;
         this.queryLevel = queryLevel;
         this.dependencies = dependencies;

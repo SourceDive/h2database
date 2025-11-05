@@ -6,6 +6,8 @@
  */
 package org.h2.test.db;
 
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +15,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.h2.test.TestBase;
 
 /**
  * Tests the sequence feature of this database.
@@ -73,11 +74,11 @@ public class TestSequence extends TestBase {
         test("create sequence s; alter sequence s restart with 2", null, 2, 3, 4);
         test("create sequence s; alter sequence s restart with 7", null, 7, 8, 9, 10);
         test("create sequence s; alter sequence s restart with 11 " +
-        "minvalue 3 maxvalue 12 cycle", null, 11, 12, 3, 4);
+                "minvalue 3 maxvalue 12 cycle", null, 11, 12, 3, 4);
         test("create sequence s; alter sequence s restart with 5 cache 2",
                 null, 5, 6, 7, 8);
         test("create sequence s; alter sequence s restart with 9 " +
-                "maxvalue 12 nocycle nocache",
+                        "maxvalue 12 nocycle nocache",
                 "Sequence \"S\" has run out of numbers", 9, 10, 11, 12);
     }
 
@@ -213,33 +214,33 @@ public class TestSequence extends TestBase {
                 stat,
                 "create sequence a minvalue 5 start with 2",
                 "Unable to create or alter sequence \"A\" because of " +
-                "invalid attributes (start value \"2\", " +
-                "min value \"5\", max value \"" + Long.MAX_VALUE +
-                "\", increment \"1\")");
+                        "invalid attributes (start value \"2\", " +
+                        "min value \"5\", max value \"" + Long.MAX_VALUE +
+                        "\", increment \"1\")");
         expectError(
                 stat,
                 "create sequence b maxvalue 5 start with 7",
                 "Unable to create or alter sequence \"B\" because of " +
-                "invalid attributes (start value \"7\", " +
+                        "invalid attributes (start value \"7\", " +
                         "min value \"1\", max value \"5\", increment \"1\")");
         expectError(
                 stat,
                 "create sequence c minvalue 5 maxvalue 2",
                 "Unable to create or alter sequence \"C\" because of " +
-                "invalid attributes (start value \"5\", " +
-                "min value \"5\", max value \"2\", increment \"1\")");
+                        "invalid attributes (start value \"5\", " +
+                        "min value \"5\", max value \"2\", increment \"1\")");
         expectError(
                 stat,
                 "create sequence d increment by 0",
                 "Unable to create or alter sequence \"D\" because of " +
-                "invalid attributes (start value \"1\", " +
-                "min value \"1\", max value \"" +
-                Long.MAX_VALUE + "\", increment \"0\")");
+                        "invalid attributes (start value \"1\", " +
+                        "min value \"1\", max value \"" +
+                        Long.MAX_VALUE + "\", increment \"0\")");
         expectError(stat,
                 "create sequence e minvalue 1 maxvalue 5 increment 99",
                 "Unable to create or alter sequence \"E\" because of " +
-                "invalid attributes (start value \"1\", " +
-                "min value \"1\", max value \"5\", increment \"99\")");
+                        "invalid attributes (start value \"1\", " +
+                        "min value \"1\", max value \"5\", increment \"99\")");
         conn.close();
     }
 
@@ -265,7 +266,7 @@ public class TestSequence extends TestBase {
                 "WITH 5 INCREMENT BY 2 " +
                 "MINVALUE 3 MAXVALUE 7 CYCLE CACHE 1;", script.get(1));
         assertEquals("CREATE SEQUENCE PUBLIC.C START " +
-                "WITH 3 MINVALUE 2 MAXVALUE 9 CACHE 2;",
+                        "WITH 3 MINVALUE 2 MAXVALUE 9 CACHE 2;",
                 script.get(2));
         assertEquals("CREATE SEQUENCE PUBLIC.D START " +
                 "WITH 1 CACHE 1;", script.get(3));

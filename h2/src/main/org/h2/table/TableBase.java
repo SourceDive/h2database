@@ -6,13 +6,14 @@
  */
 package org.h2.table;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.h2.command.ddl.CreateTableData;
 import org.h2.engine.DbSettings;
 import org.h2.mvstore.db.MVTableEngine;
 import org.h2.util.StatementBuilder;
 import org.h2.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The base class of a regular table, or a user defined table.
@@ -26,7 +27,9 @@ public abstract class TableBase extends Table {
      * The table engine used (null for regular tables).
      */
     private final String tableEngine;
-    /** Provided table parameters */
+    /**
+     * Provided table parameters
+     */
     private List<String> tableEngineParams = new ArrayList<String>();
 
     private final boolean globalTemporary;

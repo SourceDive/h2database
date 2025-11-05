@@ -19,7 +19,7 @@ class OrderExpression<T> {
     private final boolean nullsLast;
 
     OrderExpression(Query<T> query, Object expression, boolean desc,
-            boolean nullsFirst, boolean nullsLast) {
+                    boolean nullsFirst, boolean nullsLast) {
         this.query = query;
         this.expression = expression;
         this.desc = desc;

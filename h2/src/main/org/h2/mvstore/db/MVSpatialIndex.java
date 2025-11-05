@@ -6,18 +6,13 @@
  */
 package org.h2.mvstore.db;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
-import org.h2.index.BaseIndex;
-import org.h2.index.Cursor;
-import org.h2.index.IndexCondition;
-import org.h2.index.IndexType;
-import org.h2.index.SpatialIndex;
+import org.h2.index.*;
 import org.h2.message.DbException;
 import org.h2.mvstore.db.TransactionStore.Transaction;
 import org.h2.mvstore.db.TransactionStore.TransactionMap;
@@ -36,8 +31,8 @@ import org.h2.value.Value;
 import org.h2.value.ValueGeometry;
 import org.h2.value.ValueLong;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is an index based on a MVRTreeMap.
@@ -60,11 +55,11 @@ public class MVSpatialIndex extends BaseIndex implements SpatialIndex, MVIndex {
     /**
      * Constructor.
      *
-     * @param db the database
-     * @param table the table instance
-     * @param id the index id
+     * @param db        the database
+     * @param table     the table instance
+     * @param id        the index id
      * @param indexName the index name
-     * @param columns the indexed columns (only one geometry column allowed)
+     * @param columns   the indexed columns (only one geometry column allowed)
      * @param indexType the index type (only spatial index)
      */
     public MVSpatialIndex(
@@ -90,7 +85,7 @@ public class MVSpatialIndex extends BaseIndex implements SpatialIndex, MVIndex {
         if (col.column.getType() != Value.GEOMETRY) {
             throw DbException.getUnsupportedException(
                     "Spatial index on non-geometry column, "
-                    + col.column.getCreateSQL());
+                            + col.column.getCreateSQL());
         }
         this.mvTable = table;
         initBaseIndex(table, id, indexName, columns, indexType);
@@ -102,7 +97,7 @@ public class MVSpatialIndex extends BaseIndex implements SpatialIndex, MVIndex {
         VersionedValueType valueType = new VersionedValueType(vt);
         MVRTreeMap.Builder<VersionedValue> mapBuilder =
                 new MVRTreeMap.Builder<VersionedValue>().
-                valueType(valueType);
+                        valueType(valueType);
         spatialMap = db.getMvStore().getStore().openMap(mapName, mapBuilder);
         dataMap = mvTable.getTransaction(null).openMap(spatialMap);
     }
@@ -249,14 +244,14 @@ public class MVSpatialIndex extends BaseIndex implements SpatialIndex, MVIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return getCostRangeIndex(masks, table.getRowCountApproximation(),
                 filter, sortOrder);
     }
 
     @Override
     protected long getCostRangeIndex(int[] masks, long rowCount,
-            TableFilter filter, SortOrder sortOrder) {
+                                     TableFilter filter, SortOrder sortOrder) {
         rowCount += Constants.COST_ROW_OFFSET;
         long cost = rowCount;
         if (masks == null) {

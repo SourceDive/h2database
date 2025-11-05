@@ -6,9 +6,10 @@
  */
 package org.h2.test.utils;
 
+import org.h2.message.DbException;
+
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import org.h2.message.DbException;
 
 /**
  * Helper class to simplify negative testing. Usage:
@@ -30,7 +31,7 @@ public abstract class AssertThrows {
         this(new ResultVerifier() {
             @Override
             public boolean verify(Object returnValue, Throwable t, Method m,
-                    Object... args) {
+                                  Object... args) {
                 if (t == null) {
                     throw new AssertionError("Expected an exception of type " +
                             expectedExceptionClass.getSimpleName() +
@@ -61,7 +62,7 @@ public abstract class AssertThrows {
         this(new ResultVerifier() {
             @Override
             public boolean verify(Object returnValue, Throwable t, Method m,
-                    Object... args) {
+                                  Object... args) {
                 if (t != null) {
                     throw new AssertionError("Expected an exception " +
                             "to be thrown, but the method returned successfully");
@@ -82,7 +83,7 @@ public abstract class AssertThrows {
         this(new ResultVerifier() {
             @Override
             public boolean verify(Object returnValue, Throwable t, Method m,
-                    Object... args) {
+                                  Object... args) {
                 int errorCode;
                 if (t instanceof DbException) {
                     errorCode = ((DbException) t).getErrorCode();
@@ -94,7 +95,7 @@ public abstract class AssertThrows {
                 if (errorCode != expectedErrorCode) {
                     AssertionError ae = new AssertionError(
                             "Expected an SQLException or DbException with error code " +
-                            expectedErrorCode);
+                                    expectedErrorCode);
                     ae.initCause(t);
                     throw ae;
                 }

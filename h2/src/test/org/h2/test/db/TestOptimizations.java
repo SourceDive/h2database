@@ -6,23 +6,18 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.TreeSet;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.tools.SimpleResultSet;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
 import org.h2.util.Task;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.TreeSet;
 
 /**
  * Test various optimizations (query cache, optimization for MIN(..), and
@@ -509,7 +504,7 @@ public class TestOptimizations extends TestBase {
 
         prep = conn.prepareStatement(
                 "select 2 from test a where a=? and b in(" +
-                "select b.c from test b where b.d=?)");
+                        "select b.c from test b where b.d=?)");
         prep.setInt(1, 1);
         prep.setInt(2, 1);
         rs = prep.executeQuery();
@@ -729,7 +724,7 @@ public class TestOptimizations extends TestBase {
         Statement stat = conn.createStatement();
         testQuerySpeed(stat,
                 "select sum(a.n), sum(b.x) from system_range(1, 100) b, " +
-                "(select sum(x) n from system_range(1, 4000)) a");
+                        "(select sum(x) n from system_range(1, 4000)) a");
         conn.close();
     }
 
@@ -763,7 +758,7 @@ public class TestOptimizations extends TestBase {
         stat.execute("insert into test values(1), (1), (2)");
         stat.execute("insert into test2 values(1)");
         PreparedStatement prep = conn.prepareStatement(
-                    "select * from test where id = (select id from test2)");
+                "select * from test where id = (select id from test2)");
         ResultSet rs1 = prep.executeQuery();
         rs1.next();
         assertEquals(1, rs1.getInt(1));
@@ -800,58 +795,58 @@ public class TestOptimizations extends TestBase {
                 }
             }
             switch (random.nextInt(10)) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                if (random.nextInt(1000) == 1) {
-                    stat.execute("insert into test values(" + i + ", null)");
-                    map.put(new Integer(i), null);
-                } else {
-                    int value = random.nextInt();
-                    stat.execute("insert into test values(" + i + ", " + value + ")");
-                    map.put(i, value);
-                    set.add(value);
-                }
-                break;
-            case 6:
-            case 7:
-            case 8: {
-                if (map.size() > 0) {
-                    for (int j = random.nextInt(i), k = 0; k < 10; k++, j++) {
-                        if (map.containsKey(j)) {
-                            Integer x = map.remove(j);
-                            if (x != null) {
-                                set.remove(x);
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    if (random.nextInt(1000) == 1) {
+                        stat.execute("insert into test values(" + i + ", null)");
+                        map.put(new Integer(i), null);
+                    } else {
+                        int value = random.nextInt();
+                        stat.execute("insert into test values(" + i + ", " + value + ")");
+                        map.put(i, value);
+                        set.add(value);
+                    }
+                    break;
+                case 6:
+                case 7:
+                case 8: {
+                    if (map.size() > 0) {
+                        for (int j = random.nextInt(i), k = 0; k < 10; k++, j++) {
+                            if (map.containsKey(j)) {
+                                Integer x = map.remove(j);
+                                if (x != null) {
+                                    set.remove(x);
+                                }
+                                stat.execute("delete from test where id=" + j);
                             }
-                            stat.execute("delete from test where id=" + j);
                         }
                     }
+                    break;
                 }
-                break;
-            }
-            case 9: {
-                ArrayList<Integer> list = New.arrayList(map.values());
-                int count = list.size();
-                Integer min = null, max = null;
-                if (count > 0) {
-                    min = set.first();
-                    max = set.last();
+                case 9: {
+                    ArrayList<Integer> list = New.arrayList(map.values());
+                    int count = list.size();
+                    Integer min = null, max = null;
+                    if (count > 0) {
+                        min = set.first();
+                        max = set.last();
+                    }
+                    ResultSet rs = stat.executeQuery(
+                            "select min(value), max(value), count(*) from test");
+                    rs.next();
+                    Integer minDb = (Integer) rs.getObject(1);
+                    Integer maxDb = (Integer) rs.getObject(2);
+                    int countDb = rs.getInt(3);
+                    assertEquals(minDb, min);
+                    assertEquals(maxDb, max);
+                    assertEquals(countDb, count);
+                    break;
                 }
-                ResultSet rs = stat.executeQuery(
-                        "select min(value), max(value), count(*) from test");
-                rs.next();
-                Integer minDb = (Integer) rs.getObject(1);
-                Integer maxDb = (Integer) rs.getObject(2);
-                int countDb = rs.getInt(3);
-                assertEquals(minDb, min);
-                assertEquals(maxDb, max);
-                assertEquals(countDb, count);
-                break;
-            }
-            default:
+                default:
             }
         }
         conn.close();
@@ -941,7 +936,7 @@ public class TestOptimizations extends TestBase {
         stat.execute("CREATE INDEX my_index ON my_table(K1, VAL)");
         ResultSet rs = stat.executeQuery(
                 "EXPLAIN PLAN FOR SELECT * FROM my_table WHERE K1=7 " +
-                "ORDER BY K1, VAL");
+                        "ORDER BY K1, VAL");
         rs.next();
         assertContains(rs.getString(1), "/* PUBLIC.MY_INDEX: K1 = 7 */");
 
@@ -954,7 +949,7 @@ public class TestOptimizations extends TestBase {
         stat.execute("CREATE INDEX my_index2 ON my_table(K1, K2, VAL)");
         rs = stat.executeQuery(
                 "EXPLAIN PLAN FOR SELECT * FROM my_table WHERE K1=7 " +
-                "ORDER BY K1, K2, VAL");
+                        "ORDER BY K1, K2, VAL");
         rs.next();
         assertContains(rs.getString(1), "/* PUBLIC.MY_INDEX2: K1 = 7 */");
 

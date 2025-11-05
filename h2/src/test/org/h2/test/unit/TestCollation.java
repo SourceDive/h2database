@@ -6,11 +6,11 @@
  */
 package org.h2.test.unit;
 
-import java.sql.Connection;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
+
+import java.sql.Connection;
+import java.sql.Statement;
 
 /**
  * Test the ICU4J collator.
@@ -44,7 +44,7 @@ public class TestCollation extends TestBase {
         stat.execute("set collation ge");
         // not allowed to change now
         assertThrows(ErrorCode.COLLATION_CHANGE_WITH_DATA_TABLE_1, stat).
-            execute("set collation en");
+                execute("set collation en");
 
         conn.close();
         deleteDb("collation");

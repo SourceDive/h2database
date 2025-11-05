@@ -6,15 +6,15 @@
  */
 package org.h2.build.doc;
 
+import org.h2.tools.Server;
+import org.h2.util.IOUtils;
+import org.h2.util.StringUtils;
+
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-
-import org.h2.tools.Server;
-import org.h2.util.IOUtils;
-import org.h2.util.StringUtils;
 
 /**
  * The link checker makes sure that each link in the documentation
@@ -24,7 +24,7 @@ public class LinkChecker {
 
     private static final boolean OPEN_EXTERNAL_LINKS = false;
     private static final String[] IGNORE_MISSING_LINKS_TO = {
-        "SysProperties", "ErrorCode"
+            "SysProperties", "ErrorCode"
     };
 
     private final HashMap<String, String> targets = new HashMap<String, String>();

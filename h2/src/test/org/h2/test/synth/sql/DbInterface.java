@@ -65,8 +65,8 @@ public interface DbInterface {
      * Insert a row into a table.
      *
      * @param table the table
-     * @param c the column list
-     * @param v the values
+     * @param c     the column list
+     * @param v     the values
      * @return the result
      */
     Result insert(Table table, Column[] c, Value[] v) throws SQLException;
@@ -82,7 +82,7 @@ public interface DbInterface {
     /**
      * Delete a number of rows.
      *
-     * @param table the table
+     * @param table     the table
      * @param condition the condition
      * @return the result
      */
@@ -91,14 +91,14 @@ public interface DbInterface {
     /**
      * Update the given table with the new values.
      *
-     * @param table the table
-     * @param columns the columns to update
-     * @param values the new values
+     * @param table     the table
+     * @param columns   the columns to update
+     * @param values    the new values
      * @param condition the condition
      * @return the result of the update
      */
     Result update(Table table, Column[] columns, Value[] values,
-            String condition) throws SQLException;
+                  String condition) throws SQLException;
 
     /**
      * Enable or disable autocommit.

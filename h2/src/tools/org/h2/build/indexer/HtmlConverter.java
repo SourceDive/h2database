@@ -19,7 +19,7 @@ public class HtmlConverter {
     private static final HashMap<Character, String> CODE_MAP =
             new HashMap<Character, String>();
 
-    private static final String[] CHARS = { "quot:34", "amp:38", "lt:60",
+    private static final String[] CHARS = {"quot:34", "amp:38", "lt:60",
             "gt:62", "nbsp:160", "iexcl:161", "cent:162", "pound:163",
             "curren:164", "yen:165", "brvbar:166", "sect:167", "uml:168",
             "copy:169", "ordf:170", "laquo:171", "not:172", "shy:173",
@@ -69,7 +69,7 @@ public class HtmlConverter {
             "ndash:8211", "mdash:8212", "lsquo:8216", "rsquo:8217",
             "sbquo:8218", "ldquo:8220", "rdquo:8221", "bdquo:8222",
             "dagger:8224", "Dagger:8225", "hellip:8230", "permil:8240",
-            "lsaquo:8249",            "rsaquo:8250" };
+            "lsaquo:8249", "rsaquo:8250"};
 
     private HtmlConverter() {
         // utility class

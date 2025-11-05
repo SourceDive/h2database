@@ -6,25 +6,13 @@
  */
 package org.h2.util;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.TreeMap;
-import java.util.Vector;
-import java.util.Map.Entry;
 import org.h2.message.DbException;
 import org.h2.message.TraceSystem;
 import org.h2.store.fs.FileUtils;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Sorted properties file.
@@ -48,12 +36,12 @@ public class SortedProperties extends Properties {
      * Get a boolean property value from a properties object.
      *
      * @param prop the properties object
-     * @param key the key
-     * @param def the default value
+     * @param key  the key
+     * @param def  the default value
      * @return the value if set, or the default value if not
      */
     public static boolean getBooleanProperty(Properties prop, String key,
-            boolean def) {
+                                             boolean def) {
         String value = prop.getProperty(key, "" + def);
         try {
             return Boolean.parseBoolean(value);
@@ -67,8 +55,8 @@ public class SortedProperties extends Properties {
      * Get an int property value from a properties object.
      *
      * @param prop the properties object
-     * @param key the key
-     * @param def the default value
+     * @param key  the key
+     * @param def  the default value
      * @return the value if set, or the default value if not
      */
     public static int getIntProperty(Properties prop, String key, int def) {

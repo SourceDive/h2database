@@ -6,14 +6,11 @@
  */
 package org.h2.test.synth;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Random;
 import org.h2.test.TestBase;
 import org.h2.tools.DeleteDbFiles;
+
+import java.sql.*;
+import java.util.Random;
 
 /**
  * A b-tree index test.
@@ -52,7 +49,7 @@ public class TestBtreeIndex extends TestBase {
             int count = 1000;
             stat.execute(
                     "insert into test select x from system_range(1, " +
-                    count + ")");
+                            count + ")");
             if (!config.memory) {
                 conn.close();
                 conn = getConnection("index");

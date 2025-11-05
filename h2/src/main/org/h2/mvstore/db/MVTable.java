@@ -6,12 +6,6 @@
  */
 package org.h2.mvstore.db;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.command.ddl.Analyze;
@@ -33,15 +27,13 @@ import org.h2.mvstore.db.TransactionStore.Transaction;
 import org.h2.result.Row;
 import org.h2.result.SortOrder;
 import org.h2.schema.SchemaObject;
-import org.h2.table.Column;
-import org.h2.table.IndexColumn;
-import org.h2.table.RegularTable;
-import org.h2.table.Table;
-import org.h2.table.TableBase;
+import org.h2.table.*;
 import org.h2.util.MathUtils;
 import org.h2.util.New;
 import org.h2.value.DataType;
 import org.h2.value.Value;
+
+import java.util.*;
 
 /**
  * A table stored in a MVStore.
@@ -91,7 +83,7 @@ public class MVTable extends TableBase {
                 this, getId(),
                 IndexColumn.wrap(getColumns()),
                 IndexType.createScan(true)
-                );
+        );
         indexes.add(primaryIndex);
     }
 
@@ -227,12 +219,12 @@ public class MVTable extends TableBase {
             Table lock = s.getWaitForLock();
             Thread thread = s.getWaitForLockThread();
             buff.append("\nSession ").
-                append(s.toString()).
-                append(" on thread ").
-                append(thread.getName()).
-                append(" is waiting to lock ").
-                append(lock.toString()).
-                append(" while locking ");
+                    append(s.toString()).
+                    append(" on thread ").
+                    append(thread.getName()).
+                    append(" is waiting to lock ").
+                    append(lock.toString()).
+                    append(" while locking ");
             int i = 0;
             for (Table t : s.getLocks()) {
                 if (i++ > 0) {
@@ -254,7 +246,7 @@ public class MVTable extends TableBase {
 
     @Override
     public ArrayList<Session> checkDeadlock(Session session, Session clash,
-            Set<Session> visited) {
+                                            Set<Session> visited) {
         // only one deadlock check at any given time
         synchronized (RegularTable.class) {
             if (clash == null) {
@@ -369,8 +361,8 @@ public class MVTable extends TableBase {
 
     @Override
     public Index addIndex(Session session, String indexName, int indexId,
-            IndexColumn[] cols, IndexType indexType, boolean create,
-            String indexComment) {
+                          IndexColumn[] cols, IndexType indexType, boolean create,
+                          String indexComment) {
         if (indexType.isPrimaryKey()) {
             for (IndexColumn c : cols) {
                 Column column = c.column;
@@ -543,20 +535,20 @@ public class MVTable extends TableBase {
         if (first.sortType != SortOrder.ASCENDING) {
             return -1;
         }
-        switch(first.column.getType()) {
-        case Value.BYTE:
-        case Value.SHORT:
-        case Value.INT:
-        case Value.LONG:
-            break;
-        default:
-            return -1;
+        switch (first.column.getType()) {
+            case Value.BYTE:
+            case Value.SHORT:
+            case Value.INT:
+            case Value.LONG:
+                break;
+            default:
+                return -1;
         }
         return first.column.getColumnId();
     }
 
     private static void addRowsToIndex(Session session, ArrayList<Row> list,
-            Index index) {
+                                       Index index) {
         sortRows(list, index);
         for (Row row : list) {
             index.add(session, row);

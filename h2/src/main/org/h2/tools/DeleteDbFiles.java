@@ -6,18 +6,19 @@
  */
 package org.h2.tools;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.h2.engine.Constants;
 import org.h2.store.FileLister;
 import org.h2.store.fs.FileUtils;
 import org.h2.util.Tool;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 /**
  * Deletes all files belonging to a database.
  * <br />
  * The database must be closed before calling this tool.
+ *
  * @h2.resource
  */
 public class DeleteDbFiles extends Tool {
@@ -34,9 +35,9 @@ public class DeleteDbFiles extends Tool {
      * <tr><td>[-quiet]</td>
      * <td>Do not print progress information</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new DeleteDbFiles().runTool(args);
@@ -68,8 +69,8 @@ public class DeleteDbFiles extends Tool {
     /**
      * Deletes the database files.
      *
-     * @param dir the directory
-     * @param db the database name (null for all databases)
+     * @param dir   the directory
+     * @param db    the database name (null for all databases)
      * @param quiet don't print progress information
      */
     public static void execute(String dir, String db, boolean quiet) {
@@ -79,8 +80,8 @@ public class DeleteDbFiles extends Tool {
     /**
      * Deletes the database files.
      *
-     * @param dir the directory
-     * @param db the database name (null for all databases)
+     * @param dir   the directory
+     * @param db    the database name (null for all databases)
      * @param quiet don't print progress information
      */
     private void process(String dir, String db, boolean quiet) {

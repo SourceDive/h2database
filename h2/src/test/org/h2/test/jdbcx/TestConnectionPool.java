@@ -6,18 +6,18 @@
  */
 package org.h2.test.jdbcx;
 
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.h2.jdbcx.JdbcDataSource;
+import org.h2.test.TestBase;
+import org.h2.util.Task;
+
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.sql.DataSource;
-
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.h2.jdbcx.JdbcDataSource;
-import org.h2.test.TestBase;
-import org.h2.util.Task;
 
 /**
  * This class tests the JdbcConnectionPool.
@@ -182,7 +182,7 @@ public class TestConnectionPool extends TestBase {
     private void testThreads() throws Exception {
         final int len = getSize(4, 20);
         final JdbcConnectionPool man = getConnectionPool(len - 2);
-        final boolean[] stop = { false };
+        final boolean[] stop = {false};
 
         /**
          * This class gets and returns connections from the pool.
@@ -195,7 +195,7 @@ public class TestConnectionPool extends TestBase {
                         Connection conn = man.getConnection();
                         if (man.getActiveConnections() >= len + 1) {
                             throw new Exception("a: " +
-                                    man.getActiveConnections()  +
+                                    man.getActiveConnections() +
                                     " is not smaller than b: " + len + 1);
                         }
                         Statement stat = conn.createStatement();

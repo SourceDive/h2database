@@ -6,14 +6,14 @@
  */
 package org.h2.jdbc;
 
-import java.sql.SQLException;
-import java.sql.Savepoint;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.message.TraceObject;
 import org.h2.util.StringUtils;
+
+import java.sql.SQLException;
+import java.sql.Savepoint;
 
 /**
  * A savepoint is a point inside a transaction to where a transaction can be
@@ -29,7 +29,7 @@ public class JdbcSavepoint extends TraceObject implements Savepoint {
     private JdbcConnection conn;
 
     JdbcSavepoint(JdbcConnection conn, int savepointId, String name,
-            Trace trace, int id) {
+                  Trace trace, int id) {
         setTrace(trace, TraceObject.SAVEPOINT, id);
         this.conn = conn;
         this.savepointId = savepointId;
@@ -49,7 +49,7 @@ public class JdbcSavepoint extends TraceObject implements Savepoint {
      * If the name is null, the id is used.
      *
      * @param name the name (may be null)
-     * @param id the id
+     * @param id   the id
      * @return the savepoint name
      */
     static String getName(String name, int id) {
@@ -78,6 +78,7 @@ public class JdbcSavepoint extends TraceObject implements Savepoint {
 
     /**
      * Get the generated id of this savepoint.
+     *
      * @return the id
      */
     @Override
@@ -96,6 +97,7 @@ public class JdbcSavepoint extends TraceObject implements Savepoint {
 
     /**
      * Get the name of this savepoint.
+     *
      * @return the name
      */
     @Override

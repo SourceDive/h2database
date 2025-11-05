@@ -6,12 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Session;
@@ -31,6 +25,8 @@ import org.h2.util.MathUtils;
 import org.h2.util.New;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
+
+import java.util.*;
 
 /**
  * The scan index allows to access a row by key. It can be used to iterate over
@@ -59,7 +55,7 @@ public class PageDataIndex extends PageIndex {
     private final boolean multiVersion;
 
     public PageDataIndex(RegularTable table, int id, IndexColumn[] columns,
-            IndexType indexType, boolean create, Session session) {
+                         IndexType indexType, boolean create, Session session) {
         initBaseIndex(table, id, table.getName() + "_DATA", columns, indexType);
         this.multiVersion = database.isMultiVersion();
 
@@ -161,7 +157,7 @@ public class PageDataIndex extends PageIndex {
     public DbException getNewDuplicateKeyException() {
         String sql = "PRIMARY KEY ON " + table.getSQL();
         if (mainIndexColumn >= 0 && mainIndexColumn < indexColumns.length) {
-            sql +=  "(" + indexColumns[mainIndexColumn].getSQL() + ")";
+            sql += "(" + indexColumns[mainIndexColumn].getSQL() + ")";
         }
         DbException e = DbException.get(ErrorCode.DUPLICATE_KEY_1, sql);
         e.setSource(this);
@@ -226,7 +222,7 @@ public class PageDataIndex extends PageIndex {
     /**
      * Read the given page.
      *
-     * @param id the page id
+     * @param id     the page id
      * @param parent the parent, or -1 if unknown
      * @return the page
      */
@@ -259,9 +255,9 @@ public class PageDataIndex extends PageIndex {
     /**
      * Get the key from the row.
      *
-     * @param row the row
+     * @param row     the row
      * @param ifEmpty the value to use if the row is empty
-     * @param ifNull the value to use if the column is NULL
+     * @param ifNull  the value to use if the column is NULL
      * @return the key
      */
     long getKey(SearchRow row, long ifEmpty, long ifNull) {
@@ -289,9 +285,9 @@ public class PageDataIndex extends PageIndex {
     /**
      * Search for a specific row or a set of rows.
      *
-     * @param session the session
-     * @param first the key of the first row
-     * @param last the key of the last row
+     * @param session      the session
+     * @param first        the key of the first row
+     * @param last         the key of the last row
      * @param multiVersion if mvcc should be used
      * @return the cursor
      */
@@ -312,7 +308,7 @@ public class PageDataIndex extends PageIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         long cost = 10 * (tableData.getRowCountApproximation() +
                 Constants.COST_ROW_OFFSET);
         return cost;
@@ -515,7 +511,7 @@ public class PageDataIndex extends PageIndex {
      * The root page has changed.
      *
      * @param session the session
-     * @param newPos the new position
+     * @param newPos  the new position
      */
     void setRootPageId(Session session, int newPos) {
         store.removeMeta(this, session);

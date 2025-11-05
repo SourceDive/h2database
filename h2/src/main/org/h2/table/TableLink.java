@@ -6,16 +6,6 @@
  */
 package org.h2.table;
 
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.Prepared;
 import org.h2.engine.Session;
@@ -28,16 +18,12 @@ import org.h2.message.DbException;
 import org.h2.result.Row;
 import org.h2.result.RowList;
 import org.h2.schema.Schema;
-import org.h2.util.JdbcUtils;
-import org.h2.util.MathUtils;
-import org.h2.util.New;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueDate;
-import org.h2.value.ValueTime;
-import org.h2.value.ValueTimestamp;
+import org.h2.util.*;
+import org.h2.value.*;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A linked table contains connection information for a table accessible by
@@ -65,8 +51,8 @@ public class TableLink extends Table {
     private boolean readOnly;
 
     public TableLink(Schema schema, int id, String name, String driver,
-            String url, String user, String password, String originalSchema,
-            String originalTable, boolean emitUpdates, boolean force) {
+                     String url, String user, String password, String originalSchema,
+                     String originalTable, boolean emitUpdates, boolean force) {
         super(schema, id, name, false, true);
         this.driver = driver;
         this.url = url;
@@ -81,7 +67,7 @@ public class TableLink extends Table {
             if (!force) {
                 throw e;
             }
-            Column[] cols = { };
+            Column[] cols = {};
             setColumns(cols);
             linkedIndex = new LinkedIndex(this, id, IndexColumn.wrap(cols),
                     IndexType.createNonUnique(false));
@@ -91,7 +77,7 @@ public class TableLink extends Table {
 
     private void connect() {
         connectException = null;
-        for (int retry = 0;; retry++) {
+        for (int retry = 0; ; retry++) {
             try {
                 conn = database.getLinkConnection(driver, url, user, password);
                 synchronized (conn) {
@@ -176,7 +162,7 @@ public class TableLink extends Table {
             if (columnList.size() == 0) {
                 // alternative solution
                 ResultSetMetaData rsMeta = rs.getMetaData();
-                for (i = 0; i < rsMeta.getColumnCount();) {
+                for (i = 0; i < rsMeta.getColumnCount(); ) {
                     String n = rsMeta.getColumnName(i + 1);
                     n = convertColumnName(n);
                     int sqlType = rsMeta.getColumnType(i + 1);
@@ -288,21 +274,21 @@ public class TableLink extends Table {
         // for DATE columns, the reported precision is 7
         // for DECIMAL columns, the reported precision is 0
         switch (sqlType) {
-        case Types.DECIMAL:
-        case Types.NUMERIC:
-            if (precision == 0) {
-                precision = 65535;
-            }
-            break;
-        case Types.DATE:
-            precision = Math.max(ValueDate.PRECISION, precision);
-            break;
-        case Types.TIMESTAMP:
-            precision = Math.max(ValueTimestamp.PRECISION, precision);
-            break;
-        case Types.TIME:
-            precision = Math.max(ValueTime.PRECISION, precision);
-            break;
+            case Types.DECIMAL:
+            case Types.NUMERIC:
+                if (precision == 0) {
+                    precision = 65535;
+                }
+                break;
+            case Types.DATE:
+                precision = Math.max(ValueDate.PRECISION, precision);
+                break;
+            case Types.TIMESTAMP:
+                precision = Math.max(ValueTimestamp.PRECISION, precision);
+                break;
+            case Types.TIME:
+                precision = Math.max(ValueTime.PRECISION, precision);
+                break;
         }
         return precision;
     }
@@ -311,12 +297,12 @@ public class TableLink extends Table {
         // workaround for an Oracle problem:
         // for DECIMAL columns, the reported precision is -127
         switch (sqlType) {
-        case Types.DECIMAL:
-        case Types.NUMERIC:
-            if (scale < 0) {
-                scale = 32767;
-            }
-            break;
+            case Types.DECIMAL:
+            case Types.NUMERIC:
+                if (scale < 0) {
+                    scale = 32767;
+                }
+                break;
         }
         return scale;
     }
@@ -363,16 +349,16 @@ public class TableLink extends Table {
             buff.append(" COMMENT ").append(StringUtils.quoteStringSQL(comment));
         }
         buff.append('(').
-            append(StringUtils.quoteStringSQL(driver)).
-            append(", ").
-            append(StringUtils.quoteStringSQL(url)).
-            append(", ").
-            append(StringUtils.quoteStringSQL(user)).
-            append(", ").
-            append(StringUtils.quoteStringSQL(password)).
-            append(", ").
-            append(StringUtils.quoteStringSQL(originalTable)).
-            append(')');
+                append(StringUtils.quoteStringSQL(driver)).
+                append(", ").
+                append(StringUtils.quoteStringSQL(url)).
+                append(", ").
+                append(StringUtils.quoteStringSQL(user)).
+                append(", ").
+                append(StringUtils.quoteStringSQL(password)).
+                append(", ").
+                append(StringUtils.quoteStringSQL(originalTable)).
+                append(')');
         if (emitUpdates) {
             buff.append(" EMIT UPDATES");
         }
@@ -385,8 +371,8 @@ public class TableLink extends Table {
 
     @Override
     public Index addIndex(Session session, String indexName, int indexId,
-            IndexColumn[] cols, IndexType indexType, boolean create,
-            String indexComment) {
+                          IndexColumn[] cols, IndexType indexType, boolean create,
+                          String indexComment) {
         throw DbException.getUnsupportedException("LINK");
     }
 
@@ -454,7 +440,7 @@ public class TableLink extends Table {
      * Wrap a SQL exception that occurred while accessing a linked table.
      *
      * @param sql the SQL statement
-     * @param ex the exception from the remote database
+     * @param ex  the exception from the remote database
      * @return the wrapped exception
      */
     public static DbException wrapException(String sql, Exception ex) {
@@ -471,17 +457,17 @@ public class TableLink extends Table {
      * Execute a SQL statement using the given parameters. Prepared
      * statements are kept in a hash map to avoid re-creating them.
      *
-     * @param sql the SQL statement
-     * @param params the parameters or null
+     * @param sql           the SQL statement
+     * @param params        the parameters or null
      * @param reusePrepared if the prepared statement can be re-used immediately
      * @return the prepared statement, or null if it is re-used
      */
     public PreparedStatement execute(String sql, ArrayList<Value> params,
-            boolean reusePrepared) {
+                                     boolean reusePrepared) {
         if (conn == null) {
             throw connectException;
         }
-        for (int retry = 0;; retry++) {
+        for (int retry = 0; ; retry++) {
             try {
                 synchronized (conn) {
                     PreparedStatement prep = preparedMap.remove(sql);
@@ -602,7 +588,7 @@ public class TableLink extends Table {
         boolean deleteInsert;
         checkReadOnly();
         if (emitUpdates) {
-            for (rows.reset(); rows.hasNext();) {
+            for (rows.reset(); rows.hasNext(); ) {
                 prepared.checkCanceled();
                 Row oldRow = rows.next();
                 Row newRow = rows.next();
@@ -641,7 +627,7 @@ public class TableLink extends Table {
      * Add this prepared statement to the list of cached statements.
      *
      * @param prep the prepared statement
-     * @param sql the SQL statement
+     * @param sql  the SQL statement
      */
     public void reusePreparedStatement(PreparedStatement prep, String sql) {
         synchronized (conn) {
@@ -668,7 +654,7 @@ public class TableLink extends Table {
      * null).
      *
      * @param session the session
-     * @param row the row
+     * @param row     the row
      */
     @Override
     public void validateConvertUpdateSequence(Session session, Row row) {
@@ -690,7 +676,7 @@ public class TableLink extends Table {
      * not set (kept as null).
      *
      * @param session the session
-     * @param column the column
+     * @param column  the column
      * @return the value
      */
     @Override

@@ -6,6 +6,10 @@
  */
 package org.h2.test.utils;
 
+import org.h2.store.fs.FileBase;
+import org.h2.store.fs.FilePath;
+import org.h2.store.fs.FilePathWrapper;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,9 +18,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.List;
-import org.h2.store.fs.FileBase;
-import org.h2.store.fs.FilePath;
-import org.h2.store.fs.FilePathWrapper;
 
 /**
  * A debugging file system that logs all operations.
@@ -193,7 +194,7 @@ public class FilePathDebug extends FilePathWrapper {
 
     @Override
     public FilePath createTempFile(String suffix, boolean deleteOnExit,
-            boolean inTempDir) throws IOException {
+                                   boolean inTempDir) throws IOException {
         trace(name, "createTempFile", suffix, deleteOnExit, inTempDir);
         return super.createTempFile(suffix, deleteOnExit, inTempDir);
     }
@@ -202,8 +203,8 @@ public class FilePathDebug extends FilePathWrapper {
      * Print a debug message.
      *
      * @param fileName the (wrapped) file name
-     * @param method the method name
-     * @param params parameters if any
+     * @param method   the method name
+     * @param params   parameters if any
      */
     void trace(String fileName, String method, Object... params) {
         if (isTrace()) {
@@ -325,7 +326,7 @@ class FileDebug extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         debug("tryLock");
         return channel.tryLock(position, size, shared);
     }

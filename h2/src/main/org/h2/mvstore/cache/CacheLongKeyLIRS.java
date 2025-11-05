@@ -6,13 +6,9 @@
  */
 package org.h2.mvstore.cache;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.h2.mvstore.DataUtils;
+
+import java.util.*;
 
 /**
  * A scan resistant cache that uses keys of type long. It is meant to cache
@@ -39,8 +35,8 @@ import org.h2.mvstore.DataUtils;
  * of other entries have been moved to the front (1% by default). Write access
  * and moving entries to the top of the stack is synchronized per segment.
  *
- * @author Thomas Mueller
  * @param <V> the value type
+ * @author Thomas Mueller
  */
 public class CacheLongKeyLIRS<V> {
 
@@ -75,15 +71,15 @@ public class CacheLongKeyLIRS<V> {
     /**
      * Create a new cache with the given memory size.
      *
-     * @param maxMemory the maximum memory to use (1 or larger)
-     * @param averageMemory the average memory (1 or larger)
-     * @param segmentCount the number of cache segments (must be a power of 2)
+     * @param maxMemory         the maximum memory to use (1 or larger)
+     * @param averageMemory     the average memory (1 or larger)
+     * @param segmentCount      the number of cache segments (must be a power of 2)
      * @param stackMoveDistance how many other item are to be moved to the top
-     *        of the stack before the current item is moved
+     *                          of the stack before the current item is moved
      */
     @SuppressWarnings("unchecked")
     public CacheLongKeyLIRS(long maxMemory, int averageMemory,
-            int segmentCount, int stackMoveDistance) {
+                            int segmentCount, int stackMoveDistance) {
         setMaxMemory(maxMemory);
         setAverageMemory(averageMemory);
         DataUtils.checkArgument(
@@ -141,7 +137,7 @@ public class CacheLongKeyLIRS<V> {
     /**
      * Add an entry to the cache using the average memory size.
      *
-     * @param key the key (may not be null)
+     * @param key   the key (may not be null)
      * @param value the value (may not be null)
      * @return the old value, or null if there was no resident entry
      */
@@ -154,8 +150,8 @@ public class CacheLongKeyLIRS<V> {
      * cache yet. This method will usually mark unknown entries as cold and
      * known entries as hot.
      *
-     * @param key the key (may not be null)
-     * @param value the value (may not be null)
+     * @param key    the key (may not be null)
+     * @param value  the value (may not be null)
      * @param memory the memory used for the given entry
      * @return the old value, or null if there was no resident entry
      */
@@ -310,7 +306,7 @@ public class CacheLongKeyLIRS<V> {
     public synchronized Set<Map.Entry<Long, V>> entrySet() {
         HashMap<Long, V> map = new HashMap<Long, V>();
         for (long k : keySet()) {
-            map.put(k,  find(k).value);
+            map.put(k, find(k).value);
         }
         return map.entrySet();
     }
@@ -384,7 +380,7 @@ public class CacheLongKeyLIRS<V> {
      * Get the list of keys. This method allows to read the internal state of
      * the cache.
      *
-     * @param cold if true, only keys for the cold entries are returned
+     * @param cold        if true, only keys for the cold entries are returned
      * @param nonResident true for non-resident entries
      * @return the key list
      */
@@ -549,10 +545,10 @@ public class CacheLongKeyLIRS<V> {
         /**
          * Create a new cache.
          *
-         * @param maxMemory the maximum memory to use
-         * @param averageMemory the average memory usage of an object
+         * @param maxMemory         the maximum memory to use
+         * @param averageMemory     the average memory usage of an object
          * @param stackMoveDistance the number of other entries to be moved to
-         *        the top of the stack before moving an entry to the top
+         *                          the top of the stack before moving an entry to the top
          */
         Segment(long maxMemory, int averageMemory, int stackMoveDistance) {
             setMaxMemory(maxMemory);
@@ -598,7 +594,7 @@ public class CacheLongKeyLIRS<V> {
         /**
          * Get the memory used for the given key.
          *
-         * @param key the key (may not be null)
+         * @param key  the key (may not be null)
          * @param hash the hash
          * @return the memory, or 0 if there is no resident entry
          */
@@ -612,7 +608,7 @@ public class CacheLongKeyLIRS<V> {
          * adjusts the internal state of the cache sometimes, to ensure commonly
          * used entries stay in the cache.
          *
-         * @param key the key (may not be null)
+         * @param key  the key (may not be null)
          * @param hash the hash
          * @return the value, or null if there is no resident entry
          */
@@ -692,9 +688,9 @@ public class CacheLongKeyLIRS<V> {
          * cache yet. This method will usually mark unknown entries as cold and
          * known entries as hot.
          *
-         * @param key the key (may not be null)
-         * @param hash the hash
-         * @param value the value (may not be null)
+         * @param key    the key (may not be null)
+         * @param hash   the hash
+         * @param value  the value (may not be null)
          * @param memory the memory used for the given entry
          * @return the old value, or null if there was no resident entry
          */
@@ -733,7 +729,7 @@ public class CacheLongKeyLIRS<V> {
          * Remove an entry. Both resident and non-resident entries can be
          * removed.
          *
-         * @param key the key (may not be null)
+         * @param key  the key (may not be null)
          * @param hash the hash
          * @return the old value, or null if there was no resident entry
          */
@@ -853,7 +849,7 @@ public class CacheLongKeyLIRS<V> {
         /**
          * Try to find an entry in the map.
          *
-         * @param key the key
+         * @param key  the key
          * @param hash the hash
          * @return the entry (might be a non-resident)
          */
@@ -922,7 +918,7 @@ public class CacheLongKeyLIRS<V> {
          * Get the list of keys. This method allows to read the internal state
          * of the cache.
          *
-         * @param cold if true, only keys for the cold entries are returned
+         * @param cold        if true, only keys for the cold entries are returned
          * @param nonResident true for non-resident entries
          * @return the key list
          */
@@ -931,12 +927,12 @@ public class CacheLongKeyLIRS<V> {
             if (cold) {
                 Entry<V> start = nonResident ? queue2 : queue;
                 for (Entry<V> e = start.queueNext; e != start;
-                        e = e.queueNext) {
+                     e = e.queueNext) {
                     keys.add(e.key);
                 }
             } else {
                 for (Entry<V> e = stack.stackNext; e != stack;
-                        e = e.stackNext) {
+                     e = e.stackNext) {
                     keys.add(e.key);
                 }
             }
@@ -947,7 +943,7 @@ public class CacheLongKeyLIRS<V> {
          * Check whether there is a resident entry for the given key. This
          * method does not adjust the internal state of the cache.
          *
-         * @param key the key (may not be null)
+         * @param key  the key (may not be null)
          * @param hash the hash
          * @return true if there is a resident entry
          */

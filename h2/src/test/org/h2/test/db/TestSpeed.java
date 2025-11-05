@@ -6,12 +6,12 @@
  */
 package org.h2.test.db;
 
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.test.TestBase;
 
 /**
  * Various small performance tests.
@@ -102,7 +102,7 @@ public class TestSpeed extends TestBase {
             prep.setInt(1, i);
             prep.setString(2,
                     "abchelloasdfaldsjflajdflajdslfoajlskdfkjasdf" +
-                    "abcfasdfadsfadfsalksdjflasjflajsdlkfjaksdjflkskd" + i);
+                            "abcfasdfadsfadfsalksdjflasjflajsdlkfjaksdjflkskd" + i);
             prep.execute();
         }
 

@@ -6,15 +6,6 @@
  */
 package org.h2.mvstore.db;
 
-import java.io.InputStream;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.api.TableEngine;
 import org.h2.command.ddl.CreateTableData;
@@ -33,6 +24,15 @@ import org.h2.store.fs.FileUtils;
 import org.h2.table.RegularTable;
 import org.h2.table.TableBase;
 import org.h2.util.New;
+
+import java.io.InputStream;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A table engine that internally uses the MVStore.
@@ -249,7 +249,7 @@ public class MVTableEngine implements TableEngine {
         /**
          * Prepare a transaction.
          *
-         * @param session the session
+         * @param session         the session
          * @param transactionName the transaction name (may be null)
          */
         public void prepareCommit(Session session, String transactionName) {
@@ -388,15 +388,15 @@ public class MVTableEngine implements TableEngine {
 
         @Override
         public String getState() {
-            switch(state) {
-            case IN_DOUBT:
-                return "IN_DOUBT";
-            case COMMIT:
-                return "COMMIT";
-            case ROLLBACK:
-                return "ROLLBACK";
-            default:
-                throw DbException.throwInternalError("state="+state);
+            switch (state) {
+                case IN_DOUBT:
+                    return "IN_DOUBT";
+                case COMMIT:
+                    return "COMMIT";
+                case ROLLBACK:
+                    return "ROLLBACK";
+                default:
+                    throw DbException.throwInternalError("state=" + state);
             }
         }
 

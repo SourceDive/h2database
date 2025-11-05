@@ -57,8 +57,8 @@ public class PageBtreeNode extends PageBtree {
     /**
      * Read a b-tree node page.
      *
-     * @param index the index
-     * @param data the data
+     * @param index  the index
+     * @param data   the data
      * @param pageId the page id
      * @return the page
      */
@@ -71,13 +71,13 @@ public class PageBtreeNode extends PageBtree {
     /**
      * Create a new b-tree node page.
      *
-     * @param index the index
-     * @param pageId the page id
+     * @param index        the index
+     * @param pageId       the page id
      * @param parentPageId the parent page id
      * @return the page
      */
     static PageBtreeNode create(PageBtreeIndex index, int pageId,
-            int parentPageId) {
+                                int parentPageId) {
         PageBtreeNode p = new PageBtreeNode(index, pageId, index.getPageStore()
                 .createData());
         index.getPageStore().logUndo(p, null);
@@ -102,7 +102,7 @@ public class PageBtreeNode extends PageBtree {
         if (indexId != index.getId()) {
             throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
                     "page:" + getPos() + " expected index:" + index.getId() +
-                    "got:" + indexId);
+                            "got:" + indexId);
         }
         rowCount = rowCountStored = data.readInt();
         entryCount = data.readShortInt();
@@ -152,10 +152,10 @@ public class PageBtreeNode extends PageBtree {
     /**
      * Add a child at the given position.
      *
-     * @param x the position
+     * @param x           the position
      * @param childPageId the child
-     * @param row the row smaller than the first row of the child and its
-     *            children
+     * @param row         the row smaller than the first row of the child and its
+     *                    children
      */
     private void addChild(int x, int childPageId, SearchRow row) {
         int rowLength = index.getRowSize(data, row, onlyPosition);
@@ -251,7 +251,7 @@ public class PageBtreeNode extends PageBtree {
         }
         int firstChild = childPageIds[splitPoint];
         readAllRows();
-        for (int i = splitPoint; i < entryCount;) {
+        for (int i = splitPoint; i < entryCount; ) {
             p2.addChild(p2.entryCount, childPageIds[splitPoint + 1], getRow(splitPoint));
             removeChild(splitPoint);
         }
@@ -285,7 +285,7 @@ public class PageBtreeNode extends PageBtree {
      */
     void init(PageBtree page1, SearchRow pivot, PageBtree page2) {
         entryCount = 0;
-        childPageIds = new int[] { page1.getPos() };
+        childPageIds = new int[]{page1.getPos()};
         rows = SearchRow.EMPTY_ARRAY;
         offsets = Utils.EMPTY_INT_ARRAY;
         addChild(0, page2.getPos(), pivot);

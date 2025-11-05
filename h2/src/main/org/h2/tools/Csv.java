@@ -6,25 +6,6 @@
  */
 package org.h2.tools;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
@@ -34,6 +15,10 @@ import org.h2.util.IOUtils;
 import org.h2.util.JdbcUtils;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * A facility to read from and write to CSV (comma separated values) files. When
@@ -86,17 +71,17 @@ public class Csv implements SimpleRowSource {
                 for (int i = 0; i < columnCount; i++) {
                     Object o;
                     switch (sqlTypes[i]) {
-                    case Types.DATE:
-                        o = rs.getDate(i + 1);
-                        break;
-                    case Types.TIME:
-                        o = rs.getTime(i + 1);
-                        break;
-                    case Types.TIMESTAMP:
-                        o = rs.getTimestamp(i + 1);
-                        break;
-                    default:
-                        o = rs.getString(i + 1);
+                        case Types.DATE:
+                            o = rs.getDate(i + 1);
+                            break;
+                        case Types.TIME:
+                            o = rs.getTime(i + 1);
+                            break;
+                        case Types.TIMESTAMP:
+                            o = rs.getTimestamp(i + 1);
+                            break;
+                        default:
+                            o = rs.getString(i + 1);
                     }
                     row[i] = o == null ? null : o.toString();
                 }
@@ -117,7 +102,7 @@ public class Csv implements SimpleRowSource {
      * Writes the result set to a file in the CSV format.
      *
      * @param writer the writer
-     * @param rs the result set
+     * @param rs     the result set
      * @return the number of rows written
      */
     public int write(Writer writer, ResultSet rs) throws SQLException {
@@ -136,10 +121,10 @@ public class Csv implements SimpleRowSource {
      * </pre>
      *
      * @param outputFileName the name of the csv file
-     * @param rs the result set - the result set must be positioned before the
-     *          first row.
-     * @param charset the charset or null to use the system default charset
-     *          (see system property file.encoding)
+     * @param rs             the result set - the result set must be positioned before the
+     *                       first row.
+     * @param charset        the charset or null to use the system default charset
+     *                       (see system property file.encoding)
      * @return the number of rows written
      */
     public int write(String outputFileName, ResultSet rs, String charset)
@@ -156,15 +141,15 @@ public class Csv implements SimpleRowSource {
     /**
      * Writes the result set of a query to a file in the CSV format.
      *
-     * @param conn the connection
+     * @param conn           the connection
      * @param outputFileName the file name
-     * @param sql the query
-     * @param charset the charset or null to use the system default charset
-     *          (see system property file.encoding)
+     * @param sql            the query
+     * @param charset        the charset or null to use the system default charset
+     *                       (see system property file.encoding)
      * @return the number of rows written
      */
     public int write(Connection conn, String outputFileName, String sql,
-            String charset) throws SQLException {
+                     String charset) throws SQLException {
         Statement stat = conn.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         int rows = write(outputFileName, rs, charset);
@@ -184,14 +169,14 @@ public class Csv implements SimpleRowSource {
      * case sensitive (that means they need to be quoted when accessed).
      *
      * @param inputFileName the file name
-     * @param colNames or null if the column names should be read from the CSV
-     *          file
-     * @param charset the charset or null to use the system default charset
-     *          (see system property file.encoding)
+     * @param colNames      or null if the column names should be read from the CSV
+     *                      file
+     * @param charset       the charset or null to use the system default charset
+     *                      (see system property file.encoding)
      * @return the result set
      */
     public ResultSet read(String inputFileName, String[] colNames,
-            String charset) throws SQLException {
+                          String charset) throws SQLException {
         init(inputFileName, charset);
         try {
             return readResultSet(colNames);
@@ -205,9 +190,9 @@ public class Csv implements SimpleRowSource {
      * result set are created on demand, that means the reader is kept open
      * until all rows are read or the result set is closed.
      *
-     * @param reader the reader
+     * @param reader   the reader
      * @param colNames or null if the column names should be read from the CSV
-     *            file
+     *                 file
      * @return the result set
      */
     public ResultSet read(Reader reader, String[] colNames) throws IOException {

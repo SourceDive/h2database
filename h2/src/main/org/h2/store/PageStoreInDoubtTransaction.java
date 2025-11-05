@@ -22,13 +22,13 @@ public class PageStoreInDoubtTransaction implements InDoubtTransaction {
     /**
      * Create a new in-doubt transaction info object.
      *
-     * @param store the page store
-     * @param sessionId the session id
-     * @param pos the position
+     * @param store       the page store
+     * @param sessionId   the session id
+     * @param pos         the position
      * @param transaction the transaction name
      */
     public PageStoreInDoubtTransaction(PageStore store, int sessionId, int pos,
-            String transaction) {
+                                       String transaction) {
         this.store = store;
         this.sessionId = sessionId;
         this.pos = pos;
@@ -38,30 +38,30 @@ public class PageStoreInDoubtTransaction implements InDoubtTransaction {
 
     @Override
     public void setState(int state) {
-        switch(state) {
-        case COMMIT:
-            store.setInDoubtTransactionState(sessionId, pos, true);
-            break;
-        case ROLLBACK:
-            store.setInDoubtTransactionState(sessionId, pos, false);
-            break;
-        default:
-            DbException.throwInternalError("state="+state);
+        switch (state) {
+            case COMMIT:
+                store.setInDoubtTransactionState(sessionId, pos, true);
+                break;
+            case ROLLBACK:
+                store.setInDoubtTransactionState(sessionId, pos, false);
+                break;
+            default:
+                DbException.throwInternalError("state=" + state);
         }
         this.state = state;
     }
 
     @Override
     public String getState() {
-        switch(state) {
-        case IN_DOUBT:
-            return "IN_DOUBT";
-        case COMMIT:
-            return "COMMIT";
-        case ROLLBACK:
-            return "ROLLBACK";
-        default:
-            throw DbException.throwInternalError("state="+state);
+        switch (state) {
+            case IN_DOUBT:
+                return "IN_DOUBT";
+            case COMMIT:
+                return "COMMIT";
+            case ROLLBACK:
+                return "ROLLBACK";
+            default:
+                throw DbException.throwInternalError("state=" + state);
         }
     }
 

@@ -6,15 +6,15 @@
  */
 package org.h2.test.jaqu;
 
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.h2.api.ErrorCode;
 import org.h2.jaqu.Db;
 import org.h2.test.TestBase;
 import org.h2.util.JdbcUtils;
+
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Test annotation processing.
@@ -121,9 +121,9 @@ public class AnnotationsTest extends TestBase {
         db.update(prod);
 
         ProductAnnotationOnly newProd = db.from(p)
-            .where(p.productId)
-            .is(prod.productId)
-            .selectFirst();
+                .where(p.productId)
+                .is(prod.productId)
+                .selectFirst();
         assertEquals(newValue.substring(0, 15), newProd.category);
 
         newProd.category = oldValue;

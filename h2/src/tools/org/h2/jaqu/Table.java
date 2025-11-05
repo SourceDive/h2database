@@ -98,7 +98,7 @@ import java.lang.annotation.Target;
  *      -package packageName -folder destination
  *      -annotateSchema false -trimStrings true
  * </pre>
- *
+ * <p>
  * Model validation: you may validate your model class with DbInspector object.
  * The DbInspector will report errors, warnings, and suggestions:
  * <pre>
@@ -271,7 +271,7 @@ public interface Table {
         /**
          * If true, only fields that are explicitly
          * annotated as JQColumn are mapped.
-         *
+         * <p>
          * Default: true.
          */
         boolean annotationsOnly() default true;
@@ -279,9 +279,9 @@ public interface Table {
         /**
          * If true, this table is created as a memory table where data is
          * persistent, but index data is kept in main memory.
-         *
+         * <p>
          * Valid only for H2 databases.
-         *
+         * <p>
          * Default: false.
          */
         boolean memoryTable() default false;

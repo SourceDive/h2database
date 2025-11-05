@@ -20,6 +20,7 @@ import java.util.Set;
 
 /**
  * Test Bnf Sql parser
+ *
  * @author Nicolas Fortin
  */
 public class TestBnf extends TestBase {
@@ -86,13 +87,13 @@ public class TestBnf extends TestBase {
                 "DROP ALIAS IF EXISTS CUSTOM_PRINT");
         conn.createStatement().execute(
                 "CREATE ALIAS CUSTOM_PRINT " +
-                "AS $$ void print(String s) { System.out.println(s); } $$");
+                        "AS $$ void print(String s) { System.out.println(s); } $$");
         conn.createStatement().execute(
                 "DROP TABLE IF EXISTS " +
-                "TABLE_WITH_STRING_FIELD");
+                        "TABLE_WITH_STRING_FIELD");
         conn.createStatement().execute(
                 "CREATE TABLE " +
-                "TABLE_WITH_STRING_FIELD (STRING_FIELD VARCHAR(50), INT_FIELD integer)");
+                        "TABLE_WITH_STRING_FIELD (STRING_FIELD VARCHAR(50), INT_FIELD integer)");
         DbContents dbContents = new DbContents();
         dbContents.readContents("jdbc:h2:test", conn);
         assertTrue(dbContents.isH2());

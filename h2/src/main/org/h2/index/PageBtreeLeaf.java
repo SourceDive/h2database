@@ -6,8 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.Arrays;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Session;
@@ -17,6 +15,8 @@ import org.h2.result.SearchRow;
 import org.h2.store.Data;
 import org.h2.store.Page;
 import org.h2.store.PageStore;
+
+import java.util.Arrays;
 
 /**
  * A b-tree leaf page that contains index data. Format:
@@ -45,8 +45,8 @@ public class PageBtreeLeaf extends PageBtree {
     /**
      * Read a b-tree leaf page.
      *
-     * @param index the index
-     * @param data the data
+     * @param index  the index
+     * @param data   the data
      * @param pageId the page id
      * @return the page
      */
@@ -59,13 +59,13 @@ public class PageBtreeLeaf extends PageBtree {
     /**
      * Create a new page.
      *
-     * @param index the index
-     * @param pageId the page id
+     * @param index        the index
+     * @param pageId       the page id
      * @param parentPageId the parent
      * @return the page
      */
     static PageBtreeLeaf create(PageBtreeIndex index, int pageId,
-            int parentPageId) {
+                                int parentPageId) {
         PageBtreeLeaf p = new PageBtreeLeaf(index, pageId, index.getPageStore()
                 .createData());
         index.getPageStore().logUndo(p, null);
@@ -86,7 +86,7 @@ public class PageBtreeLeaf extends PageBtree {
         if (indexId != index.getId()) {
             throw DbException.get(ErrorCode.FILE_CORRUPTED_1,
                     "page:" + getPos() + " expected index:" + index.getId() +
-                    "got:" + indexId);
+                            "got:" + indexId);
         }
         entryCount = data.readShortInt();
         offsets = new int[entryCount];
@@ -208,7 +208,7 @@ public class PageBtreeLeaf extends PageBtree {
     PageBtree split(int splitPoint) {
         int newPageId = index.getPageStore().allocatePage();
         PageBtreeLeaf p2 = PageBtreeLeaf.create(index, newPageId, parentPageId);
-        for (int i = splitPoint; i < entryCount;) {
+        for (int i = splitPoint; i < entryCount; ) {
             p2.addRow(getRow(splitPoint), false);
             removeRow(splitPoint);
         }

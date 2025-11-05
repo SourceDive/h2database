@@ -6,43 +6,22 @@
  */
 package org.h2.server.web;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TimeZone;
-
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
 import org.h2.message.TraceSystem;
 import org.h2.server.Service;
 import org.h2.server.ShutdownHandler;
 import org.h2.store.fs.FileUtils;
-import org.h2.util.IOUtils;
-import org.h2.util.JdbcUtils;
-import org.h2.util.MathUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.New;
-import org.h2.util.SortedProperties;
-import org.h2.util.StringUtils;
-import org.h2.util.Tool;
-import org.h2.util.Utils;
+import org.h2.util.*;
+
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * The web server is a simple standalone HTTP server that implements the H2
@@ -53,60 +32,60 @@ public class WebServer implements Service {
     static final String TRANSFER = "transfer";
 
     static final String[][] LANGUAGES = {
-        { "cs", "\u010ce\u0161tina" },
-        { "de", "Deutsch" },
-        { "en", "English" },
-        { "es", "Espa\u00f1ol" },
-        { "fr", "Fran\u00e7ais" },
-        { "hu", "Magyar"},
-        { "ko", "\ud55c\uad6d\uc5b4"},
-        { "in", "Indonesia"},
-        { "it", "Italiano"},
-        { "ja", "\u65e5\u672c\u8a9e"},
-        { "nl", "Nederlands"},
-        { "pl", "Polski"},
-        { "pt_BR", "Portugu\u00eas (Brasil)"},
-        { "pt_PT", "Portugu\u00eas (Europeu)"},
-        { "ru", "\u0440\u0443\u0441\u0441\u043a\u0438\u0439"},
-        { "sk", "Slovensky"},
-        { "tr", "T\u00fcrk\u00e7e"},
-        { "uk", "\u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430"},
-        { "zh_CN", "\u4e2d\u6587 (\u7b80\u4f53)"},
-        { "zh_TW", "\u4e2d\u6587 (\u7e41\u9ad4)"},
+            {"cs", "\u010ce\u0161tina"},
+            {"de", "Deutsch"},
+            {"en", "English"},
+            {"es", "Espa\u00f1ol"},
+            {"fr", "Fran\u00e7ais"},
+            {"hu", "Magyar"},
+            {"ko", "\ud55c\uad6d\uc5b4"},
+            {"in", "Indonesia"},
+            {"it", "Italiano"},
+            {"ja", "\u65e5\u672c\u8a9e"},
+            {"nl", "Nederlands"},
+            {"pl", "Polski"},
+            {"pt_BR", "Portugu\u00eas (Brasil)"},
+            {"pt_PT", "Portugu\u00eas (Europeu)"},
+            {"ru", "\u0440\u0443\u0441\u0441\u043a\u0438\u0439"},
+            {"sk", "Slovensky"},
+            {"tr", "T\u00fcrk\u00e7e"},
+            {"uk", "\u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430"},
+            {"zh_CN", "\u4e2d\u6587 (\u7b80\u4f53)"},
+            {"zh_TW", "\u4e2d\u6587 (\u7e41\u9ad4)"},
     };
 
     private static final String DEFAULT_LANGUAGE = "en";
 
     private static final String[] GENERIC = {
-        "Generic JNDI Data Source|javax.naming.InitialContext|" +
-                "java:comp/env/jdbc/Test|sa",
-        "Generic Firebird Server|org.firebirdsql.jdbc.FBDriver|" +
-                "jdbc:firebirdsql:localhost:c:/temp/firebird/test|sysdba",
-        "Generic SQLite|org.sqlite.JDBC|" +
-                "jdbc:sqlite:test|sa",
-        "Generic DB2|COM.ibm.db2.jdbc.net.DB2Driver|" +
-                "jdbc:db2://localhost/test|" ,
-        "Generic Oracle|oracle.jdbc.driver.OracleDriver|" +
-                    "jdbc:oracle:thin:@localhost:1521:XE|sa" ,
-        "Generic MS SQL Server 2000|com.microsoft.jdbc.sqlserver.SQLServerDriver|" +
-                "jdbc:microsoft:sqlserver://localhost:1433;DatabaseName=sqlexpress|sa",
-        "Generic MS SQL Server 2005|com.microsoft.sqlserver.jdbc.SQLServerDriver|" +
-                "jdbc:sqlserver://localhost;DatabaseName=test|sa",
-        "Generic PostgreSQL|org.postgresql.Driver|" +
-                "jdbc:postgresql:test|" ,
-        "Generic MySQL|com.mysql.jdbc.Driver|" +
-                "jdbc:mysql://localhost:3306/test|" ,
-        "Generic HSQLDB|org.hsqldb.jdbcDriver|" +
-                "jdbc:hsqldb:test;hsqldb.default_table_type=cached|sa" ,
-        "Generic Derby (Server)|org.apache.derby.jdbc.ClientDriver|" +
-                "jdbc:derby://localhost:1527/test;create=true|sa",
-        "Generic Derby (Embedded)|org.apache.derby.jdbc.EmbeddedDriver|" +
-                "jdbc:derby:test;create=true|sa",
-        "Generic H2 (Server)|org.h2.Driver|" +
-                "jdbc:h2:tcp://localhost/~/test|sa",
-        // this will be listed on top for new installations
-        "Generic H2 (Embedded)|org.h2.Driver|" +
-                "jdbc:h2:~/test|sa",
+            "Generic JNDI Data Source|javax.naming.InitialContext|" +
+                    "java:comp/env/jdbc/Test|sa",
+            "Generic Firebird Server|org.firebirdsql.jdbc.FBDriver|" +
+                    "jdbc:firebirdsql:localhost:c:/temp/firebird/test|sysdba",
+            "Generic SQLite|org.sqlite.JDBC|" +
+                    "jdbc:sqlite:test|sa",
+            "Generic DB2|COM.ibm.db2.jdbc.net.DB2Driver|" +
+                    "jdbc:db2://localhost/test|",
+            "Generic Oracle|oracle.jdbc.driver.OracleDriver|" +
+                    "jdbc:oracle:thin:@localhost:1521:XE|sa",
+            "Generic MS SQL Server 2000|com.microsoft.jdbc.sqlserver.SQLServerDriver|" +
+                    "jdbc:microsoft:sqlserver://localhost:1433;DatabaseName=sqlexpress|sa",
+            "Generic MS SQL Server 2005|com.microsoft.sqlserver.jdbc.SQLServerDriver|" +
+                    "jdbc:sqlserver://localhost;DatabaseName=test|sa",
+            "Generic PostgreSQL|org.postgresql.Driver|" +
+                    "jdbc:postgresql:test|",
+            "Generic MySQL|com.mysql.jdbc.Driver|" +
+                    "jdbc:mysql://localhost:3306/test|",
+            "Generic HSQLDB|org.hsqldb.jdbcDriver|" +
+                    "jdbc:hsqldb:test;hsqldb.default_table_type=cached|sa",
+            "Generic Derby (Server)|org.apache.derby.jdbc.ClientDriver|" +
+                    "jdbc:derby://localhost:1527/test;create=true|sa",
+            "Generic Derby (Embedded)|org.apache.derby.jdbc.EmbeddedDriver|" +
+                    "jdbc:derby:test;create=true|sa",
+            "Generic H2 (Server)|org.h2.Driver|" +
+                    "jdbc:h2:tcp://localhost/~/test|sa",
+            // this will be listed on top for new installations
+            "Generic H2 (Embedded)|org.h2.Driver|" +
+                    "jdbc:h2:~/test|sa",
     };
 
     private static int ticker;
@@ -459,15 +438,15 @@ public class WebServer implements Service {
      * Read the translation for this language and save them in the 'text'
      * property of this session.
      *
-     * @param session the session
+     * @param session  the session
      * @param language the language
      */
     void readTranslations(WebSession session, String language) {
         Properties text = new Properties();
         try {
-            trace("translation: "+language);
-            byte[] trans = getFile("_text_"+language+".prop");
-            trace("  "+new String(trans));
+            trace("translation: " + language);
+            byte[] trans = getFile("_text_" + language + ".prop");
+            trace("  " + new String(trans));
             text = SortedProperties.fromLines(new String(trans, Constants.UTF8));
             // remove starting # (if not translated yet)
             for (Entry<Object, Object> entry : text.entrySet()) {
@@ -598,7 +577,7 @@ public class WebServer implements Service {
                     updateSetting(info);
                 }
             } else {
-                for (int i = 0;; i++) {
+                for (int i = 0; ; i++) {
                     String data = prop.getProperty(String.valueOf(i));
                     if (data == null) {
                         break;
@@ -627,13 +606,13 @@ public class WebServer implements Service {
                 prop = new SortedProperties();
                 prop.setProperty("webPort",
                         "" + SortedProperties.getIntProperty(old,
-                        "webPort", port));
+                                "webPort", port));
                 prop.setProperty("webAllowOthers",
                         "" + SortedProperties.getBooleanProperty(old,
-                        "webAllowOthers", allowOthers));
+                                "webAllowOthers", allowOthers));
                 prop.setProperty("webSSL",
                         "" + SortedProperties.getBooleanProperty(old,
-                        "webSSL", ssl));
+                                "webSSL", ssl));
             }
             ArrayList<ConnectionInfo> settings = getSettings();
             int len = settings.size();
@@ -657,14 +636,14 @@ public class WebServer implements Service {
     /**
      * Open a database connection.
      *
-     * @param driver the driver class name
+     * @param driver      the driver class name
      * @param databaseUrl the database URL
-     * @param user the user name
-     * @param password the password
+     * @param user        the user name
+     * @param password    the password
      * @return the database connection
      */
     Connection getConnection(String driver, String databaseUrl, String user,
-            String password) throws SQLException {
+                             String password) throws SQLException {
         driver = driver.trim();
         databaseUrl = databaseUrl.trim();
         org.h2.Driver.load();

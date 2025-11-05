@@ -6,8 +6,6 @@
  */
 package org.h2.command;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import org.h2.engine.SessionRemote;
 import org.h2.engine.SysProperties;
 import org.h2.expression.ParameterInterface;
@@ -19,6 +17,9 @@ import org.h2.result.ResultRemote;
 import org.h2.util.New;
 import org.h2.value.Transfer;
 import org.h2.value.Value;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Represents the client-side part of a SQL statement.
@@ -38,7 +39,7 @@ public class CommandRemote implements CommandInterface {
     private final int created;
 
     public CommandRemote(SessionRemote session,
-            ArrayList<Transfer> transferList, String sql, int fetchSize) {
+                         ArrayList<Transfer> transferList, String sql, int fetchSize) {
         this.transferList = transferList;
         trace = session.getTrace();
         this.sql = sql;
@@ -59,12 +60,12 @@ public class CommandRemote implements CommandInterface {
                 if (createParams) {
                     s.traceOperation("SESSION_PREPARE_READ_PARAMS", id);
                     transfer.
-                        writeInt(SessionRemote.SESSION_PREPARE_READ_PARAMS).
-                        writeInt(id).writeString(sql);
+                            writeInt(SessionRemote.SESSION_PREPARE_READ_PARAMS).
+                            writeInt(id).writeString(sql);
                 } else {
                     s.traceOperation("SESSION_PREPARE", id);
                     transfer.writeInt(SessionRemote.SESSION_PREPARE).
-                        writeInt(id).writeString(sql);
+                            writeInt(id).writeString(sql);
                 }
                 s.done(transfer);
                 isQuery = transfer.readBoolean();
@@ -147,7 +148,7 @@ public class CommandRemote implements CommandInterface {
                 try {
                     session.traceOperation("COMMAND_EXECUTE_QUERY", id);
                     transfer.writeInt(SessionRemote.COMMAND_EXECUTE_QUERY).
-                        writeInt(id).writeInt(objectId).writeInt(maxRows);
+                            writeInt(id).writeInt(objectId).writeInt(maxRows);
                     int fetch;
                     if (session.isClustered() || scrollable) {
                         fetch = Integer.MAX_VALUE;

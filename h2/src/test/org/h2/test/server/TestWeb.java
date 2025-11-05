@@ -6,35 +6,6 @@
  */
 package org.h2.test.server;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.ServletContext;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
@@ -46,6 +17,17 @@ import org.h2.tools.Server;
 import org.h2.util.IOUtils;
 import org.h2.util.StringUtils;
 import org.h2.util.Task;
+
+import javax.servlet.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.*;
+import java.security.Principal;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Tests the H2 Console application.
@@ -124,17 +106,20 @@ public class TestWeb extends TestBase {
             @Override
             public void test() throws SQLException {
                 Server.createPgServer("-pgPort 8182");
-        }};
+            }
+        };
         new AssertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1) {
             @Override
             public void test() throws SQLException {
                 Server.createTcpServer("-tcpPort 8182");
-        }};
+            }
+        };
         new AssertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1) {
             @Override
             public void test() throws SQLException {
                 Server.createWebServer("-webPort=8182");
-        }};
+            }
+        };
     }
 
     private void testAlreadyRunning() throws Exception {
@@ -185,7 +170,7 @@ public class TestWeb extends TestBase {
             assertTrue(FileUtils.exists(getBaseDir() + "/backup.zip"));
             result = client.get(url,
                     "tools.do?tool=DeleteDbFiles&args=-dir," +
-                    getBaseDir() + ",-db,web");
+                            getBaseDir() + ",-db,web");
             String fn = getBaseDir() + "/web";
             if (config.mvStore) {
                 fn += Constants.SUFFIX_MV_FILE;
@@ -233,7 +218,7 @@ public class TestWeb extends TestBase {
             new File("transfer/testUpload.txt").delete();
             client.upload(url + "/transfer/testUpload.txt",
                     "testUpload.txt", new ByteArrayInputStream(
-                    "Hallo Welt".getBytes()));
+                            "Hallo Welt".getBytes()));
             byte[] d = IOUtils.readBytesAndClose(
                     new FileInputStream("transfer/testUpload.txt"), -1);
             assertEquals("Hallo Welt", new String(d));

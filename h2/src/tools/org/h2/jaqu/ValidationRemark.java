@@ -31,7 +31,7 @@ public class ValidationRemark {
     private final String message;
 
     private ValidationRemark(Level level, String table, String type,
-            String message) {
+                             String message) {
         this.level = level;
         this.table = table;
         this.fieldType = type;
@@ -40,7 +40,7 @@ public class ValidationRemark {
     }
 
     private ValidationRemark(Level level, String table, FieldDefinition field,
-            String message) {
+                             String message) {
         this.level = level;
         this.table = table;
         this.fieldType = field.dataType;
@@ -49,7 +49,7 @@ public class ValidationRemark {
     }
 
     private ValidationRemark(Level level, String table, ColumnInspector col,
-            String message) {
+                             String message) {
         this.level = level;
         this.table = table;
         this.fieldType = col.type;
@@ -58,37 +58,37 @@ public class ValidationRemark {
     }
 
     public static ValidationRemark consider(String table, String type,
-            String message) {
+                                            String message) {
         return new ValidationRemark(Level.CONSIDER, table, type, message);
     }
 
     public static ValidationRemark consider(String table, ColumnInspector col,
-            String message) {
+                                            String message) {
         return new ValidationRemark(Level.CONSIDER, table, col, message);
     }
 
     public static ValidationRemark warn(String table, ColumnInspector col,
-            String message) {
+                                        String message) {
         return new ValidationRemark(Level.WARN, table, col, message);
     }
 
     public static ValidationRemark warn(String table, String type,
-            String message) {
+                                        String message) {
         return new ValidationRemark(Level.WARN, table, type, message);
     }
 
     public static ValidationRemark error(String table, ColumnInspector col,
-            String message) {
+                                         String message) {
         return new ValidationRemark(Level.ERROR, table, col, message);
     }
 
     public static ValidationRemark error(String table, String type,
-            String message) {
+                                         String message) {
         return new ValidationRemark(Level.ERROR, table, type, message);
     }
 
     public static ValidationRemark error(String table, FieldDefinition field,
-            String message) {
+                                         String message) {
         return new ValidationRemark(Level.ERROR, table, field, message);
     }
 

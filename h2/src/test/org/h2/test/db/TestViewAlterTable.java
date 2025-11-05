@@ -6,12 +6,13 @@
  */
 package org.h2.test.db;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.h2.test.TestBase;
-import org.h2.api.ErrorCode;
 
 /**
  * Test the impact of ALTER TABLE statements on views.
@@ -109,7 +110,7 @@ public class TestViewAlterTable extends TestBase {
         // each individual column that was in 'test' when the view was
         // originally created. This is consistent with PostgreSQL.
         assertThrows(ErrorCode.COLUMN_NOT_FOUND_1, stat).
-            executeQuery("select d from v4");
+                executeQuery("select d from v4");
         checkViewRemainsValid();
     }
 

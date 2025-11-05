@@ -6,18 +6,18 @@
  */
 package org.h2.store;
 
-import java.io.IOException;
-import java.lang.ref.Reference;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
 import org.h2.security.SecureFileStore;
 import org.h2.store.fs.FileUtils;
+
+import java.io.IOException;
+import java.lang.ref.Reference;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
 
 /**
  * This class is an abstraction of a random access file.
@@ -60,8 +60,8 @@ public class FileStore {
      * Create a new file using the given settings.
      *
      * @param handler the callback object
-     * @param name the file name
-     * @param mode the access mode ("r", "rw", "rws", "rwd")
+     * @param name    the file name
+     * @param mode    the access mode ("r", "rw", "rws", "rwd")
      */
     protected FileStore(DataHandler handler, String name, String mode) {
         this.handler = handler;
@@ -88,8 +88,8 @@ public class FileStore {
      * Open a non encrypted file store with the given settings.
      *
      * @param handler the data handler
-     * @param name the file name
-     * @param mode the access mode (r, rw, rws, rwd)
+     * @param name    the file name
+     * @param mode    the access mode (r, rw, rws, rwd)
      * @return the created object
      */
     public static FileStore open(DataHandler handler, String name, String mode) {
@@ -100,14 +100,14 @@ public class FileStore {
      * Open an encrypted file store with the given settings.
      *
      * @param handler the data handler
-     * @param name the file name
-     * @param mode the access mode (r, rw, rws, rwd)
-     * @param cipher the name of the cipher algorithm
-     * @param key the encryption key
+     * @param name    the file name
+     * @param mode    the access mode (r, rw, rws, rwd)
+     * @param cipher  the name of the cipher algorithm
+     * @param key     the encryption key
      * @return the created object
      */
     public static FileStore open(DataHandler handler, String name, String mode,
-            String cipher, byte[] key) {
+                                 String cipher, byte[] key) {
         return open(handler, name, mode, cipher, key,
                 Constants.ENCRYPTION_KEY_HASH_ITERATIONS);
     }
@@ -115,16 +115,16 @@ public class FileStore {
     /**
      * Open an encrypted file store with the given settings.
      *
-     * @param handler the data handler
-     * @param name the file name
-     * @param mode the access mode (r, rw, rws, rwd)
-     * @param cipher the name of the cipher algorithm
-     * @param key the encryption key
+     * @param handler       the data handler
+     * @param name          the file name
+     * @param mode          the access mode (r, rw, rws, rwd)
+     * @param cipher        the name of the cipher algorithm
+     * @param key           the encryption key
      * @param keyIterations the number of iterations the key should be hashed
      * @return the created object
      */
     public static FileStore open(DataHandler handler, String name, String mode,
-            String cipher, byte[] key, int keyIterations) {
+                                 String cipher, byte[] key, int keyIterations) {
         FileStore store;
         if (cipher == null) {
             store = new FileStore(handler, name, mode);
@@ -248,7 +248,7 @@ public class FileStore {
     /**
      * Read a number of bytes without decrypting.
      *
-     * @param b the target buffer
+     * @param b   the target buffer
      * @param off the offset
      * @param len the number of bytes to read
      */
@@ -259,7 +259,7 @@ public class FileStore {
     /**
      * Read a number of bytes.
      *
-     * @param b the target buffer
+     * @param b   the target buffer
      * @param off the offset
      * @param len the number of bytes to read
      */
@@ -302,7 +302,7 @@ public class FileStore {
     /**
      * Write a number of bytes without encrypting.
      *
-     * @param b the source buffer
+     * @param b   the source buffer
      * @param off the offset
      * @param len the number of bytes to write
      */
@@ -313,7 +313,7 @@ public class FileStore {
     /**
      * Write a number of bytes.
      *
-     * @param b the source buffer
+     * @param b   the source buffer
      * @param off the offset
      * @param len the number of bytes to write
      */

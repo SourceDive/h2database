@@ -6,29 +6,15 @@
  */
 package org.h2.build.doclet;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import com.sun.javadoc.*;
+import org.h2.util.StatementBuilder;
+import org.h2.util.StringUtils;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-import org.h2.util.StatementBuilder;
-import org.h2.util.StringUtils;
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.ConstructorDoc;
-import com.sun.javadoc.ExecutableMemberDoc;
-import com.sun.javadoc.FieldDoc;
-import com.sun.javadoc.LanguageVersion;
-import com.sun.javadoc.MethodDoc;
-import com.sun.javadoc.ParamTag;
-import com.sun.javadoc.Parameter;
-import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.Tag;
-import com.sun.javadoc.ThrowsTag;
-import com.sun.javadoc.Type;
 
 /**
  * This class is a custom doclet implementation to generate the
@@ -115,7 +101,7 @@ public class Doclet {
         MethodDoc[] methods = clazz.methods();
         ExecutableMemberDoc[] constructorsMethods =
                 new ExecutableMemberDoc[constructors.length
-                + methods.length];
+                        + methods.length];
         System.arraycopy(constructors, 0, constructorsMethods, 0,
                 constructors.length);
         System.arraycopy(methods, 0, constructorsMethods, constructors.length,
@@ -197,8 +183,8 @@ public class Doclet {
                         formatText(firstSentence) + "</div>");
             }
             writer.println("</td></tr>");
-            writer.println("<tr onclick=\"return off("+
-                    id +")\" class=\"detail\" id=\"_"+id+"\">");
+            writer.println("<tr onclick=\"return off(" +
+                    id + ")\" class=\"detail\" id=\"_" + id + "\">");
             writer.println("<td class=\"return\">" +
                     type + "</td><td>");
             writeMethodDetails(writer, clazz, method, signature);
@@ -282,7 +268,7 @@ public class Doclet {
     }
 
     private void writeFieldDetails(PrintWriter writer, ClassDoc clazz,
-            FieldDoc field) {
+                                   FieldDoc field) {
         if (skipField(clazz, field)) {
             return;
         }
@@ -306,7 +292,7 @@ public class Doclet {
     }
 
     private void writeMethodDetails(PrintWriter writer, ClassDoc clazz,
-            ExecutableMemberDoc method, String signature) {
+                                    ExecutableMemberDoc method, String signature) {
         String name = method.name();
         if (skipMethod(method)) {
             return;
@@ -350,7 +336,7 @@ public class Doclet {
                 addError("Undocumented parameter(s) (" +
                         getLink(clazz, method.position().line()) + ") " +
                         name + " documented: " + paramTags.length +
-                        " params: "+ params.length);
+                        " params: " + params.length);
             }
         }
         for (int j = 0; j < paramTags.length; j++) {
@@ -411,7 +397,7 @@ public class Doclet {
     }
 
     private String getFieldLink(String text, String constant, ClassDoc clazz,
-            String name) {
+                                String name) {
         String link = constant != null ? constant : name.toLowerCase();
         int linkStart = text.indexOf("<code>");
         if (linkStart >= 0) {
@@ -521,7 +507,7 @@ public class Doclet {
     }
 
     private boolean foundMethod(ClassDoc clazz, boolean include,
-            String methodName, int parameterCount) {
+                                String methodName, int parameterCount) {
         if (include) {
             for (MethodDoc m : clazz.methods()) {
                 if (m.name().equals(methodName)
@@ -550,7 +536,7 @@ public class Doclet {
     }
 
     private static String getTypeName(boolean isStatic, boolean isVarArgs,
-            Type type) {
+                                      Type type) {
         if (type == null) {
             return "";
         }

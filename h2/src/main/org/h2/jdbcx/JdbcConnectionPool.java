@@ -20,19 +20,14 @@
  */
 package org.h2.jdbcx;
 
+import org.h2.message.DbException;
+import org.h2.util.New;
+
+import javax.sql.*;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.sql.ConnectionEvent;
-import javax.sql.ConnectionEventListener;
-import javax.sql.ConnectionPoolDataSource;
-import javax.sql.DataSource;
-import javax.sql.PooledConnection;
-import org.h2.util.New;
-import org.h2.message.DbException;
-
-//## Java 1.7 ##
 import java.util.logging.Logger;
 //*/
 
@@ -40,7 +35,7 @@ import java.util.logging.Logger;
  * A simple standalone JDBC connection pool.
  * It is based on the
  * <a href="http://www.source-code.biz/snippets/java/8.htm">
- *  MiniConnectionPoolManager written by Christian d'Heureuse (Java 1.5)
+ * MiniConnectionPoolManager written by Christian d'Heureuse (Java 1.5)
  * </a>. It is used as follows:
  * <pre>
  * import java.sql.*;
@@ -60,7 +55,7 @@ import java.util.logging.Logger;
  * </pre>
  *
  * @author Christian d'Heureuse
- *      (<a href="http://www.source-code.biz">www.source-code.biz</a>)
+ * (<a href="http://www.source-code.biz">www.source-code.biz</a>)
  * @author Thomas Mueller
  */
 public class JdbcConnectionPool implements DataSource, ConnectionEventListener {
@@ -100,13 +95,13 @@ public class JdbcConnectionPool implements DataSource, ConnectionEventListener {
     /**
      * Constructs a new connection pool for H2 databases.
      *
-     * @param url the database URL of the H2 connection
-     * @param user the user name
+     * @param url      the database URL of the H2 connection
+     * @param user     the user name
      * @param password the password
      * @return the connection pool
      */
     public static JdbcConnectionPool create(String url, String user,
-            String password) {
+                                            String password) {
         JdbcDataSource ds = new JdbcDataSource();
         ds.setURL(url);
         ds.setUser(user);
@@ -189,7 +184,7 @@ public class JdbcConnectionPool implements DataSource, ConnectionEventListener {
      *
      * @return a new Connection object.
      * @throws SQLException when a new connection could not be established,
-     *      or a timeout occurred
+     *                      or a timeout occurred
      */
     @Override
     public Connection getConnection() throws SQLException {

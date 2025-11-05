@@ -64,7 +64,7 @@ public class CreateSequence extends SchemaCommand {
         Long min = getLong(minValue);
         Long max = getLong(maxValue);
         Sequence sequence = new Sequence(getSchema(), id, sequenceName, startValue, inc,
-            cache, min, max, cycle, belongsToTable);
+                cache, min, max, cycle, belongsToTable);
         db.addSchemaObject(session, sequence);
         return 0;
     }

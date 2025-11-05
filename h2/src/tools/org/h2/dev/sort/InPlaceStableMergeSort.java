@@ -74,7 +74,7 @@ public class InPlaceStableMergeSort<T> {
      * Sort a block recursively using merge sort.
      *
      * @param from the index of the first entry to sort
-     * @param to the index of the last entry to sort
+     * @param to   the index of the last entry to sort
      */
     void mergeSort(int from, int to) {
         if (to - from < INSERTION_SORT_SIZE) {
@@ -91,7 +91,7 @@ public class InPlaceStableMergeSort<T> {
      * Sort a block using the binary insertion sort algorithm.
      *
      * @param from the index of the first entry to sort
-     * @param to the index of the last entry to sort
+     * @param to   the index of the last entry to sort
      */
     private void binaryInsertionSort(int from, int to) {
         for (int i = from + 1; i <= to; i++) {
@@ -107,9 +107,9 @@ public class InPlaceStableMergeSort<T> {
     /**
      * Find the index of the element that is larger than x.
      *
-     * @param x the element to search
+     * @param x    the element to search
      * @param from the index of the first entry
-     * @param to the index of the last entry
+     * @param to   the index of the last entry
      * @return the position
      */
     private int binarySearch(T x, int from, int to) {
@@ -127,9 +127,9 @@ public class InPlaceStableMergeSort<T> {
     /**
      * Merge two arrays.
      *
-     * @param from the start of the first range
+     * @param from   the start of the first range
      * @param second start of the second range
-     * @param to the last element of the second range
+     * @param to     the last element of the second range
      */
     private void merge(int from, int second, int to) {
         int len1 = second - from, len2 = to - second + 1;
@@ -159,9 +159,9 @@ public class InPlaceStableMergeSort<T> {
      * Merge two (large) arrays. This is done recursively by merging the
      * beginning of both arrays, and then the end of both arrays.
      *
-     * @param from the start of the first range
+     * @param from   the start of the first range
      * @param second start of the second range
-     * @param to the last element of the second range
+     * @param to     the last element of the second range
      */
     private void mergeBig(int from, int second, int to) {
         int len1 = second - from, len2 = to - second + 1;
@@ -187,16 +187,16 @@ public class InPlaceStableMergeSort<T> {
      * up merging.
      *
      * @param target the target array
-     * @param pos the position of the first element in the target array
-     * @param s1 the first source array
-     * @param from1 the index of the first element in the first source array
-     * @param to1 the index of the last element in the first source array
-     * @param s2 the second source array
-     * @param from2 the index of the first element in the second source array
-     * @param to2 the index of the last element in the second source array
+     * @param pos    the position of the first element in the target array
+     * @param s1     the first source array
+     * @param from1  the index of the first element in the first source array
+     * @param to1    the index of the last element in the first source array
+     * @param s2     the second source array
+     * @param from2  the index of the first element in the second source array
+     * @param to2    the index of the last element in the second source array
      */
     private void mergeSmall(T[] target, int pos, T[] s1, int from1, int to1,
-            T[] s2, int from2, int to2) {
+                            T[] s2, int from2, int to2) {
         T x1 = s1[from1], x2 = s2[from2];
         while (true) {
             if (comp.compare(x1, x2) <= 0) {
@@ -220,9 +220,9 @@ public class InPlaceStableMergeSort<T> {
     /**
      * Find the largest element in the sorted array that is smaller than x.
      *
-     * @param x the element to search
+     * @param x    the element to search
      * @param from the index of the first entry
-     * @param to the index of the last entry
+     * @param to   the index of the last entry
      * @return the index of the resulting element
      */
     private int findLower(T x, int from, int to) {
@@ -244,9 +244,9 @@ public class InPlaceStableMergeSort<T> {
      * Find the smallest element in the sorted array that is larger than or
      * equal to x.
      *
-     * @param x the element to search
+     * @param x    the element to search
      * @param from the index of the first entry
-     * @param to the index of the last entry
+     * @param to   the index of the last entry
      * @return the index of the resulting element
      */
     private int findUpper(T x, int from, int to) {
@@ -268,9 +268,9 @@ public class InPlaceStableMergeSort<T> {
      * Swap the elements of two blocks in the data array. Both blocks are next
      * to each other (the second block starts just after the first block ends).
      *
-     * @param from the index of the first element in the first block
+     * @param from   the index of the first element in the first block
      * @param second the index of the first element in the second block
-     * @param to the index of the last element in the second block
+     * @param to     the index of the last element in the second block
      */
     private void swapBlocks(int from, int second, int to) {
         int len1 = second - from, len2 = to - second + 1;
@@ -297,7 +297,7 @@ public class InPlaceStableMergeSort<T> {
      * Reverse all elements in a block.
      *
      * @param from the index of the first element
-     * @param to the index of the last element
+     * @param to   the index of the last element
      */
     private void reverseBlock(int from, int to) {
         while (from < to) {

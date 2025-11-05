@@ -23,8 +23,8 @@ public class TestMultiOrder extends TestMultiThread {
     private static int orderCount;
     private static int orderLineCount;
 
-    private static final String[] ITEMS = { "Apples", "Oranges",
-            "Bananas", "Coffee" };
+    private static final String[] ITEMS = {"Apples", "Oranges",
+            "Bananas", "Coffee"};
 
     private Connection conn;
     private PreparedStatement insertLine;

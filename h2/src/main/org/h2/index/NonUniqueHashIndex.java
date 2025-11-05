@@ -6,7 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.ArrayList;
 import org.h2.engine.Session;
 import org.h2.message.DbException;
 import org.h2.result.Row;
@@ -19,6 +18,8 @@ import org.h2.table.TableFilter;
 import org.h2.util.New;
 import org.h2.util.ValueHashMap;
 import org.h2.value.Value;
+
+import java.util.ArrayList;
 
 /**
  * A non-unique index based on an in-memory hash map.
@@ -36,7 +37,7 @@ public class NonUniqueHashIndex extends BaseIndex {
     private long rowCount;
 
     public NonUniqueHashIndex(RegularTable table, int id, String indexName,
-            IndexColumn[] columns, IndexType indexType) {
+                              IndexColumn[] columns, IndexType indexType) {
         initBaseIndex(table, id, indexName, columns, indexType);
         this.indexColumn = columns[0].column.getColumnId();
         this.tableData = table;
@@ -132,7 +133,7 @@ public class NonUniqueHashIndex extends BaseIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         for (Column column : columns) {
             int index = column.getColumnId();
             int mask = masks[index];

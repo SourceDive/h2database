@@ -6,14 +6,14 @@
  */
 package org.h2.message;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-
 import org.h2.engine.SysProperties;
 import org.h2.expression.ParameterInterface;
 import org.h2.util.StatementBuilder;
 import org.h2.util.StringUtils;
 import org.h2.value.Value;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
 
 /**
  * This class represents a trace module.
@@ -156,8 +156,8 @@ public class Trace {
     /**
      * Write a message with trace level ERROR to the trace system.
      *
-     * @param t the exception
-     * @param s the message
+     * @param t      the exception
+     * @param s      the message
      * @param params the parameters
      */
     public void error(Throwable t, String s, Object... params) {
@@ -181,7 +181,7 @@ public class Trace {
     /**
      * Write a message with trace level INFO to the trace system.
      *
-     * @param s the message
+     * @param s      the message
      * @param params the parameters
      */
     public void info(String s, Object... params) {
@@ -237,10 +237,10 @@ public class Trace {
     /**
      * Write a SQL statement with trace level INFO to the trace system.
      *
-     * @param sql the SQL statement
+     * @param sql    the SQL statement
      * @param params the parameters used, in the for {1:...}
-     * @param count the update count
-     * @param time the time it took to run the statement in ms
+     * @param count  the update count
+     * @param time   the time it took to run the statement in ms
      */
     public void infoSQL(String sql, String params, int count, long time) {
         if (!isEnabled(TraceSystem.INFO)) {
@@ -271,9 +271,9 @@ public class Trace {
             buff.append(' ');
         }
         buff.append("*/").
-            append(StringUtils.javaEncode(sql)).
-            append(StringUtils.javaEncode(params)).
-            append(';');
+                append(StringUtils.javaEncode(sql)).
+                append(StringUtils.javaEncode(params)).
+                append(';');
         sql = buff.toString();
         traceWriter.write(TraceSystem.INFO, module, sql, null);
     }
@@ -281,7 +281,7 @@ public class Trace {
     /**
      * Write a message with trace level DEBUG to the trace system.
      *
-     * @param s the message
+     * @param s      the message
      * @param params the parameters
      */
     public void debug(String s, Object... params) {
@@ -304,6 +304,7 @@ public class Trace {
 
     /**
      * Write a message with trace level DEBUG to the trace system.
+     *
      * @param t the exception
      * @param s the message
      */

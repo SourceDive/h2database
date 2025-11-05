@@ -6,14 +6,11 @@
  */
 package org.h2.test.synth;
 
+import org.h2.bnf.*;
+import org.h2.util.New;
+
 import java.util.ArrayList;
 import java.util.Random;
-import org.h2.bnf.Bnf;
-import org.h2.bnf.BnfVisitor;
-import org.h2.bnf.Rule;
-import org.h2.bnf.RuleFixed;
-import org.h2.bnf.RuleHead;
-import org.h2.util.New;
 
 /**
  * A BNF visitor that generates a random SQL statement.
@@ -110,42 +107,42 @@ public class BnfRandom implements BnfVisitor {
     private String getRandomFixed(int type) {
         Random r = random;
         switch (type) {
-        case RuleFixed.YMD:
-            return (1800 + r.nextInt(200)) + "-" +
-                (1 + r.nextInt(12)) + "-" + (1 + r.nextInt(31));
-        case RuleFixed.HMS:
-            return (r.nextInt(24)) + "-" + (r.nextInt(60)) + "-" + (r.nextInt(60));
-        case RuleFixed.NANOS:
-            return "" + (r.nextInt(100000) + r.nextInt(10000));
-        case RuleFixed.ANY_UNTIL_EOL:
-        case RuleFixed.ANY_EXCEPT_SINGLE_QUOTE:
-        case RuleFixed.ANY_EXCEPT_DOUBLE_QUOTE:
-        case RuleFixed.ANY_WORD:
-        case RuleFixed.ANY_EXCEPT_2_DOLLAR:
-        case RuleFixed.ANY_UNTIL_END: {
-            StringBuilder buff = new StringBuilder();
-            int len = r.nextBoolean() ? 1 : r.nextInt(5);
-            for (int i = 0; i < len; i++) {
-                buff.append((char) ('A' + r.nextInt('C' - 'A')));
+            case RuleFixed.YMD:
+                return (1800 + r.nextInt(200)) + "-" +
+                        (1 + r.nextInt(12)) + "-" + (1 + r.nextInt(31));
+            case RuleFixed.HMS:
+                return (r.nextInt(24)) + "-" + (r.nextInt(60)) + "-" + (r.nextInt(60));
+            case RuleFixed.NANOS:
+                return "" + (r.nextInt(100000) + r.nextInt(10000));
+            case RuleFixed.ANY_UNTIL_EOL:
+            case RuleFixed.ANY_EXCEPT_SINGLE_QUOTE:
+            case RuleFixed.ANY_EXCEPT_DOUBLE_QUOTE:
+            case RuleFixed.ANY_WORD:
+            case RuleFixed.ANY_EXCEPT_2_DOLLAR:
+            case RuleFixed.ANY_UNTIL_END: {
+                StringBuilder buff = new StringBuilder();
+                int len = r.nextBoolean() ? 1 : r.nextInt(5);
+                for (int i = 0; i < len; i++) {
+                    buff.append((char) ('A' + r.nextInt('C' - 'A')));
+                }
+                return buff.toString();
             }
-            return buff.toString();
-        }
-        case RuleFixed.HEX_START:
-            return "0x";
-        case RuleFixed.CONCAT:
-            return "||";
-        case RuleFixed.AZ_UNDERSCORE:
-            return "" + (char) ('A' + r.nextInt('C' - 'A'));
-        case RuleFixed.AF:
-            return "" + (char) ('A' + r.nextInt('F' - 'A'));
-        case RuleFixed.DIGIT:
-            return "" + (char) ('0' + r.nextInt(10));
-        case RuleFixed.OPEN_BRACKET:
-            return "[";
-        case RuleFixed.CLOSE_BRACKET:
-            return "]";
-        default:
-            throw new AssertionError("type="+type);
+            case RuleFixed.HEX_START:
+                return "0x";
+            case RuleFixed.CONCAT:
+                return "||";
+            case RuleFixed.AZ_UNDERSCORE:
+                return "" + (char) ('A' + r.nextInt('C' - 'A'));
+            case RuleFixed.AF:
+                return "" + (char) ('A' + r.nextInt('F' - 'A'));
+            case RuleFixed.DIGIT:
+                return "" + (char) ('0' + r.nextInt(10));
+            case RuleFixed.OPEN_BRACKET:
+                return "[";
+            case RuleFixed.CLOSE_BRACKET:
+                return "]";
+            default:
+                throw new AssertionError("type=" + type);
         }
     }
 

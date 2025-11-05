@@ -6,14 +6,10 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
+
+import java.sql.*;
 
 /**
  * Tests for overloaded user defined functions.
@@ -157,7 +153,7 @@ public class TestFunctionOverload extends TestBase {
      * This method is called via reflection from the database.
      *
      * @param conn the connection
-     * @param one the value
+     * @param one  the value
      * @return the value
      */
     public static int overload1or2WithConn(Connection conn, int one)

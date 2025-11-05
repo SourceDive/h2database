@@ -6,15 +6,12 @@
  */
 package org.h2.test.synth;
 
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Random;
 import org.h2.test.TestBase;
 import org.h2.test.utils.SelfDestructor;
+
+import java.io.InputStream;
+import java.sql.*;
+import java.util.Random;
 
 /**
  * Standalone recovery test. A new process is started and then killed while it
@@ -36,10 +33,10 @@ public class TestKillRestart extends TestBase {
         //        "killRestart;CACHE_SIZE=2048;WRITE_DELAY=0", true);
         String user = getUser(), password = getPassword();
         String selfDestruct = SelfDestructor.getPropertyString(60);
-        String[] procDef = { "java", selfDestruct,
+        String[] procDef = {"java", selfDestruct,
                 "-cp", getClassPath(),
                 getClass().getName(), "-url", url, "-user", user,
-                "-password", password };
+                "-password", password};
 
         int len = getSize(2, 15);
         for (int i = 0; i < len; i++) {
@@ -144,7 +141,7 @@ public class TestKillRestart extends TestBase {
                 if (r.nextInt(100) < 10) {
                     conn.createStatement().execute(
                             "ALTER TABLE TEST_META " +
-                            "ALTER COLUMN ID INT DEFAULT 10");
+                                    "ALTER COLUMN ID INT DEFAULT 10");
                 }
                 if (r.nextBoolean()) {
                     if (r.nextBoolean()) {

@@ -6,21 +6,17 @@
  */
 package org.h2.test.unit;
 
-import java.io.OutputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
 import org.h2.api.ErrorCode;
 import org.h2.jdbc.JdbcConnection;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.util.SortedProperties;
 import org.h2.util.Task;
+
+import java.io.OutputStream;
+import java.sql.*;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Test the serialized (server-less) mode.
@@ -124,8 +120,8 @@ public class TestFileLockSerialized extends TestBase {
         conn.close();
 
         final int len = 10;
-        final Exception[] ex = { null };
-        final boolean[] stop = { false };
+        final Exception[] ex = {null};
+        final boolean[] stop = {false};
         Thread[] threads = new Thread[len];
         for (int i = 0; i < len; i++) {
             Thread t = new Thread(new Runnable() {
@@ -194,7 +190,7 @@ public class TestFileLockSerialized extends TestBase {
         conn.createStatement()
                 .execute(
                         "create table test(id identity) as " +
-                        "select x from system_range(1, 100)");
+                                "select x from system_range(1, 100)");
         conn.close();
         Task task = new Task() {
             @Override
@@ -349,7 +345,7 @@ public class TestFileLockSerialized extends TestBase {
     }
 
     private void testAutoIncrement(final int waitTime, int howManyThreads,
-            int runTime) throws Exception {
+                                   int runTime) throws Exception {
         println("testAutoIncrement waitTime: " + waitTime +
                 " howManyThreads: " + howManyThreads + " runTime: " + runTime);
         deleteDb("fileLockSerialized");
@@ -365,10 +361,10 @@ public class TestFileLockSerialized extends TestBase {
         conn.close();
 
         final long endTime = System.currentTimeMillis() + runTime;
-        final Exception[] ex = { null };
+        final Exception[] ex = {null};
         final Connection[] connList = new Connection[howManyThreads];
-        final boolean[] stop = { false };
-        final int[] nextInt = { 0 };
+        final boolean[] stop = {false};
+        final int[] nextInt = {0};
         Thread[] threads = new Thread[howManyThreads];
         for (int i = 0; i < howManyThreads; i++) {
             final int finalNrOfConnection = i;
@@ -433,7 +429,7 @@ public class TestFileLockSerialized extends TestBase {
     }
 
     private void testConcurrentUpdates(final int waitTime, int howManyThreads,
-            int runTime) throws Exception {
+                                       int runTime) throws Exception {
         println("testConcurrentUpdates waitTime: " + waitTime +
                 " howManyThreads: " + howManyThreads + " runTime: " + runTime);
         deleteDb("fileLockSerialized");
@@ -449,10 +445,10 @@ public class TestFileLockSerialized extends TestBase {
         conn.close();
 
         final long endTime = System.currentTimeMillis() + runTime;
-        final Exception[] ex = { null };
+        final Exception[] ex = {null};
         final Connection[] connList = new Connection[howManyThreads];
-        final boolean[] stop = { false };
-        final int[] lastInt = { 1 };
+        final boolean[] stop = {false};
+        final int[] lastInt = {1};
         Thread[] threads = new Thread[howManyThreads];
         for (int i = 0; i < howManyThreads; i++) {
             final int finalNrOfConnection = i;
@@ -507,7 +503,7 @@ public class TestFileLockSerialized extends TestBase {
     /**
      * If a checkpoint occurs between beforeWriting and checkWritingAllowed then
      * the result of checkWritingAllowed is READ_ONLY, which is wrong.
-     *
+     * <p>
      * Also, if a checkpoint started before beforeWriting, and ends between
      * between beforeWriting and checkWritingAllowed, then the same error
      * occurs.

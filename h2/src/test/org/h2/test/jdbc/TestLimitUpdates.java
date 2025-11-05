@@ -6,11 +6,12 @@
  */
 package org.h2.test.jdbc;
 
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.h2.test.TestBase;
 
 /**
  * Test for limit updates.
@@ -105,7 +106,7 @@ public class TestLimitUpdates extends TestBase {
     }
 
     private static void updateLimit(final Connection conn, final int value,
-            final int limit) throws SQLException {
+                                    final int limit) throws SQLException {
         PreparedStatement prep = null;
         try {
             prep = conn.prepareStatement(

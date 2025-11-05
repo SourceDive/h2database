@@ -33,7 +33,7 @@ public interface H2CursorDriver {
     /**
      * Execute the query.
      *
-     * @param factory the cursor factory
+     * @param factory  the cursor factory
      * @param bindArgs the parameter values
      * @return the cursor
      */

@@ -6,13 +6,9 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.test.TestBase;
+
+import java.sql.*;
 
 /**
  * Tests for the ON DUPLICATE KEY UPDATE in the Insert class.
@@ -55,7 +51,7 @@ public class TestDuplicateKeyUpdate extends TestBase {
 
         stat.execute("INSERT INTO table_test ( id, a_text, some_text ) VALUES " +
                 "(1, 'aaaaaaaaaa', 'aaaaaaaaaa'), " +
-                "(2, 'bbbbbbbbbb', 'bbbbbbbbbb'), "+
+                "(2, 'bbbbbbbbbb', 'bbbbbbbbbb'), " +
                 "(3, 'cccccccccc', 'cccccccccc'), " +
                 "(4, 'dddddddddd', 'dddddddddd'), " +
                 "(5, 'eeeeeeeeee', 'eeeeeeeeee')");
@@ -193,7 +189,7 @@ public class TestDuplicateKeyUpdate extends TestBase {
         for (int i = 0; i <= 2; ++i) {
             PreparedStatement prep = conn.prepareStatement(
                     "insert into test(key, count) values(?, ?) " +
-                    "on duplicate key update count = count + 1");
+                            "on duplicate key update count = count + 1");
             prep.setString(1, "a");
             prep.setInt(2, 1);
             prep.addBatch();
@@ -225,7 +221,7 @@ public class TestDuplicateKeyUpdate extends TestBase {
         for (int i = 0; i <= 2; ++i) {
             PreparedStatement prep = conn.prepareStatement(
                     "insert into test(key, count) values(?, ?), (?, ?), (?, ?) " +
-                    "on duplicate key update count = count + 1");
+                            "on duplicate key update count = count + 1");
             prep.setString(1, "a");
             prep.setInt(2, 1);
             prep.setString(3, "b");

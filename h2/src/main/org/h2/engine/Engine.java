@@ -6,8 +6,6 @@
  */
 package org.h2.engine;
 
-import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
 import org.h2.command.Parser;
@@ -18,6 +16,8 @@ import org.h2.util.MathUtils;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
+import java.util.HashMap;
 
 /**
  * The engine contains a map of all open databases.
@@ -38,7 +38,7 @@ public class Engine implements SessionFactory {
     }
 
     private Session openSession(ConnectionInfo ci, boolean ifExists,
-            String cipher) {
+                                String cipher) {
         String name = ci.getName();
         Database database;
         ci.removeProperty("NO_UPGRADE", false);
@@ -160,7 +160,7 @@ public class Engine implements SessionFactory {
         String cipher = ci.removeProperty("CIPHER", null);
         String init = ci.removeProperty("INIT", null);
         Session session;
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             session = openSession(ci, ifExists, cipher);
             if (session != null) {
                 break;
@@ -263,7 +263,7 @@ public class Engine implements SessionFactory {
      * is a bit randomized to protect against timing attacks. Also the delay
      * doubles after each unsuccessful logins, to make brute force attacks
      * harder.
-     *
+     * <p>
      * There is only one exception message both for wrong user and for
      * wrong password, to make it harder to get the list of user names. This
      * method must only be called from one place, so it is not possible from the

@@ -493,7 +493,7 @@ public class XMLParser {
      * Get the value of this attribute.
      *
      * @param namespaceURI the namespace URI (currently ignored)
-     * @param name the local name of the attribute
+     * @param name         the local name of the attribute
      * @return the value or null
      */
     public String getAttributeValue(String namespaceURI, String name) {

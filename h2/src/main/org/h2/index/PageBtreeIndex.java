@@ -41,8 +41,8 @@ public class PageBtreeIndex extends PageIndex {
     private int memoryCount;
 
     public PageBtreeIndex(RegularTable table, int id, String indexName,
-            IndexColumn[] columns,
-            IndexType indexType, boolean create, Session session) {
+                          IndexColumn[] columns,
+                          IndexType indexType, boolean create, Session session) {
         initBaseIndex(table, id, indexName, columns, indexType);
         if (!database.isStarting() && create) {
             checkIndexColumnTypes(columns);
@@ -72,7 +72,7 @@ public class PageBtreeIndex extends PageIndex {
         }
         this.needRebuild = create || (rowCount == 0 && store.isRecoveryRunning());
         if (trace.isDebugEnabled()) {
-            trace.debug("opened {0} rows: {1}", getName() , rowCount);
+            trace.debug("opened {0} rows: {1}", getName(), rowCount);
         }
         memoryPerPage = (Constants.MEMORY_PAGE_BTREE + store.getPageSize()) >> 2;
     }
@@ -175,7 +175,7 @@ public class PageBtreeIndex extends PageIndex {
     }
 
     private Cursor find(Session session, SearchRow first, boolean bigger,
-            SearchRow last) {
+                        SearchRow last) {
         if (SysProperties.CHECK && store == null) {
             throw DbException.get(ErrorCode.OBJECT_CLOSED);
         }
@@ -219,7 +219,7 @@ public class PageBtreeIndex extends PageIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return 10 * getCostRangeIndex(masks, tableData.getRowCount(session),
                 filter, sortOrder);
     }
@@ -294,7 +294,7 @@ public class PageBtreeIndex extends PageIndex {
      * Get a row from the main index.
      *
      * @param session the session
-     * @param key the row key
+     * @param key     the row key
      * @return the row
      */
     @Override
@@ -338,14 +338,14 @@ public class PageBtreeIndex extends PageIndex {
     /**
      * Read a row from the data page at the given offset.
      *
-     * @param data the data
-     * @param offset the offset
+     * @param data         the data
+     * @param offset       the offset
      * @param onlyPosition whether only the position of the row is stored
-     * @param needData whether the row data is required
+     * @param needData     whether the row data is required
      * @return the row
      */
     SearchRow readRow(Data data, int offset, boolean onlyPosition,
-            boolean needData) {
+                      boolean needData) {
         synchronized (data) {
             data.setPos(offset);
             long key = data.readVarLong();
@@ -380,10 +380,10 @@ public class PageBtreeIndex extends PageIndex {
     /**
      * Write a row to the data page at the given offset.
      *
-     * @param data the data
-     * @param offset the offset
+     * @param data         the data
+     * @param offset       the offset
      * @param onlyPosition whether only the position of the row is stored
-     * @param row the row to write
+     * @param row          the row to write
      */
     void writeRow(Data data, int offset, SearchRow row, boolean onlyPosition) {
         data.setPos(offset);
@@ -399,8 +399,8 @@ public class PageBtreeIndex extends PageIndex {
     /**
      * Get the size of a row (only the part that is stored in the index).
      *
-     * @param dummy a dummy data page to calculate the size
-     * @param row the row
+     * @param dummy        a dummy data page to calculate the size
+     * @param row          the row
      * @param onlyPosition whether only the position of the row is stored
      * @return the number of bytes
      */
@@ -424,7 +424,7 @@ public class PageBtreeIndex extends PageIndex {
      * The root page has changed.
      *
      * @param session the session
-     * @param newPos the new position
+     * @param newPos  the new position
      */
     void setRootPageId(Session session, int newPos) {
         store.removeMeta(this, session);

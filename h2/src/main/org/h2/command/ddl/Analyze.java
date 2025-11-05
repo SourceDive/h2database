@@ -6,7 +6,6 @@
  */
 package org.h2.command.ddl;
 
-import java.util.ArrayList;
 import org.h2.command.CommandInterface;
 import org.h2.command.Prepared;
 import org.h2.engine.Database;
@@ -19,6 +18,8 @@ import org.h2.table.Table;
 import org.h2.util.StatementBuilder;
 import org.h2.value.Value;
 import org.h2.value.ValueInt;
+
+import java.util.ArrayList;
 
 /**
  * This class represents the statement
@@ -51,12 +52,12 @@ public class Analyze extends DefineCommand {
      * Analyze this table.
      *
      * @param session the session
-     * @param table the table
-     * @param sample the number of sample rows
-     * @param manual whether the command was called by the user
+     * @param table   the table
+     * @param sample  the number of sample rows
+     * @param manual  whether the command was called by the user
      */
     public static void analyzeTable(Session session, Table table, int sample,
-            boolean manual) {
+                                    boolean manual) {
         if (!(table.getTableType().equals(Table.TABLE)) ||
                 table.isHidden() || session == null) {
             return;

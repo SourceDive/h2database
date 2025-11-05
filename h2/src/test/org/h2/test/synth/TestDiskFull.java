@@ -6,14 +6,14 @@
  */
 package org.h2.test.synth;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+import org.h2.test.utils.FilePathUnstable;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.api.ErrorCode;
-import org.h2.test.TestBase;
-import org.h2.test.utils.FilePathUnstable;
 
 /**
  * Test simulated disk full problems.
@@ -54,8 +54,8 @@ public class TestDiskFull extends TestBase {
         deleteDb("memFS:", null);
         fs.setDiskFullCount(x, 0);
         String url = "jdbc:h2:unstable:memFS:diskFull" + x +
-            ";FILE_LOCK=NO;TRACE_LEVEL_FILE=0;WRITE_DELAY=10;" +
-            "LOCK_TIMEOUT=100;CACHE_SIZE=4096";
+                ";FILE_LOCK=NO;TRACE_LEVEL_FILE=0;WRITE_DELAY=10;" +
+                "LOCK_TIMEOUT=100;CACHE_SIZE=4096";
         url = getURL(url, true);
         Connection conn = null;
         Statement stat = null;

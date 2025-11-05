@@ -6,31 +6,15 @@
  */
 package org.h2.test.unit;
 
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.UUID;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.test.utils.AssertThrows;
 import org.h2.tools.SimpleResultSet;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueBytes;
-import org.h2.value.ValueDecimal;
-import org.h2.value.ValueDouble;
-import org.h2.value.ValueFloat;
-import org.h2.value.ValueLobDb;
-import org.h2.value.ValueResultSet;
-import org.h2.value.ValueString;
-import org.h2.value.ValueUuid;
+import org.h2.value.*;
+
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.UUID;
 
 /**
  * Tests features of values.
@@ -63,8 +47,8 @@ public class TestValue extends TestBase {
         Value v;
         String spaces = new String(new char[100]).replace((char) 0, ' ');
 
-        v = ValueArray.get(new Value[] { ValueString.get("hello"),
-                ValueString.get("world") });
+        v = ValueArray.get(new Value[]{ValueString.get("hello"),
+                ValueString.get("world")});
         assertEquals(10, v.getPrecision());
         assertEquals(5, v.convertPrecision(5, true).getPrecision());
         v = ValueArray.get(new Value[]{ValueString.get(""), ValueString.get("")});
@@ -213,9 +197,9 @@ public class TestValue extends TestBase {
             assertEquals(i < 2 ? -1 : i > 2 ? 1 : 0, v.getSignum());
         }
         for (int i = 0; i < d.length - 1; i++) {
-            assertTrue(values[i].compareTypeSave(values[i+1], null) < 0);
+            assertTrue(values[i].compareTypeSave(values[i + 1], null) < 0);
             assertTrue(values[i + 1].compareTypeSave(values[i], null) > 0);
-            assertTrue(!values[i].equals(values[i+1]));
+            assertTrue(!values[i].equals(values[i + 1]));
         }
     }
 
@@ -236,10 +220,12 @@ public class TestValue extends TestBase {
 
     private void testModulusDouble() {
         final ValueDouble vd1 = ValueDouble.get(12);
-        new AssertThrows(ErrorCode.DIVISION_BY_ZERO_1) { @Override
-        public void test() {
-            vd1.modulus(ValueDouble.get(0));
-        }};
+        new AssertThrows(ErrorCode.DIVISION_BY_ZERO_1) {
+            @Override
+            public void test() {
+                vd1.modulus(ValueDouble.get(0));
+            }
+        };
         ValueDouble vd2 = ValueDouble.get(10);
         ValueDouble vd3 = vd1.modulus(vd2);
         assertEquals(2, vd3.getDouble());
@@ -247,10 +233,12 @@ public class TestValue extends TestBase {
 
     private void testModulusDecimal() {
         final ValueDecimal vd1 = ValueDecimal.get(new BigDecimal(12));
-        new AssertThrows(ErrorCode.DIVISION_BY_ZERO_1) { @Override
-        public void test() {
-            vd1.modulus(ValueDecimal.get(new BigDecimal(0)));
-        }};
+        new AssertThrows(ErrorCode.DIVISION_BY_ZERO_1) {
+            @Override
+            public void test() {
+                vd1.modulus(ValueDecimal.get(new BigDecimal(0)));
+            }
+        };
         ValueDecimal vd2 = ValueDecimal.get(new BigDecimal(10));
         ValueDecimal vd3 = vd1.modulus(vd2);
         assertEquals(2, vd3.getDouble());

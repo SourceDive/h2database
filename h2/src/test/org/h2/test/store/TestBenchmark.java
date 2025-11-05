@@ -6,14 +6,14 @@
  */
 package org.h2.test.store;
 
+import org.h2.store.FileLister;
+import org.h2.store.fs.FileUtils;
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Random;
-
-import org.h2.store.FileLister;
-import org.h2.store.fs.FileUtils;
-import org.h2.test.TestBase;
 
 /**
  * Tests performance and helps analyze bottlenecks.

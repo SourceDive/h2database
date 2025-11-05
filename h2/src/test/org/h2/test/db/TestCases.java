@@ -6,24 +6,16 @@
  */
 package org.h2.test.db;
 
-import java.io.File;
-import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
+
+import java.io.File;
+import java.io.StringReader;
+import java.sql.*;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Various test cases.
@@ -288,7 +280,7 @@ public class TestCases extends TestBase {
         Connection conn = getConnection("cases");
         Statement stat = conn.createStatement();
         stat.execute("create table test(id identity, name text)");
-        String[] data = { "\uff1e", "\ud848\udf1e" };
+        String[] data = {"\uff1e", "\ud848\udf1e"};
         PreparedStatement prep = conn.prepareStatement(
                 "insert into test(name) values(?)");
         for (int i = 0; i < data.length; i++) {
@@ -390,7 +382,7 @@ public class TestCases extends TestBase {
 
         PreparedStatement ps = conn.prepareStatement(
                 "select name from test where id in " +
-                "(select id from test where name = ?)");
+                        "(select id from test where name = ?)");
         ps.setString(1, "Hello");
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -422,7 +414,7 @@ public class TestCases extends TestBase {
         stat.execute("create table test(id int)");
         stat.execute("insert into test values(1)");
         String sql = "select ?, ?, (select count(*) from test inner join " +
-            "(select id from test where 0=?) as t2 on t2.id=test.id) from test";
+                "(select id from test where 0=?) as t2 on t2.id=test.id) from test";
         ResultSet rs;
         rs = stat.executeQuery(sql.replace('?', '0'));
         rs.next();
@@ -453,7 +445,7 @@ public class TestCases extends TestBase {
     }
 
     private void testCompareDoubleWithIntColumn(Statement stat, boolean pk,
-            double x, boolean prepared) throws SQLException {
+                                                double x, boolean prepared) throws SQLException {
         if (pk) {
             stat.execute("create table test(id int primary key)");
         } else {
@@ -587,8 +579,8 @@ public class TestCases extends TestBase {
                 "create table t(i identity, n varchar) as select 1, 'x'");
         PreparedStatement prep = conn.prepareStatement(
                 "select 1 from dual " +
-                "inner join(select n from t where i=?) a on a.n='x' " +
-                "inner join(select n from t where i=?) b on b.n='x'");
+                        "inner join(select n from t where i=?) a on a.n='x' " +
+                        "inner join(select n from t where i=?) b on b.n='x'");
         prep.setInt(1, 1);
         prep.setInt(2, 1);
         prep.execute();
@@ -608,7 +600,7 @@ public class TestCases extends TestBase {
         String encrypted = rs.getString(1);
         PreparedStatement prep2 = conn.prepareStatement(
                 "CALL TRIM(CHAR(0) FROM " +
-                "UTF8TOSTRING(DECRYPT('AES', RAWTOHEX(?), ?)))");
+                        "UTF8TOSTRING(DECRYPT('AES', RAWTOHEX(?), ?)))");
         prep2.setCharacterStream(1, new StringReader(key), -1);
         prep2.setCharacterStream(2, new StringReader(encrypted), -1);
         ResultSet rs2 = prep2.executeQuery();
@@ -640,7 +632,7 @@ public class TestCases extends TestBase {
             return;
         }
         assertThrows(ErrorCode.INVALID_DATABASE_NAME_1, this).
-            getConnection("cases/");
+                getConnection("cases/");
     }
 
     private void testReuseSpace() throws SQLException {
@@ -798,7 +790,7 @@ public class TestCases extends TestBase {
         for (int i = 0; i < 1000; i++) {
             stat.execute("INSERT INTO TEST() VALUES()");
         }
-        final SQLException[] stopped = { null };
+        final SQLException[] stopped = {null};
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1302,8 +1294,8 @@ public class TestCases extends TestBase {
         c0.createStatement().executeUpdate("SET AUTOCOMMIT FALSE");
         c0.createStatement().executeUpdate(
                 "create table australia (ID  INTEGER NOT NULL, " +
-                "Name VARCHAR(100), firstName VARCHAR(100), " +
-                "Points INTEGER, LicenseID INTEGER, PRIMARY KEY(ID))");
+                        "Name VARCHAR(100), firstName VARCHAR(100), " +
+                        "Points INTEGER, LicenseID INTEGER, PRIMARY KEY(ID))");
         c0.createStatement().executeUpdate("COMMIT");
         c0.close();
 
@@ -1350,7 +1342,7 @@ public class TestCases extends TestBase {
         c0.createStatement().executeUpdate("SET AUTOCOMMIT FALSE");
         PreparedStatement p65 = c0.prepareStatement(
                 "insert into australia" +
-                "(id, Name, FirstName, Points, LicenseID) values (?, ?, ?, ?, ?)");
+                        "(id, Name, FirstName, Points, LicenseID) values (?, ?, ?, ?, ?)");
         len = getSize(1, 1000);
         for (int i = 0; i < len; i++) {
             p65.setInt(1, i);
@@ -1405,9 +1397,9 @@ public class TestCases extends TestBase {
 
         ResultSet rs = stat.executeQuery(
                 "select master.id, master.name " +
-                "from master " +
-                "where master.id in (select detail.id from detail) " +
-                "order by master.id");
+                        "from master " +
+                        "where master.id in (select detail.id from detail) " +
+                        "order by master.id");
         assertTrue(rs.next());
         assertEquals(1, rs.getInt(1));
         assertTrue(rs.next());
@@ -1467,12 +1459,12 @@ public class TestCases extends TestBase {
                 "FROM TEST LIMIT ((SELECT COUNT(*) FROM TEST) / 10)");
         rs.next();
         assertEquals("DELETE FROM PUBLIC.TEST\n" +
-                "    /* PUBLIC.TEST.tableScan */\n" +
-                "LIMIT ((SELECT\n" +
-                "    COUNT(*)\n" +
-                "FROM PUBLIC.TEST\n" +
-                "    /* PUBLIC.TEST.tableScan */\n" +
-                "/* direct lookup */) / 10)",
+                        "    /* PUBLIC.TEST.tableScan */\n" +
+                        "LIMIT ((SELECT\n" +
+                        "    COUNT(*)\n" +
+                        "FROM PUBLIC.TEST\n" +
+                        "    /* PUBLIC.TEST.tableScan */\n" +
+                        "/* direct lookup */) / 10)",
                 rs.getString(1));
 
         PreparedStatement prep;

@@ -6,7 +6,6 @@
  */
 package org.h2.result;
 
-import java.util.ArrayList;
 import org.h2.command.ddl.CreateTableData;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
@@ -22,6 +21,8 @@ import org.h2.table.RegularTable;
 import org.h2.table.Table;
 import org.h2.value.Value;
 import org.h2.value.ValueArray;
+
+import java.util.ArrayList;
 
 /**
  * This class implements the temp table buffer for the LocalResult class.
@@ -62,7 +63,7 @@ public class ResultTempTable implements ResultExternal {
         indexColumn.columnName = COLUMN_NAME;
         IndexType indexType;
         indexType = IndexType.createPrimaryKey(true, false);
-        IndexColumn[] indexCols = { indexColumn };
+        IndexColumn[] indexCols = {indexColumn};
         if (session.getDatabase().getMvStore() != null) {
             index = table.addIndex(session, data.tableName, indexId, indexCols,
                     indexType, true, null);

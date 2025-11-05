@@ -6,14 +6,6 @@
  */
 package org.h2.tools;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.h2.message.DbException;
 import org.h2.store.fs.FileUtils;
 import org.h2.util.IOUtils;
@@ -21,8 +13,14 @@ import org.h2.util.JdbcUtils;
 import org.h2.util.StringUtils;
 import org.h2.util.Tool;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.sql.*;
+
 /**
  * Creates a SQL script file by extracting the schema and data of a database.
+ *
  * @h2.resource
  */
 public class Script extends Tool {
@@ -45,9 +43,9 @@ public class Script extends Tool {
      * <tr><td>[-quiet]</td>
      * <td>Do not print progress information</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new Script().runTool(args);
@@ -106,7 +104,7 @@ public class Script extends Tool {
     }
 
     private static void processScript(String url, String user, String password,
-            String fileName, String options1, String options2) throws SQLException {
+                                      String fileName, String options1, String options2) throws SQLException {
         Connection conn = null;
         Statement stat = null;
         try {
@@ -124,13 +122,13 @@ public class Script extends Tool {
     /**
      * Backs up a database to a SQL script file.
      *
-     * @param url the database URL
-     * @param user the user name
+     * @param url      the database URL
+     * @param user     the user name
      * @param password the password
      * @param fileName the script file
      */
     public static void execute(String url, String user, String password,
-            String fileName) throws SQLException {
+                               String fileName) throws SQLException {
         OutputStream o = null;
         try {
             o = FileUtils.newOutputStream(fileName, false);
@@ -146,13 +144,13 @@ public class Script extends Tool {
     /**
      * Backs up a database to a stream. The stream is not closed.
      *
-     * @param url the database URL
-     * @param user the user name
+     * @param url      the database URL
+     * @param user     the user name
      * @param password the password
-     * @param out the output stream
+     * @param out      the output stream
      */
     public static void execute(String url, String user, String password,
-            OutputStream out) throws SQLException {
+                               OutputStream out) throws SQLException {
         Connection conn = null;
         try {
             org.h2.Driver.load();
@@ -169,7 +167,7 @@ public class Script extends Tool {
      * The connection is not closed.
      *
      * @param conn the connection
-     * @param out the output stream
+     * @param out  the output stream
      */
     static void process(Connection conn, OutputStream out) throws SQLException {
         Statement stat = null;

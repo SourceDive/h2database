@@ -6,12 +6,13 @@
  */
 package org.h2.bnf.context;
 
+import org.h2.util.New;
+import org.h2.util.StringUtils;
+
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.h2.util.New;
-import org.h2.util.StringUtils;
 
 /**
  * Contains meta data information about a database schema.
@@ -72,7 +73,7 @@ public class DbSchema {
     DbSchema(DbContents contents, String name, boolean isDefault) {
         this.contents = contents;
         this.name = name;
-        this.quotedName =  contents.quoteIdentifier(name);
+        this.quotedName = contents.quoteIdentifier(name);
         this.isDefault = isDefault;
         if (name == null) {
             // firebird
@@ -116,7 +117,7 @@ public class DbSchema {
     /**
      * Read all tables for this schema from the database meta data.
      *
-     * @param meta the database meta data
+     * @param meta       the database meta data
      * @param tableTypes the table types to read
      */
     public void readTables(DatabaseMetaData meta, String[] tableTypes)
@@ -150,6 +151,7 @@ public class DbSchema {
 
     /**
      * Read all procedures in the dataBase.
+     *
      * @param meta the database meta data
      * @throws SQLException Error while fetching procedures
      */

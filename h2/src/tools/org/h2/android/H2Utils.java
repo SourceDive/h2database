@@ -14,13 +14,13 @@ public class H2Utils {
     /**
      * A replacement for Context.openOrCreateDatabase.
      *
-     * @param name the database name
-     * @param mode the access mode
+     * @param name    the database name
+     * @param mode    the access mode
      * @param factory the cursor factory to use
      * @return the database connection
      */
     public static H2Database openOrCreateDatabase(String name, int mode,
-            H2Database.CursorFactory factory) {
+                                                  H2Database.CursorFactory factory) {
         return H2Database.openOrCreateDatabase(name, factory);
     }
 

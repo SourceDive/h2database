@@ -29,7 +29,7 @@ public class TreeIndex extends BaseIndex {
     private boolean closed;
 
     public TreeIndex(RegularTable table, int id, String indexName,
-            IndexColumn[] columns, IndexType indexType) {
+                     IndexColumn[] columns, IndexType indexType) {
         initBaseIndex(table, id, indexName, columns, indexType);
         tableData = table;
         if (!database.isStarting()) {
@@ -83,35 +83,35 @@ public class TreeIndex extends BaseIndex {
         while (true) {
             int sign = isLeft ? 1 : -1;
             switch (x.balance * sign) {
-            case 1:
-                x.balance = 0;
-                return;
-            case 0:
-                x.balance = -sign;
-                break;
-            case -1:
-                TreeNode l = child(x, isLeft);
-                if (l.balance == -sign) {
-                    replace(x, l);
-                    set(x, isLeft, child(l, !isLeft));
-                    set(l, !isLeft, x);
+                case 1:
                     x.balance = 0;
-                    l.balance = 0;
-                } else {
-                    TreeNode r = child(l, !isLeft);
-                    replace(x, r);
-                    set(l, !isLeft, child(r, isLeft));
-                    set(r, isLeft, l);
-                    set(x, isLeft, child(r, !isLeft));
-                    set(r, !isLeft, x);
-                    int rb = r.balance;
-                    x.balance = (rb == -sign) ? sign : 0;
-                    l.balance = (rb == sign) ? -sign : 0;
-                    r.balance = 0;
-                }
-                return;
-            default:
-                DbException.throwInternalError("b:" + x.balance * sign);
+                    return;
+                case 0:
+                    x.balance = -sign;
+                    break;
+                case -1:
+                    TreeNode l = child(x, isLeft);
+                    if (l.balance == -sign) {
+                        replace(x, l);
+                        set(x, isLeft, child(l, !isLeft));
+                        set(l, !isLeft, x);
+                        x.balance = 0;
+                        l.balance = 0;
+                    } else {
+                        TreeNode r = child(l, !isLeft);
+                        replace(x, r);
+                        set(l, !isLeft, child(r, isLeft));
+                        set(r, isLeft, l);
+                        set(x, isLeft, child(r, !isLeft));
+                        set(r, !isLeft, x);
+                        int rb = r.balance;
+                        x.balance = (rb == -sign) ? sign : 0;
+                        l.balance = (rb == sign) ? -sign : 0;
+                        r.balance = 0;
+                    }
+                    return;
+                default:
+                    DbException.throwInternalError("b:" + x.balance * sign);
             }
             if (x == root) {
                 return;
@@ -164,7 +164,7 @@ public class TreeIndex extends BaseIndex {
         } else {
             TreeNode d = x;
             x = x.left;
-            for (TreeNode temp = x; (temp = temp.right) != null;) {
+            for (TreeNode temp = x; (temp = temp.right) != null; ) {
                 x = temp;
             }
             // x will be replaced with n later
@@ -227,43 +227,43 @@ public class TreeIndex extends BaseIndex {
             x = n;
             int sign = isLeft ? 1 : -1;
             switch (x.balance * sign) {
-            case -1:
-                x.balance = 0;
-                break;
-            case 0:
-                x.balance = sign;
-                return;
-            case 1:
-                TreeNode r = child(x, !isLeft);
-                int b = r.balance;
-                if (b * sign >= 0) {
-                    replace(x, r);
-                    set(x, !isLeft, child(r, isLeft));
-                    set(r, isLeft, x);
-                    if (b == 0) {
-                        x.balance = sign;
-                        r.balance = -sign;
-                        return;
-                    }
+                case -1:
                     x.balance = 0;
-                    r.balance = 0;
-                    x = r;
-                } else {
-                    TreeNode l = child(r, isLeft);
-                    replace(x, l);
-                    b = l.balance;
-                    set(r, isLeft, child(l, !isLeft));
-                    set(l, !isLeft, r);
-                    set(x, !isLeft, child(l, isLeft));
-                    set(l, isLeft, x);
-                    x.balance = (b == sign) ? -sign : 0;
-                    r.balance = (b == -sign) ? sign : 0;
-                    l.balance = 0;
-                    x = l;
-                }
-                break;
-            default:
-                DbException.throwInternalError("b: " + x.balance * sign);
+                    break;
+                case 0:
+                    x.balance = sign;
+                    return;
+                case 1:
+                    TreeNode r = child(x, !isLeft);
+                    int b = r.balance;
+                    if (b * sign >= 0) {
+                        replace(x, r);
+                        set(x, !isLeft, child(r, isLeft));
+                        set(r, isLeft, x);
+                        if (b == 0) {
+                            x.balance = sign;
+                            r.balance = -sign;
+                            return;
+                        }
+                        x.balance = 0;
+                        r.balance = 0;
+                        x = r;
+                    } else {
+                        TreeNode l = child(r, isLeft);
+                        replace(x, l);
+                        b = l.balance;
+                        set(r, isLeft, child(l, !isLeft));
+                        set(l, !isLeft, r);
+                        set(x, !isLeft, child(l, isLeft));
+                        set(l, isLeft, x);
+                        x.balance = (b == sign) ? -sign : 0;
+                        r.balance = (b == -sign) ? sign : 0;
+                        l.balance = 0;
+                        x = l;
+                    }
+                    break;
+                default:
+                    DbException.throwInternalError("b: " + x.balance * sign);
             }
             isLeft = x.isFromLeft();
             n = x.parent;
@@ -320,7 +320,7 @@ public class TreeIndex extends BaseIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return getCostRangeIndex(masks, tableData.getRowCountApproximation(),
                 filter, sortOrder);
     }

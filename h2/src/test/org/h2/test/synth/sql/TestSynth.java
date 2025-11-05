@@ -6,12 +6,12 @@
  */
 package org.h2.test.synth.sql;
 
-import java.util.ArrayList;
-
 import org.h2.test.TestAll;
 import org.h2.test.TestBase;
 import org.h2.util.MathUtils;
 import org.h2.util.New;
+
+import java.util.ArrayList;
 
 /**
  * A test that generates random SQL statements against a number of databases
@@ -102,45 +102,45 @@ public class TestSynth extends TestBase {
 
     private void addRandomCommands() throws Exception {
         switch (random.getInt(20)) {
-        case 0: {
-            add(Command.getDisconnect(this));
-            add(Command.getConnect(this));
-            break;
-        }
-        case 1: {
-            Table table = Table.newRandomTable(this);
-            add(Command.getCreateTable(this, table));
-            break;
-        }
-        case 2: {
-            Table table = randomTable();
-            add(Command.getCreateIndex(this, table.newRandomIndex()));
-            break;
-        }
-        case 3:
-        case 4:
-        case 5: {
-            Table table = randomTable();
-            add(Command.getRandomInsert(this, table));
-            break;
-        }
-        case 6:
-        case 7:
-        case 8: {
-            Table table = randomTable();
-            add(Command.getRandomUpdate(this, table));
-            break;
-        }
-        case 9:
-        case 10: {
-            Table table = randomTable();
-            add(Command.getRandomDelete(this, table));
-            break;
-        }
-        default: {
-            Table table = randomTable();
-            add(Command.getRandomSelect(this, table));
-        }
+            case 0: {
+                add(Command.getDisconnect(this));
+                add(Command.getConnect(this));
+                break;
+            }
+            case 1: {
+                Table table = Table.newRandomTable(this);
+                add(Command.getCreateTable(this, table));
+                break;
+            }
+            case 2: {
+                Table table = randomTable();
+                add(Command.getCreateIndex(this, table.newRandomIndex()));
+                break;
+            }
+            case 3:
+            case 4:
+            case 5: {
+                Table table = randomTable();
+                add(Command.getRandomInsert(this, table));
+                break;
+            }
+            case 6:
+            case 7:
+            case 8: {
+                Table table = randomTable();
+                add(Command.getRandomUpdate(this, table));
+                break;
+            }
+            case 9:
+            case 10: {
+                Table table = randomTable();
+                add(Command.getRandomDelete(this, table));
+                break;
+            }
+            default: {
+                Table table = randomTable();
+                add(Command.getRandomSelect(this, table));
+            }
         }
     }
 
@@ -257,7 +257,7 @@ public class TestSynth extends TestBase {
      * Print this message if the log is enabled.
      *
      * @param id the id
-     * @param s the message
+     * @param s  the message
      */
     void log(int id, String s) {
         if (showLog && id == 0) {
@@ -270,7 +270,7 @@ public class TestSynth extends TestBase {
     }
 
     private void addDatabase(String className, String url, String user,
-            String password, boolean useSentinel) {
+                             String password, boolean useSentinel) {
         DbConnection db = new DbConnection(this, className, url, user,
                 password, databases.size(), useSentinel);
         databases.add(db);

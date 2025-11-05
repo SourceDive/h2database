@@ -6,13 +6,13 @@
  */
 package org.h2.test.db;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.api.ErrorCode;
-import org.h2.test.TestBase;
 
 /**
  * Test the impact of DROP VIEW statements on dependent views.
@@ -73,7 +73,7 @@ public class TestViewDropView extends TestBase {
         if (dropRestrict) {
             // should fail because have dependencies
             assertThrows(ErrorCode.CANNOT_DROP_2, stat).
-                execute("drop view v1");
+                    execute("drop view v1");
         } else {
             stat.execute("drop view v1");
             checkViewRemainsValid();
@@ -84,7 +84,7 @@ public class TestViewDropView extends TestBase {
         createTestData();
         // should fail because have dependencies
         assertThrows(ErrorCode.CANNOT_DROP_2, stat).
-            execute("drop view v1 restrict");
+                execute("drop view v1 restrict");
         checkViewRemainsValid();
     }
 

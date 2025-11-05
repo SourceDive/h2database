@@ -6,12 +6,13 @@
  */
 package org.h2.store;
 
-import java.io.IOException;
-import java.io.InputStream;
 import org.h2.engine.Constants;
 import org.h2.message.DbException;
 import org.h2.mvstore.DataUtils;
 import org.h2.tools.CompressTool;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An input stream that is backed by a file store.
@@ -26,7 +27,7 @@ public class FileStoreInputStream extends InputStream {
     private final boolean alwaysClose;
 
     public FileStoreInputStream(FileStore store, DataHandler handler,
-            boolean compression, boolean alwaysClose) {
+                                boolean compression, boolean alwaysClose) {
         this.store = store;
         this.alwaysClose = alwaysClose;
         if (compression) {

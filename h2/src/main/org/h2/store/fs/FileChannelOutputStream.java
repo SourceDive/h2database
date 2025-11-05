@@ -17,13 +17,13 @@ import java.nio.channels.FileChannel;
 public class FileChannelOutputStream extends OutputStream {
 
     private final FileChannel channel;
-    private final byte[] buffer = { 0 };
+    private final byte[] buffer = {0};
 
     /**
      * Create a new file object output stream from the file channel.
      *
      * @param channel the file channel
-     * @param append true for append mode, false for truncate and overwrite
+     * @param append  true for append mode, false for truncate and overwrite
      */
     public FileChannelOutputStream(FileChannel channel, boolean append)
             throws IOException {

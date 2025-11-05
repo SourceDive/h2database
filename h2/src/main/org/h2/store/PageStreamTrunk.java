@@ -44,7 +44,7 @@ public class PageStreamTrunk extends Page {
     private Data data;
 
     private PageStreamTrunk(PageStore store, int parent, int pageId, int next,
-            int logKey, int[] pageIds) {
+                            int logKey, int[] pageIds) {
         setPos(pageId);
         this.parent = parent;
         this.store = store;
@@ -63,8 +63,8 @@ public class PageStreamTrunk extends Page {
     /**
      * Read a stream trunk page.
      *
-     * @param store the page store
-     * @param data the data
+     * @param store  the page store
+     * @param data   the data
      * @param pageId the page id
      * @return the page
      */
@@ -77,16 +77,16 @@ public class PageStreamTrunk extends Page {
     /**
      * Create a new stream trunk page.
      *
-     * @param store the page store
-     * @param parent the parent page
-     * @param pageId the page id
-     * @param next the next trunk page
-     * @param logKey the log key
+     * @param store   the page store
+     * @param parent  the parent page
+     * @param pageId  the page id
+     * @param next    the next trunk page
+     * @param logKey  the log key
      * @param pageIds the stream data page ids
      * @return the page
      */
     static PageStreamTrunk create(PageStore store, int parent, int pageId,
-            int next, int logKey, int[] pageIds) {
+                                  int next, int logKey, int[] pageIds) {
         return new PageStreamTrunk(store, parent, pageId, next, logKey, pageIds);
     }
 

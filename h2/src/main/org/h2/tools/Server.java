@@ -6,10 +6,6 @@
  */
 package org.h2.tools;
 
-import java.net.URI;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
@@ -23,8 +19,13 @@ import org.h2.util.StringUtils;
 import org.h2.util.Tool;
 import org.h2.util.Utils;
 
+import java.net.URI;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 /**
  * Starts the H2 Console (web-) server, TCP, and PG server.
+ *
  * @h2.resource
  */
 public class Server extends Tool implements Runnable, ShutdownHandler {
@@ -43,7 +44,7 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
      * Create a new server for the given service.
      *
      * @param service the service
-     * @param args the command line arguments
+     * @param args    the command line arguments
      */
     public Server(Service service, String... args) throws SQLException {
         verifyArgs(args);
@@ -112,9 +113,9 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
      * The options -xAllowOthers are potentially risky.
      * <br />
      * For details, see Advanced Topics / Protection against Remote Access.
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new Server().runTool(args);
@@ -362,14 +363,14 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
      *         password, true, false);
      * </pre>
      *
-     * @param url example: tcp://localhost:9094
+     * @param url      example: tcp://localhost:9094
      * @param password the password to use ("" for no password)
-     * @param force the shutdown (don't wait)
-     * @param all whether all TCP servers that are running in the JVM should be
-     *            stopped
+     * @param force    the shutdown (don't wait)
+     * @param all      whether all TCP servers that are running in the JVM should be
+     *                 stopped
      */
     public static void shutdownTcpServer(String url, String password,
-            boolean force, boolean all) throws SQLException {
+                                         boolean force, boolean all) throws SQLException {
         TcpServer.shutdown(url, password, force, all);
     }
 
@@ -384,9 +385,9 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
             buff.append("Not started");
         } else if (isRunning(false)) {
             buff.append(service.getType()).
-                append(" server running at ").
-                append(service.getURL()).
-                append(" (");
+                    append(" server running at ").
+                    append(service.getURL()).
+                    append(" (");
             if (service.getAllowOthers()) {
                 buff.append("others can connect");
             } else {
@@ -395,10 +396,10 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
             buff.append(')');
         } else {
             buff.append("The ").
-                append(service.getType()).
-                append(" server could not be started. " +
-                        "Possible cause: another server is already running at ").
-                append(service.getURL());
+                    append(service.getType()).
+                    append(" server could not be started. " +
+                            "Possible cause: another server is already running at ").
+                    append(service.getURL());
         }
         return buff.toString();
     }
@@ -467,6 +468,7 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
 
     /**
      * Tries to start the server.
+     *
      * @return the server if successful
      * @throws SQLException if the server could not be started
      */
@@ -489,7 +491,7 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
             }
             throw DbException.get(ErrorCode.EXCEPTION_OPENING_PORT_2,
                     name, "timeout; " +
-                    "please check your network configuration, specially the file /etc/hosts");
+                            "please check your network configuration, specially the file /etc/hosts");
         } catch (DbException e) {
             throw DbException.toSQLException(e);
         }
@@ -631,9 +633,9 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
                     }
                     rt.exec(args);
                 } else if (osName.indexOf("windows") >= 0) {
-                    rt.exec(new String[] { "cmd.exe", "/C",  browser, url });
+                    rt.exec(new String[]{"cmd.exe", "/C", browser, url});
                 } else {
-                    rt.exec(new String[] { browser, url });
+                    rt.exec(new String[]{browser, url});
                 }
                 return;
             }
@@ -641,34 +643,34 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
                 Class<?> desktopClass = Class.forName("java.awt.Desktop");
                 // Desktop.isDesktopSupported()
                 Boolean supported = (Boolean) desktopClass.
-                    getMethod("isDesktopSupported").
-                    invoke(null, new Object[0]);
+                        getMethod("isDesktopSupported").
+                        invoke(null, new Object[0]);
                 URI uri = new URI(url);
                 if (supported) {
                     // Desktop.getDesktop();
                     Object desktop = desktopClass.getMethod("getDesktop").
-                        invoke(null, new Object[0]);
+                            invoke(null, new Object[0]);
                     // desktop.browse(uri);
                     desktopClass.getMethod("browse", URI.class).
-                        invoke(desktop, uri);
+                            invoke(desktop, uri);
                     return;
                 }
             } catch (Exception e) {
                 // ignore
             }
             if (osName.indexOf("windows") >= 0) {
-                rt.exec(new String[] { "rundll32", "url.dll,FileProtocolHandler", url });
+                rt.exec(new String[]{"rundll32", "url.dll,FileProtocolHandler", url});
             } else if (osName.indexOf("mac") >= 0 || osName.indexOf("darwin") >= 0) {
                 // Mac OS: to open a page with Safari, use "open -a Safari"
-                Runtime.getRuntime().exec(new String[] { "open", url });
+                Runtime.getRuntime().exec(new String[]{"open", url});
             } else {
-                String[] browsers = { "chromium", "google-chrome", "firefox",
+                String[] browsers = {"chromium", "google-chrome", "firefox",
                         "mozilla-firefox", "mozilla", "konqueror", "netscape",
-                        "opera", "midori" };
+                        "opera", "midori"};
                 boolean ok = false;
                 for (String b : browsers) {
                     try {
-                        rt.exec(new String[] { b, url });
+                        rt.exec(new String[]{b, url});
                         ok = true;
                         break;
                     } catch (Exception e) {
@@ -679,13 +681,13 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
                     // No success in detection.
                     throw new Exception(
                             "Browser detection failed and system property " +
-                            SysProperties.H2_BROWSER + " not set");
+                                    SysProperties.H2_BROWSER + " not set");
                 }
             }
         } catch (Exception e) {
             throw new Exception(
                     "Failed to start a browser to open the URL " +
-            url + ": " + e.getMessage());
+                            url + ": " + e.getMessage());
         }
     }
 
@@ -699,7 +701,7 @@ public class Server extends Tool implements Runnable, ShutdownHandler {
      */
     public static void startWebServer(Connection conn) throws SQLException {
         WebServer webServer = new WebServer();
-        Server web = new Server(webServer, new String[] { "-webPort", "0" });
+        Server web = new Server(webServer, new String[]{"-webPort", "0"});
         web.start();
         Server server = new Server();
         server.web = web;

@@ -6,6 +6,14 @@
  */
 package org.h2.dev.ftp.server;
 
+import org.h2.server.Service;
+import org.h2.store.fs.FileUtils;
+import org.h2.tools.Server;
+import org.h2.util.IOUtils;
+import org.h2.util.NetUtils;
+import org.h2.util.SortedProperties;
+import org.h2.util.Tool;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,13 +26,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
-import org.h2.server.Service;
-import org.h2.store.fs.FileUtils;
-import org.h2.tools.Server;
-import org.h2.util.IOUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.SortedProperties;
-import org.h2.util.Tool;
 
 /**
  * Small FTP Server. Intended for ad-hoc networks in a secure environment.
@@ -146,9 +147,9 @@ public class FtpServer extends Tool implements Service {
      * <tr><td>[-trace]</td>
      * <td>Print additional trace information; for all servers</td></tr>
      * </table>
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         new FtpServer().runTool(args);
@@ -241,7 +242,7 @@ public class FtpServer extends Tool implements Service {
         String date;
         if (mod.after(now)
                 || Math.abs((now.getTime() - mod.getTime()) /
-                        1000 / 60 / 60 / 24) > 180) {
+                1000 / 60 / 60 / 24) > 180) {
             synchronized (dateFormatOld) {
                 date = dateFormatOld.format(mod);
             }
@@ -296,7 +297,7 @@ public class FtpServer extends Tool implements Service {
     /**
      * Get the directory listing for this directory.
      *
-     * @param directory the directory to list
+     * @param directory       the directory to list
      * @param listDirectories if sub-directories should be listed
      * @return the list
      */

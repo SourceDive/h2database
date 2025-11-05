@@ -6,14 +6,6 @@
  */
 package org.h2.test.unit;
 
-import java.io.ByteArrayInputStream;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.Random;
-
 import org.h2.api.JavaObjectSerializer;
 import org.h2.engine.Constants;
 import org.h2.store.DataHandler;
@@ -25,29 +17,15 @@ import org.h2.tools.SimpleResultSet;
 import org.h2.util.SmallLRUCache;
 import org.h2.util.TempFileDeleter;
 import org.h2.util.Utils;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueArray;
-import org.h2.value.ValueBoolean;
-import org.h2.value.ValueByte;
-import org.h2.value.ValueBytes;
-import org.h2.value.ValueDate;
-import org.h2.value.ValueDecimal;
-import org.h2.value.ValueDouble;
-import org.h2.value.ValueFloat;
-import org.h2.value.ValueGeometry;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueJavaObject;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueResultSet;
-import org.h2.value.ValueShort;
-import org.h2.value.ValueString;
-import org.h2.value.ValueStringFixed;
-import org.h2.value.ValueStringIgnoreCase;
-import org.h2.value.ValueTime;
-import org.h2.value.ValueTimestamp;
-import org.h2.value.ValueUuid;
+import org.h2.value.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.Random;
 
 /**
  * Tests the memory consumption of values. Values can estimate how much memory
@@ -136,73 +114,74 @@ public class TestValueMemory extends TestBase implements DataHandler {
             }
         }
     }
+
     private Value create(int type) throws SQLException {
         switch (type) {
-        case Value.NULL:
-            return ValueNull.INSTANCE;
-        case Value.BOOLEAN:
-            return ValueBoolean.get(false);
-        case Value.BYTE:
-            return ValueByte.get((byte) random.nextInt());
-        case Value.SHORT:
-            return ValueShort.get((short) random.nextInt());
-        case Value.INT:
-            return ValueInt.get(random.nextInt());
-        case Value.LONG:
-            return ValueLong.get(random.nextLong());
-        case Value.DECIMAL:
-            return ValueDecimal.get(new BigDecimal(random.nextInt()));
-            // + "12123344563456345634565234523451312312"
-        case Value.DOUBLE:
-            return ValueDouble.get(random.nextDouble());
-        case Value.FLOAT:
-            return ValueFloat.get(random.nextFloat());
-        case Value.TIME:
-            return ValueTime.get(new java.sql.Time(random.nextLong()));
-        case Value.DATE:
-            return ValueDate.get(new java.sql.Date(random.nextLong()));
-        case Value.TIMESTAMP:
-            return ValueTimestamp.get(new java.sql.Timestamp(random.nextLong()));
-        case Value.BYTES:
-            return ValueBytes.get(randomBytes(random.nextInt(1000)));
-        case Value.STRING:
-            return ValueString.get(randomString(random.nextInt(100)));
-        case Value.STRING_IGNORECASE:
-            return ValueStringIgnoreCase.get(randomString(random.nextInt(100)));
-        case Value.BLOB: {
-            int len = (int) Math.abs(random.nextGaussian() * 10);
-            byte[] data = randomBytes(len);
-            return getLobStorage().createBlob(new ByteArrayInputStream(data), len);
-        }
-        case Value.CLOB: {
-            int len = (int) Math.abs(random.nextGaussian() * 10);
-            String s = randomString(len);
-            return getLobStorage().createClob(new StringReader(s), len);
-        }
-        case Value.ARRAY: {
-            int len = random.nextInt(20);
-            Value[] list = new Value[len];
-            for (int i = 0; i < list.length; i++) {
-                list[i] = create(Value.STRING);
-            }
-            return ValueArray.get(list);
-        }
-        case Value.RESULT_SET:
-            return ValueResultSet.get(new SimpleResultSet());
-        case Value.JAVA_OBJECT:
-            return ValueJavaObject.getNoCopy(null, randomBytes(random.nextInt(100)), this);
-        case Value.UUID:
-            return ValueUuid.get(random.nextLong(), random.nextLong());
-        case Value.STRING_FIXED:
-            return ValueStringFixed.get(randomString(random.nextInt(100)));
-        case Value.GEOMETRY:
-            if (DataType.GEOMETRY_CLASS == null) {
+            case Value.NULL:
                 return ValueNull.INSTANCE;
+            case Value.BOOLEAN:
+                return ValueBoolean.get(false);
+            case Value.BYTE:
+                return ValueByte.get((byte) random.nextInt());
+            case Value.SHORT:
+                return ValueShort.get((short) random.nextInt());
+            case Value.INT:
+                return ValueInt.get(random.nextInt());
+            case Value.LONG:
+                return ValueLong.get(random.nextLong());
+            case Value.DECIMAL:
+                return ValueDecimal.get(new BigDecimal(random.nextInt()));
+            // + "12123344563456345634565234523451312312"
+            case Value.DOUBLE:
+                return ValueDouble.get(random.nextDouble());
+            case Value.FLOAT:
+                return ValueFloat.get(random.nextFloat());
+            case Value.TIME:
+                return ValueTime.get(new java.sql.Time(random.nextLong()));
+            case Value.DATE:
+                return ValueDate.get(new java.sql.Date(random.nextLong()));
+            case Value.TIMESTAMP:
+                return ValueTimestamp.get(new java.sql.Timestamp(random.nextLong()));
+            case Value.BYTES:
+                return ValueBytes.get(randomBytes(random.nextInt(1000)));
+            case Value.STRING:
+                return ValueString.get(randomString(random.nextInt(100)));
+            case Value.STRING_IGNORECASE:
+                return ValueStringIgnoreCase.get(randomString(random.nextInt(100)));
+            case Value.BLOB: {
+                int len = (int) Math.abs(random.nextGaussian() * 10);
+                byte[] data = randomBytes(len);
+                return getLobStorage().createBlob(new ByteArrayInputStream(data), len);
             }
-            return ValueGeometry.get("POINT (" + random.nextInt(100) + " " +
-                    random.nextInt(100) + ")");
-        default:
-            throw new AssertionError("type=" + type);
+            case Value.CLOB: {
+                int len = (int) Math.abs(random.nextGaussian() * 10);
+                String s = randomString(len);
+                return getLobStorage().createClob(new StringReader(s), len);
+            }
+            case Value.ARRAY: {
+                int len = random.nextInt(20);
+                Value[] list = new Value[len];
+                for (int i = 0; i < list.length; i++) {
+                    list[i] = create(Value.STRING);
+                }
+                return ValueArray.get(list);
+            }
+            case Value.RESULT_SET:
+                return ValueResultSet.get(new SimpleResultSet());
+            case Value.JAVA_OBJECT:
+                return ValueJavaObject.getNoCopy(null, randomBytes(random.nextInt(100)), this);
+            case Value.UUID:
+                return ValueUuid.get(random.nextLong(), random.nextLong());
+            case Value.STRING_FIXED:
+                return ValueStringFixed.get(randomString(random.nextInt(100)));
+            case Value.GEOMETRY:
+                if (DataType.GEOMETRY_CLASS == null) {
+                    return ValueNull.INSTANCE;
+                }
+                return ValueGeometry.get("POINT (" + random.nextInt(100) + " " +
+                        random.nextInt(100) + ")");
+            default:
+                throw new AssertionError("type=" + type);
         }
     }
 
@@ -281,7 +260,7 @@ public class TestValueMemory extends TestBase implements DataHandler {
 
     @Override
     public int readLob(long lobId, byte[] hmac, long offset, byte[] buff,
-            int off, int length) {
+                       int off, int length) {
         return -1;
     }
 

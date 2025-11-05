@@ -6,13 +6,14 @@
  */
 package org.h2.value;
 
+import org.h2.message.DbException;
+import org.h2.tools.SimpleResultSet;
+import org.h2.util.StatementBuilder;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import org.h2.message.DbException;
-import org.h2.tools.SimpleResultSet;
-import org.h2.util.StatementBuilder;
 
 /**
  * Implementation of the RESULT_SET data type.
@@ -41,9 +42,9 @@ public class ValueResultSet extends Value {
      * Create a result set value for the given result set. The result set will
      * be fully read in memory. The original result set is not closed.
      *
-     * @param rs the result set
+     * @param rs      the result set
      * @param maxrows the maximum number of rows to read (0 to just read the
-     *            meta data)
+     *                meta data)
      * @return the value
      */
     public static ValueResultSet getCopy(ResultSet rs, int maxrows) {
@@ -105,7 +106,7 @@ public class ValueResultSet extends Value {
                 for (int j = 0; j < columnCount; j++) {
                     buff.appendExceptFirst(", ");
                     int t = DataType.getValueTypeFromResultSet(meta, j + 1);
-                    Value v = DataType.readValue(null, result, j+1, t);
+                    Value v = DataType.readValue(null, result, j + 1, t);
                     buff.append(v.getString());
                 }
                 buff.append(')');

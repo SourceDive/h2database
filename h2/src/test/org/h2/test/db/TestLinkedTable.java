@@ -6,19 +6,12 @@
  */
 package org.h2.test.db;
 
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-
 import org.h2.api.ErrorCode;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
+
+import java.math.BigDecimal;
+import java.sql.*;
 
 /**
  * Tests the linked table feature (CREATE LINKED TABLE).
@@ -75,8 +68,8 @@ public class TestLinkedTable extends TestBase {
         conn.close();
         conn = getConnection("linkedTable1");
         stat = conn.createStatement();
-        stat.execute("create linked table link(null, '"+url2+
-                "', '"+user+"', '"+password+"', 'TEST')");
+        stat.execute("create linked table link(null, '" + url2 +
+                "', '" + user + "', '" + password + "', 'TEST')");
         conn.close();
         conn = getConnection("linkedTable1");
         conn.close();
@@ -186,7 +179,7 @@ public class TestLinkedTable extends TestBase {
         Connection cb = DriverManager.getConnection("jdbc:h2:mem:two", "sa", "sa");
         Statement sb = cb.createStatement();
         sb.execute("CREATE LINKED TABLE T1(NULL, '" +
-                url + "', '"+user+"', '"+password+"', 'TEST')");
+                url + "', '" + user + "', '" + password + "', 'TEST')");
         sb.executeQuery("SELECT * FROM DUAL A " +
                 "LEFT OUTER JOIN T1 A ON A.ID=1 LEFT OUTER JOIN T1 B ON B.ID=1");
         sb.execute("DROP ALL OBJECTS");
@@ -209,9 +202,9 @@ public class TestLinkedTable extends TestBase {
         Connection cb = DriverManager.getConnection("jdbc:h2:mem:two", "sa", "sa");
         Statement sb = cb.createStatement();
         sb.execute("CREATE LINKED TABLE T1(NULL, '" + url +
-                ";OPEN_NEW=TRUE', '"+user+"', '"+password+"', 'TEST')");
+                ";OPEN_NEW=TRUE', '" + user + "', '" + password + "', 'TEST')");
         sb.execute("CREATE LINKED TABLE T2(NULL, '" + url +
-                ";OPEN_NEW=TRUE', '"+user+"', '"+password+"', 'TEST')");
+                ";OPEN_NEW=TRUE', '" + user + "', '" + password + "', 'TEST')");
         sb.execute("DROP ALL OBJECTS");
         cb.close();
     }
@@ -231,9 +224,9 @@ public class TestLinkedTable extends TestBase {
                 execute("CREATE LINKED TABLE T(NULL, " +
                         "'jdbc:h2:mem:one', 'sa', 'sa', 'TEST')");
         sb.execute("CREATE LINKED TABLE T(NULL, " +
-                        "'jdbc:h2:mem:one', 'sa', 'sa', 'PUBLIC', 'TEST')");
+                "'jdbc:h2:mem:one', 'sa', 'sa', 'PUBLIC', 'TEST')");
         sb.execute("CREATE LINKED TABLE T2(NULL, " +
-                        "'jdbc:h2:mem:one', 'sa', 'sa', 'P', 'TEST')");
+                "'jdbc:h2:mem:one', 'sa', 'sa', 'P', 'TEST')");
         assertSingleValue(sb, "SELECT * FROM T", 1);
         assertSingleValue(sb, "SELECT * FROM T2", 2);
         sa.execute("DROP ALL OBJECTS");
@@ -573,7 +566,7 @@ public class TestLinkedTable extends TestBase {
         String s = ts.toString();
         assertEquals("2001-02-03 11:22:33.4455", s);
         assertTrue(ts.equals(Timestamp.valueOf("2001-02-03 11:22:33.4455")));
-        assertEquals(new byte[] { (byte) 255, (byte) 1, (byte) 2 }, rs.getBytes("XBY"));
+        assertEquals(new byte[]{(byte) 255, (byte) 1, (byte) 2}, rs.getBytes("XBY"));
         assertTrue(rs.getBoolean("XBO"));
         assertEquals(3000, rs.getShort("XSM"));
         assertEquals(1234567890123456789L, rs.getLong("XBI"));
@@ -630,14 +623,14 @@ public class TestLinkedTable extends TestBase {
     }
 
     private void testCachingResultsCheckResult(PreparedStatement ps,
-            int expected) throws SQLException {
+                                               int expected) throws SQLException {
         ResultSet rs = ps.executeQuery();
         rs.next();
         assertEquals(expected, rs.getInt(1));
     }
 
     private void testCachingResultsCheckResult(PreparedStatement ps,
-            int expected, String value) throws SQLException {
+                                               int expected, String value) throws SQLException {
         ps.setString(1, value);
         ResultSet rs = ps.executeQuery();
         int counter = 0;

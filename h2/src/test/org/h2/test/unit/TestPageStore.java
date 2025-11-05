@@ -6,18 +6,6 @@
  */
 package org.h2.test.unit;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.result.Row;
@@ -27,6 +15,14 @@ import org.h2.test.TestBase;
 import org.h2.util.IOUtils;
 import org.h2.util.JdbcUtils;
 import org.h2.util.New;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Test the page store.
@@ -467,7 +463,7 @@ public class TestPageStore extends TestBase {
         stat.execute("call rand(1)");
         stat.execute(
                 "create table test(id int primary key, data varchar, test int) as " +
-                "select x, '', 123 from system_range(1, " + size + ")");
+                        "select x, '', 123 from system_range(1, " + size + ")");
         Random random = new Random(1);
         PreparedStatement prep = conn.prepareStatement(
                 "update test set data=space(?) where id=?");
@@ -514,7 +510,7 @@ public class TestPageStore extends TestBase {
                 "create unique index idx_test_name on test(name)");
         conn.createStatement().execute(
                 "INSERT INTO TEST " +
-                "SELECT X, X || space(10) FROM SYSTEM_RANGE(1, 1000)");
+                        "SELECT X, X || space(10) FROM SYSTEM_RANGE(1, 1000)");
         conn.close();
         conn = getConnection(url);
         conn.createStatement().execute("DELETE FROM TEST WHERE ID=1");
@@ -804,45 +800,45 @@ public class TestPageStore extends TestBase {
             int op = random.nextInt(3);
             Integer x = random.nextInt(100);
             switch (op) {
-            case 0:
-                if (!rows.contains(x)) {
-                    log("insert into test(id) values(" + x + ");");
-                    stat.execute("INSERT INTO TEST(ID) VALUES(" + x + ");");
-                    rows.add(x);
-                }
-                break;
-            case 1:
-                if (rows.contains(x)) {
-                    log("delete from test where id=" + x + ";");
-                    stat.execute("DELETE FROM TEST WHERE ID=" + x);
-                    rows.remove(x);
-                }
-                break;
-            case 2:
-                conn.close();
-                conn = getConnection("pageStoreFuzz");
-                stat = conn.createStatement();
-                ResultSet rs = stat.executeQuery("SELECT * FROM TEST ORDER BY ID");
-                log("--reconnect");
-                for (int test : rows) {
-                    if (!rs.next()) {
-                        log("error: expected next");
-                        conn.close();
-                        return i;
+                case 0:
+                    if (!rows.contains(x)) {
+                        log("insert into test(id) values(" + x + ");");
+                        stat.execute("INSERT INTO TEST(ID) VALUES(" + x + ");");
+                        rows.add(x);
                     }
-                    int y = rs.getInt(1);
-                    // System.out.println(" " + x);
-                    if (y != test) {
-                        log("error: " + y + " <> " + test);
-                        conn.close();
-                        return i;
+                    break;
+                case 1:
+                    if (rows.contains(x)) {
+                        log("delete from test where id=" + x + ";");
+                        stat.execute("DELETE FROM TEST WHERE ID=" + x);
+                        rows.remove(x);
                     }
-                }
-                if (rs.next()) {
-                    log("error: unexpected next");
+                    break;
+                case 2:
                     conn.close();
-                    return i;
-                }
+                    conn = getConnection("pageStoreFuzz");
+                    stat = conn.createStatement();
+                    ResultSet rs = stat.executeQuery("SELECT * FROM TEST ORDER BY ID");
+                    log("--reconnect");
+                    for (int test : rows) {
+                        if (!rs.next()) {
+                            log("error: expected next");
+                            conn.close();
+                            return i;
+                        }
+                        int y = rs.getInt(1);
+                        // System.out.println(" " + x);
+                        if (y != test) {
+                            log("error: " + y + " <> " + test);
+                            conn.close();
+                            return i;
+                        }
+                    }
+                    if (rs.next()) {
+                        log("error: unexpected next");
+                        conn.close();
+                        return i;
+                    }
             }
         }
         conn.close();
@@ -886,10 +882,10 @@ public class TestPageStore extends TestBase {
                 return;
             }
             switch (state) {
-            case DatabaseEventListener.STATE_STATEMENT_START:
-            case DatabaseEventListener.STATE_STATEMENT_END:
-            case DatabaseEventListener.STATE_STATEMENT_PROGRESS:
-                return;
+                case DatabaseEventListener.STATE_STATEMENT_START:
+                case DatabaseEventListener.STATE_STATEMENT_END:
+                case DatabaseEventListener.STATE_STATEMENT_PROGRESS:
+                    return;
             }
             event("setProgress " + state + " " + name + " " + x + " " + max);
         }

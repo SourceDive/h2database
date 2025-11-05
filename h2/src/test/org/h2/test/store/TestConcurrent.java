@@ -6,18 +6,6 @@
  */
 package org.h2.test.store;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVMapConcurrent;
@@ -27,6 +15,14 @@ import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.util.New;
 import org.h2.util.Task;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.channels.FileChannel;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Tests concurrently accessing a tree map store.
@@ -231,7 +227,7 @@ public class TestConcurrent extends TestMVStore {
                         m.higherKey(5);
                         m.lowerKey(5);
                         for (Iterator<Integer> it = m.keyIterator(null);
-                                it.hasNext();) {
+                             it.hasNext(); ) {
                             it.next();
                         }
                     }
@@ -375,7 +371,7 @@ public class TestConcurrent extends TestMVStore {
     }
 
     private void testConcurrentWrite(final AtomicInteger detected,
-            final AtomicInteger notDetected) throws InterruptedException {
+                                     final AtomicInteger notDetected) throws InterruptedException {
         final MVStore s = openStore(null);
         final MVMap<Integer, Integer> m = s.openMap("data");
         final int size = 20;

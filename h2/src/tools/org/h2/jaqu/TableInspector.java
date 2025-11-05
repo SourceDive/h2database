@@ -6,22 +6,7 @@
  */
 package org.h2.jaqu;
 
-import java.lang.reflect.Modifier;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.h2.jaqu.Table.IndexType;
-import org.h2.jaqu.Table.JQColumn;
-import org.h2.jaqu.Table.JQIndex;
-import org.h2.jaqu.Table.JQSchema;
-import org.h2.jaqu.Table.JQTable;
+import org.h2.jaqu.Table.*;
 import org.h2.jaqu.TableDefinition.FieldDefinition;
 import org.h2.jaqu.TableDefinition.IndexDefinition;
 import org.h2.util.JdbcUtils;
@@ -29,9 +14,14 @@ import org.h2.util.New;
 import org.h2.util.StatementBuilder;
 import org.h2.util.StringUtils;
 
-import static org.h2.jaqu.ValidationRemark.consider;
-import static org.h2.jaqu.ValidationRemark.error;
-import static org.h2.jaqu.ValidationRemark.warn;
+import java.lang.reflect.Modifier;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.*;
+
+import static org.h2.jaqu.ValidationRemark.*;
 
 /**
  * Class to inspect the contents of a particular table including its indexes.
@@ -52,7 +42,7 @@ public class TableInspector {
     private Map<String, ColumnInspector> columns;
 
     TableInspector(String schema, String table, boolean forceUpperCase,
-            Class<? extends java.util.Date> dateTimeClass) {
+                   Class<? extends java.util.Date> dateTimeClass) {
         this.schema = schema;
         this.table = table;
         this.forceUpperCase = forceUpperCase;
@@ -64,7 +54,7 @@ public class TableInspector {
      * <p>
      *
      * @param schema the schema name
-     * @param table the table name
+     * @param table  the table name
      * @return true if the table matches
      */
     boolean matches(String schema, String table) {
@@ -158,7 +148,7 @@ public class TableInspector {
      * @return a complete model (class definition) for this table as a string
      */
     String generateModel(String packageName, boolean annotateSchema,
-            boolean trimStrings) {
+                         boolean trimStrings) {
 
         // import statements
         Set<String> imports = New.hashSet();
@@ -259,7 +249,7 @@ public class TableInspector {
      * Generates the specified index annotation.
      */
     void generateIndexAnnotations(AnnotationBuilder ap, String parameter,
-            IndexType type) {
+                                  IndexType type) {
         List<IndexInspector> list = getIndexes(type);
         if (list.size() == 0) {
             // no matching indexes
@@ -288,7 +278,7 @@ public class TableInspector {
     }
 
     private StatementBuilder generateColumn(Set<String> imports,
-            ColumnInspector col, boolean trimStrings) {
+                                            ColumnInspector col, boolean trimStrings) {
         StatementBuilder sb = new StatementBuilder();
         Class<?> clazz = col.clazz;
         String column = ModelUtils.convertColumnToFieldName(col.name
@@ -370,14 +360,14 @@ public class TableInspector {
      * warnings, and errors about the model. The caller may choose to have
      * validate throw an exception on any validation ERROR.
      *
-     * @param <T> the table type
-     * @param def the table definition
+     * @param <T>        the table type
+     * @param def        the table definition
      * @param throwError whether or not to throw an exception if an error was
-     *            found
+     *                   found
      * @return a list if validation remarks
      */
     <T> List<ValidationRemark> validate(TableDefinition<T> def,
-            boolean throwError) {
+                                        boolean throwError) {
         List<ValidationRemark> remarks = New.arrayList();
 
         // model class definition validation
@@ -425,7 +415,7 @@ public class TableInspector {
      * IndexDefinition within the TableDefinition.
      */
     private <T> void validate(List<ValidationRemark> remarks,
-            TableDefinition<T> def, IndexInspector index, boolean throwError) {
+                              TableDefinition<T> def, IndexInspector index, boolean throwError) {
         List<IndexDefinition> defIndexes = def.getIndexes(IndexType.STANDARD);
         List<IndexInspector> dbIndexes = getIndexes(IndexType.STANDARD);
         if (defIndexes.size() > dbIndexes.size()) {
@@ -445,7 +435,7 @@ public class TableInspector {
      * primary key, autoincrement.
      */
     private void validate(List<ValidationRemark> remarks,
-            FieldDefinition fieldDef, boolean throwError) {
+                          FieldDefinition fieldDef, boolean throwError) {
         // unknown field
         String field = forceUpperCase ? fieldDef.columnName.toUpperCase()
                 : fieldDef.columnName;
@@ -527,7 +517,7 @@ public class TableInspector {
                         table,
                         col,
                         MessageFormat.format("{0}.defaultValue=\"{1}\""
-                                + " is improperly formatted!",
+                                        + " is improperly formatted!",
                                 JQColumn.class.getSimpleName(),
                                 fieldDef.defaultValue)).throwError(throwError));
                 // next field

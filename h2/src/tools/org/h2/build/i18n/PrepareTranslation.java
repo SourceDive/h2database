@@ -6,26 +6,15 @@
  */
 package org.h2.build.i18n;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Stack;
 import org.h2.build.doc.XMLParser;
 import org.h2.server.web.PageParser;
 import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.util.SortedProperties;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * This class updates the translation source code files by parsing
@@ -34,8 +23,8 @@ import org.h2.util.StringUtils;
  */
 public class PrepareTranslation {
     private static final String MAIN_LANGUAGE = "en";
-    private static final String[] EXCLUDE = { "datatypes.html",
-            "functions.html", "grammar.html" };
+    private static final String[] EXCLUDE = {"datatypes.html",
+            "functions.html", "grammar.html"};
 
     /**
      * This method is called when executing this application from the command
@@ -88,7 +77,7 @@ public class PrepareTranslation {
     }
 
     private static void buildHtml(String templateDir, String targetDir,
-            String language) throws IOException {
+                                  String language) throws IOException {
         File[] list = new File(templateDir).listFiles();
         new File(targetDir).mkdirs();
         // load the main 'translation'
@@ -110,7 +99,7 @@ public class PrepareTranslation {
                 prop.put(key, t);
             }
         }
-        ArrayList <String>fileNames = new ArrayList<String>();
+        ArrayList<String> fileNames = new ArrayList<String>();
         for (File f : list) {
             String name = f.getName();
             if (!name.endsWith(".jsp")) {
@@ -464,7 +453,7 @@ public class PrepareTranslation {
     }
 
     private static void prepare(Properties main, Properties base, File trans,
-            boolean utf8) throws IOException {
+                                boolean utf8) throws IOException {
         SortedProperties p = load(trans.getAbsolutePath(), utf8);
         Properties oldTranslations = new Properties();
         for (Object k : base.keySet()) {

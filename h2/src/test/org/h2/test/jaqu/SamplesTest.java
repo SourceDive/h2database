@@ -6,20 +6,16 @@
  */
 package org.h2.test.jaqu;
 
-import static org.h2.jaqu.Function.count;
-import static org.h2.jaqu.Function.isNull;
-import static org.h2.jaqu.Function.length;
-import static org.h2.jaqu.Function.max;
-import static org.h2.jaqu.Function.min;
-import static org.h2.jaqu.Function.not;
-import static org.h2.jaqu.Function.sum;
+import org.h2.jaqu.Db;
+import org.h2.jaqu.Filter;
+import org.h2.test.TestBase;
+
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.h2.jaqu.Db;
-import org.h2.jaqu.Filter;
-import org.h2.test.TestBase;
+
+import static org.h2.jaqu.Function.*;
 
 /**
  * This is the implementation of the 101 LINQ Samples as described in
@@ -93,7 +89,7 @@ public class SamplesTest extends TestBase {
 
     private void testReverseColumns() {
         db.executeUpdate("create table TestReverse" +
-                    "(id int, name varchar, additional varchar)");
+                "(id int, name varchar, additional varchar)");
         TestReverse t = new TestReverse();
         t.id = 10;
         t.name = "Hello";
@@ -113,9 +109,9 @@ public class SamplesTest extends TestBase {
 
         Product p = new Product();
         List<Product> soldOutProducts =
-            db.from(p).
-            where(p.unitsInStock).is(0).
-            orderBy(p.productId).select();
+                db.from(p).
+                        where(p.unitsInStock).is(0).
+                        orderBy(p.productId).select();
 
         assertEquals("[Chef Anton's Gumbo Mix: 0]", soldOutProducts.toString());
     }
@@ -130,10 +126,10 @@ public class SamplesTest extends TestBase {
 
         Product p = new Product();
         List<Product> expensiveInStockProducts =
-            db.from(p).
-            where(p.unitsInStock).bigger(0).
-            and(p.unitPrice).bigger(30.0).
-            orderBy(p.productId).select();
+                db.from(p).
+                        where(p.unitsInStock).bigger(0).
+                        and(p.unitPrice).bigger(30.0).
+                        orderBy(p.productId).select();
 
         assertEquals("[Northwoods Cranberry Sauce: 6, Mishi Kobe Niku: 29, Ikura: 31]",
                 expensiveInStockProducts.toString());
@@ -148,9 +144,9 @@ public class SamplesTest extends TestBase {
 
         Customer c = new Customer();
         List<Customer> waCustomers =
-            db.from(c).
-            where(c.region).is("WA").
-            select();
+                db.from(c).
+                        where(c.region).is("WA").
+                        select();
 
         assertEquals("[ALFKI, ANATR]", waCustomers.toString());
     }
@@ -163,8 +159,8 @@ public class SamplesTest extends TestBase {
 
         Product p = new Product();
         List<String> productNames =
-            db.from(p).
-            orderBy(p.productId).select(p.productName);
+                db.from(p).
+                        orderBy(p.productId).select(p.productName);
 
         List<Product> products = Product.getList();
         for (int i = 0; i < products.size(); i++) {
@@ -193,12 +189,14 @@ public class SamplesTest extends TestBase {
 
         final Product p = new Product();
         List<ProductPrice> productInfos =
-            db.from(p).orderBy(p.productId).
-            select(new ProductPrice() { {
-                    productName = p.productName;
-                    category = p.category;
-                    price = p.unitPrice;
-            }});
+                db.from(p).orderBy(p.productId).
+                        select(new ProductPrice() {
+                            {
+                                productName = p.productName;
+                                category = p.category;
+                                price = p.unitPrice;
+                            }
+                        });
 
         List<Product> products = Product.getList();
         assertEquals(products.size(), productInfos.size());
@@ -218,6 +216,7 @@ public class SamplesTest extends TestBase {
         public String customerId;
         public Integer orderId;
         public BigDecimal total;
+
         @Override
         public String toString() {
             return customerId + ":" + orderId + ":" + total;
@@ -239,15 +238,17 @@ public class SamplesTest extends TestBase {
         final Customer c = new Customer();
         final Order o = new Order();
         List<CustOrder> orders =
-            db.from(c).
-            innerJoin(o).on(c.customerId).is(o.customerId).
-            where(o.total).smaller(new BigDecimal("100.00")).
-            orderBy(1).
-            select(new CustOrder() { {
-                customerId = c.customerId;
-                orderId = o.orderId;
-                total = o.total;
-            }});
+                db.from(c).
+                        innerJoin(o).on(c.customerId).is(o.customerId).
+                        where(o.total).smaller(new BigDecimal("100.00")).
+                        orderBy(1).
+                        select(new CustOrder() {
+                            {
+                                customerId = c.customerId;
+                                orderId = o.orderId;
+                                total = o.total;
+                            }
+                        });
 
         assertEquals("[ANATR:10308:88.80]", orders.toString());
     }
@@ -283,10 +284,10 @@ public class SamplesTest extends TestBase {
     private void testLength() {
         Product p = new Product();
         List<Integer> lengths =
-            db.from(p).
-            where(length(p.productName)).smaller(10).
-            orderBy(1).
-            selectDistinct(length(p.productName));
+                db.from(p).
+                        where(length(p.productName)).smaller(10).
+                        orderBy(1).
+                        selectDistinct(length(p.productName));
         assertEquals("[4, 5]", lengths.toString());
     }
 
@@ -311,8 +312,8 @@ public class SamplesTest extends TestBase {
     private void testLike() {
         Product p = new Product();
         List<Product> aList = db.from(p).
-            where(p.productName).like("Cha%").
-            orderBy(p.productName).select();
+                where(p.productName).like("Cha%").
+                orderBy(p.productName).select();
         assertEquals("[Chai: 39, Chang: 17]", aList.toString());
     }
 
@@ -324,13 +325,13 @@ public class SamplesTest extends TestBase {
     private void testComplexObject() {
         ComplexObject co = new ComplexObject();
         String sql = db.from(co).
-            where(co.id).is(1).
-            and(co.amount).is(1L).
-            and(co.birthday).smaller(new java.util.Date()).
-            and(co.created).smaller(java.sql.Timestamp.valueOf("2005-05-05 05:05:05")).
-            and(co.name).is("hello").
-            and(co.time).smaller(java.sql.Time.valueOf("23:23:23")).
-            and(co.value).is(new BigDecimal("1")).getSQL();
+                where(co.id).is(1).
+                and(co.amount).is(1L).
+                and(co.birthday).smaller(new java.util.Date()).
+                and(co.created).smaller(java.sql.Timestamp.valueOf("2005-05-05 05:05:05")).
+                and(co.name).is("hello").
+                and(co.time).smaller(java.sql.Time.valueOf("23:23:23")).
+                and(co.value).is(new BigDecimal("1")).getSQL();
         assertEquals("SELECT * FROM ComplexObject " +
                 "WHERE id = ? " +
                 "AND amount = ? " +
@@ -341,14 +342,14 @@ public class SamplesTest extends TestBase {
                 "AND value = ?", sql);
 
         long count = db.from(co).
-            where(co.id).is(1).
-            and(co.amount).is(1L).
-            and(co.birthday).smaller(new java.util.Date()).
-            and(co.created).smaller(java.sql.Timestamp.valueOf("2005-05-05 05:05:05")).
-            and(co.name).is("hello").
-            and(co.time).smaller(java.sql.Time.valueOf("23:23:23")).
-            and(co.value).is(new BigDecimal("1")).
-            selectCount();
+                where(co.id).is(1).
+                and(co.amount).is(1L).
+                and(co.birthday).smaller(new java.util.Date()).
+                and(co.created).smaller(java.sql.Timestamp.valueOf("2005-05-05 05:05:05")).
+                and(co.name).is("hello").
+                and(co.time).smaller(java.sql.Time.valueOf("23:23:23")).
+                and(co.value).is(new BigDecimal("1")).
+                selectCount();
         assertEquals(1, count);
     }
 
@@ -360,24 +361,28 @@ public class SamplesTest extends TestBase {
         final ComplexObject co = new ComplexObject();
 
         String sql = db.from(co).
-            where(new Filter() { @Override
-            public boolean where() {
-                    return co.id == x
-                    && co.name.equals(name)
-                    && co.name.equals("hello");
-            } }).getSQL();
+                where(new Filter() {
+                    @Override
+                    public boolean where() {
+                        return co.id == x
+                                && co.name.equals(name)
+                                && co.name.equals("hello");
+                    }
+                }).getSQL();
         assertEquals("SELECT * FROM ComplexObject " +
                 "WHERE id=? " +
                 "AND ?=name " +
                 "AND 'hello'=name", sql);
 
         long count = db.from(co).
-            where(new Filter() { @Override
-            public boolean where() {
-                return co.id == x
-                && co.name.equals(name)
-                && co.name.equals("hello");
-            } }).selectCount();
+                where(new Filter() {
+                    @Override
+                    public boolean where() {
+                        return co.id == x
+                                && co.name.equals(name)
+                                && co.name.equals("hello");
+                    }
+                }).selectCount();
 
         assertEquals(1, count);
     }
@@ -409,6 +414,7 @@ public class SamplesTest extends TestBase {
     public static class ProductGroup {
         public String category;
         public Long productCount;
+
         @Override
         public String toString() {
             return category + ":" + productCount;
@@ -427,16 +433,18 @@ public class SamplesTest extends TestBase {
 
         final Product p = new Product();
         List<ProductGroup> list =
-            db.from(p).
-            groupBy(p.category).
-            orderBy(1).
-            select(new ProductGroup() { {
-                category = p.category;
-                productCount = count();
-            }});
+                db.from(p).
+                        groupBy(p.category).
+                        orderBy(1).
+                        select(new ProductGroup() {
+                            {
+                                category = p.category;
+                                productCount = count();
+                            }
+                        });
 
         assertEquals("[Beverages:2, Condiments:5, " +
-                "Meat/Poultry:1, Produce:1, Seafood:1]",
+                        "Meat/Poultry:1, Produce:1, Seafood:1]",
                 list.toString());
     }
 

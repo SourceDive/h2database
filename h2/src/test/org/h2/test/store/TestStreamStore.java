@@ -6,6 +6,15 @@
  */
 package org.h2.test.store;
 
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
+import org.h2.mvstore.StreamStore;
+import org.h2.store.fs.FileUtils;
+import org.h2.test.TestBase;
+import org.h2.util.IOUtils;
+import org.h2.util.New;
+import org.h2.util.StringUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,14 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.h2.mvstore.MVMap;
-import org.h2.mvstore.MVStore;
-import org.h2.mvstore.StreamStore;
-import org.h2.store.fs.FileUtils;
-import org.h2.test.TestBase;
-import org.h2.util.IOUtils;
-import org.h2.util.New;
-import org.h2.util.StringUtils;
 
 /**
  * Test the stream store.
@@ -79,11 +80,11 @@ public class TestStreamStore extends TestBase {
         StreamStore s = new StreamStore(map);
         s.setMaxBlockSize(1024);
         assertThrows(IOException.class, s).
-            put(createFailingStream(new IOException()));
+                put(createFailingStream(new IOException()));
         assertEquals(0, map.size());
         // the runtime exception is converted to an IOException
         assertThrows(IOException.class, s).
-            put(createFailingStream(new IllegalStateException()));
+                put(createFailingStream(new IllegalStateException()));
         assertEquals(0, map.size());
     }
 
@@ -367,7 +368,7 @@ public class TestStreamStore extends TestBase {
     }
 
     private void test(StreamStore store, int minBlockSize, int maxBlockSize,
-            int length) throws IOException {
+                      int length) throws IOException {
         store.setMinBlockSize(minBlockSize);
         assertEquals(minBlockSize, store.getMinBlockSize());
         store.setMaxBlockSize(maxBlockSize);

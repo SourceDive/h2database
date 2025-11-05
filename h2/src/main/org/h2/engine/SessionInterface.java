@@ -6,11 +6,12 @@
  */
 package org.h2.engine;
 
-import java.io.Closeable;
 import org.h2.command.CommandInterface;
 import org.h2.message.Trace;
 import org.h2.store.DataHandler;
 import org.h2.value.Value;
+
+import java.io.Closeable;
 
 /**
  * A local or remote session. A session represents a database connection.
@@ -20,7 +21,7 @@ public interface SessionInterface extends Closeable {
     /**
      * Parse a command and prepare it for execution.
      *
-     * @param sql the SQL statement
+     * @param sql       the SQL statement
      * @param fetchSize the number of rows to fetch in one step
      * @return the prepared command
      */

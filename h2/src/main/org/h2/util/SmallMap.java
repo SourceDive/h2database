@@ -6,11 +6,11 @@
  */
 package org.h2.util;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * A simple hash table with an optimization for the last recently used object.
@@ -37,7 +37,7 @@ public class SmallMap {
      * maximum size, objects with a low id are removed.
      *
      * @param id the object id
-     * @param o the object
+     * @param o  the object
      * @return the id
      */
     public int addObject(int id, Object o) {
@@ -75,11 +75,11 @@ public class SmallMap {
     /**
      * Get an object from the map if it is stored.
      *
-     * @param id the id of the object
+     * @param id          the id of the object
      * @param ifAvailable only return it if available, otherwise return null
      * @return the object or null
      * @throws DbException if isAvailable is false and the object has not been
-     *             found
+     *                     found
      */
     public Object getObject(int id, boolean ifAvailable) {
         if (id == cacheId) {

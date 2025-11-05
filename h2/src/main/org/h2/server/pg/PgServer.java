@@ -6,21 +6,6 @@
  */
 package org.h2.server.pg;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.message.DbException;
@@ -28,6 +13,16 @@ import org.h2.server.Service;
 import org.h2.util.NetUtils;
 import org.h2.util.New;
 import org.h2.util.Tool;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.sql.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class implements a subset of the PostgreSQL protocol as described here:
@@ -202,7 +197,7 @@ public class PgServer implements Service {
                     PgServerThread c = new PgServerThread(s, this);
                     running.add(c);
                     c.setProcessId(pid.incrementAndGet());
-                    Thread thread = new Thread(c, threadName+" thread");
+                    Thread thread = new Thread(c, threadName + " thread");
                     thread.setDaemon(isDaemon);
                     c.setThread(thread);
                     thread.start();
@@ -305,15 +300,15 @@ public class PgServer implements Service {
      * method is used to get CREATE INDEX command for an index, or the column
      * definition of one column in the index.
      *
-     * @param conn the connection
-     * @param indexId the index id
+     * @param conn            the connection
+     * @param indexId         the index id
      * @param ordinalPosition the ordinal position (null if the SQL statement
-     *            should be returned)
-     * @param pretty this flag is ignored
+     *                        should be returned)
+     * @param pretty          this flag is ignored
      * @return the SQL statement or the column name
      */
     public static String getIndexColumn(Connection conn, int indexId,
-            Integer ordinalPosition, Boolean pretty) throws SQLException {
+                                        Integer ordinalPosition, Boolean pretty) throws SQLException {
         if (ordinalPosition == null || ordinalPosition.intValue() == 0) {
             PreparedStatement prep = conn.prepareStatement(
                     "select sql from information_schema.indexes where id=?");
@@ -326,7 +321,7 @@ public class PgServer implements Service {
         }
         PreparedStatement prep = conn.prepareStatement(
                 "select column_name from information_schema.indexes " +
-                "where id=? and ordinal_position=?");
+                        "where id=? and ordinal_position=?");
         prep.setInt(1, indexId);
         prep.setInt(2, ordinalPosition.intValue());
         ResultSet rs = prep.executeQuery();
@@ -352,7 +347,7 @@ public class PgServer implements Service {
     /**
      * Get the OID of an object. This method is called by the database.
      *
-     * @param conn the connection
+     * @param conn      the connection
      * @param tableName the table name
      * @return the oid
      */
@@ -380,14 +375,14 @@ public class PgServer implements Service {
      */
     public static String getEncodingName(int code) {
         switch (code) {
-        case 0:
-            return "SQL_ASCII";
-        case 6:
-            return "UTF8";
-        case 8:
-            return "LATIN1";
-        default:
-            return code < 40 ? "UTF8" : "";
+            case 0:
+                return "SQL_ASCII";
+            case 6:
+                return "UTF8";
+            case 8:
+                return "LATIN1";
+            default:
+                return code < 40 ? "UTF8" : "";
         }
     }
 
@@ -417,7 +412,7 @@ public class PgServer implements Service {
      * This method is called by the database.
      *
      * @param conn the connection
-     * @param id the user id
+     * @param id   the user id
      * @return the user name
      */
     public static String getUserById(Connection conn, int id) throws SQLException {
@@ -435,7 +430,7 @@ public class PgServer implements Service {
      * Check if the this session has the given database privilege.
      * This method is called by the database.
      *
-     * @param id the session id
+     * @param id        the session id
      * @param privilege the privilege to check
      * @return true
      */
@@ -447,7 +442,7 @@ public class PgServer implements Service {
      * Check if the current session has access to this table.
      * This method is called by the database.
      *
-     * @param table the table name
+     * @param table     the table name
      * @param privilege the privilege to check
      * @return true
      */
@@ -460,7 +455,7 @@ public class PgServer implements Service {
      * This method is called by the database.
      *
      * @param table the table name
-     * @param id the id
+     * @param id    the id
      * @return 1
      */
     public static int getCurrentTid(String table, String id) {
@@ -472,7 +467,7 @@ public class PgServer implements Service {
      * it "decompiles the internal form of an expression, assuming that any vars
      * in it refer to the relation indicated by the second parameter".
      *
-     * @param exprText the expression text
+     * @param exprText    the expression text
      * @param relationOid the relation object id
      * @return always null
      */
@@ -484,8 +479,8 @@ public class PgServer implements Service {
      * Check if the current session has access to this table.
      * This method is called by the database.
      *
-     * @param conn the connection
-     * @param pgType the PostgreSQL type oid
+     * @param conn    the connection
+     * @param pgType  the PostgreSQL type oid
      * @param typeMod the type modifier (typically -1)
      * @return the name of the given type
      */
@@ -510,40 +505,40 @@ public class PgServer implements Service {
      */
     public static int convertType(final int type) {
         switch (type) {
-        case Types.BOOLEAN:
-            return PG_TYPE_BOOL;
-        case Types.VARCHAR:
-            return PG_TYPE_VARCHAR;
-        case Types.CLOB:
-            return PG_TYPE_TEXT;
-        case Types.CHAR:
-            return PG_TYPE_BPCHAR;
-        case Types.SMALLINT:
-            return PG_TYPE_INT2;
-        case Types.INTEGER:
-            return PG_TYPE_INT4;
-        case Types.BIGINT:
-            return PG_TYPE_INT8;
-        case Types.DECIMAL:
-            return PG_TYPE_NUMERIC;
-        case Types.REAL:
-            return PG_TYPE_FLOAT4;
-        case Types.DOUBLE:
-            return PG_TYPE_FLOAT8;
-        case Types.TIME:
-            return PG_TYPE_TIME;
-        case Types.DATE:
-            return PG_TYPE_DATE;
-        case Types.TIMESTAMP:
-            return PG_TYPE_TIMESTAMP_NO_TMZONE;
-        case Types.VARBINARY:
-            return PG_TYPE_BYTEA;
-        case Types.BLOB:
-            return PG_TYPE_OID;
-        case Types.ARRAY:
-            return PG_TYPE_TEXTARRAY;
-        default:
-            return PG_TYPE_UNKNOWN;
+            case Types.BOOLEAN:
+                return PG_TYPE_BOOL;
+            case Types.VARCHAR:
+                return PG_TYPE_VARCHAR;
+            case Types.CLOB:
+                return PG_TYPE_TEXT;
+            case Types.CHAR:
+                return PG_TYPE_BPCHAR;
+            case Types.SMALLINT:
+                return PG_TYPE_INT2;
+            case Types.INTEGER:
+                return PG_TYPE_INT4;
+            case Types.BIGINT:
+                return PG_TYPE_INT8;
+            case Types.DECIMAL:
+                return PG_TYPE_NUMERIC;
+            case Types.REAL:
+                return PG_TYPE_FLOAT4;
+            case Types.DOUBLE:
+                return PG_TYPE_FLOAT8;
+            case Types.TIME:
+                return PG_TYPE_TIME;
+            case Types.DATE:
+                return PG_TYPE_DATE;
+            case Types.TIMESTAMP:
+                return PG_TYPE_TIMESTAMP_NO_TMZONE;
+            case Types.VARBINARY:
+                return PG_TYPE_BYTEA;
+            case Types.BLOB:
+                return PG_TYPE_OID;
+            case Types.ARRAY:
+                return PG_TYPE_TEXTARRAY;
+            default:
+                return PG_TYPE_UNKNOWN;
         }
     }
 

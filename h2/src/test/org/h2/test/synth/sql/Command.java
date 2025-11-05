@@ -6,10 +6,11 @@
  */
 package org.h2.test.synth.sql;
 
-import java.sql.SQLException;
-import java.util.HashMap;
 import org.h2.util.New;
 import org.h2.util.StatementBuilder;
+
+import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * Represents a statement.
@@ -134,7 +135,7 @@ class Command {
      * Create a create table command.
      *
      * @param config the configuration
-     * @param table the table
+     * @param table  the table
      * @return the command
      */
     static Command getCreateTable(TestSynth config, Table table) {
@@ -145,7 +146,7 @@ class Command {
      * Create a create index command.
      *
      * @param config the configuration
-     * @param index the index
+     * @param index  the index
      * @return the command
      */
     static Command getCreateIndex(TestSynth config, Index index) {
@@ -156,7 +157,7 @@ class Command {
      * Create a random select command.
      *
      * @param config the configuration
-     * @param table the table
+     * @param table  the table
      * @return the command
      */
     static Command getRandomSelect(TestSynth config, Table table) {
@@ -216,7 +217,7 @@ class Command {
      * Create a random delete command.
      *
      * @param config the configuration
-     * @param table the table
+     * @param table  the table
      * @return the command
      */
     static Command getRandomDelete(TestSynth config, Table table) {
@@ -229,7 +230,7 @@ class Command {
      * Create a random update command.
      *
      * @param config the configuration
-     * @param table the table
+     * @param table  the table
      * @return the command
      */
     static Command getRandomUpdate(TestSynth config, Table table) {
@@ -242,7 +243,7 @@ class Command {
      * Create a random insert command.
      *
      * @param config the configuration
-     * @param table the table
+     * @param table  the table
      * @return the command
      */
     static Command getRandomInsert(TestSynth config, Table table) {
@@ -255,7 +256,7 @@ class Command {
      * Add a subquery table to the command.
      *
      * @param alias the table alias
-     * @param t the table
+     * @param t     the table
      */
     void addSubqueryTable(String alias, Table t) {
         tables.put(alias, t);
@@ -296,7 +297,7 @@ class Command {
             buff.append(s);
         }
         buff.append("  FROM ").append(table.getName()).append(" M").
-            append(' ').append(join);
+                append(' ').append(join);
         if (condition != null) {
             buff.append("  WHERE ").append(condition);
         }
@@ -315,68 +316,68 @@ class Command {
     Result run(DbInterface db) throws Exception {
         try {
             switch (type) {
-            case CONNECT:
-                db.connect();
-                result = new Result("connect");
-                break;
-            case RESET:
-                db.reset();
-                result = new Result("reset");
-                break;
-            case DISCONNECT:
-                db.disconnect();
-                result = new Result("disconnect");
-                break;
-            case END:
-                db.end();
-                result = new Result("disconnect");
-                break;
-            case CREATE_TABLE:
-                db.createTable(table);
-                result = new Result("createTable");
-                break;
-            case DROP_TABLE:
-                db.dropTable(table);
-                result = new Result("dropTable");
-                break;
-            case CREATE_INDEX:
-                db.createIndex(index);
-                result = new Result("createIndex");
-                break;
-            case DROP_INDEX:
-                db.dropIndex(index);
-                result = new Result("dropIndex");
-                break;
-            case INSERT:
-                result = db.insert(table, columns, values);
-                break;
-            case SELECT:
-                result = select(db);
-                break;
-            case DELETE:
-                result = db.delete(table, condition);
-                break;
-            case UPDATE:
-                result = db.update(table, columns, values, condition);
-                break;
-            case AUTOCOMMIT_ON:
-                db.setAutoCommit(true);
-                result = new Result("setAutoCommit true");
-                break;
-            case AUTOCOMMIT_OFF:
-                db.setAutoCommit(false);
-                result = new Result("setAutoCommit false");
-                break;
-            case COMMIT:
-                db.commit();
-                result = new Result("commit");
-                break;
-            case ROLLBACK:
-                db.rollback();
-                result = new Result("rollback");
-                break;
-            default:
-                throw new AssertionError("type=" + type);
+                case CONNECT:
+                    db.connect();
+                    result = new Result("connect");
+                    break;
+                case RESET:
+                    db.reset();
+                    result = new Result("reset");
+                    break;
+                case DISCONNECT:
+                    db.disconnect();
+                    result = new Result("disconnect");
+                    break;
+                case END:
+                    db.end();
+                    result = new Result("disconnect");
+                    break;
+                case CREATE_TABLE:
+                    db.createTable(table);
+                    result = new Result("createTable");
+                    break;
+                case DROP_TABLE:
+                    db.dropTable(table);
+                    result = new Result("dropTable");
+                    break;
+                case CREATE_INDEX:
+                    db.createIndex(index);
+                    result = new Result("createIndex");
+                    break;
+                case DROP_INDEX:
+                    db.dropIndex(index);
+                    result = new Result("dropIndex");
+                    break;
+                case INSERT:
+                    result = db.insert(table, columns, values);
+                    break;
+                case SELECT:
+                    result = select(db);
+                    break;
+                case DELETE:
+                    result = db.delete(table, condition);
+                    break;
+                case UPDATE:
+                    result = db.update(table, columns, values, condition);
+                    break;
+                case AUTOCOMMIT_ON:
+                    db.setAutoCommit(true);
+                    result = new Result("setAutoCommit true");
+                    break;
+                case AUTOCOMMIT_OFF:
+                    db.setAutoCommit(false);
+                    result = new Result("setAutoCommit false");
+                    break;
+                case COMMIT:
+                    db.commit();
+                    result = new Result("commit");
+                    break;
+                case ROLLBACK:
+                    db.rollback();
+                    result = new Result("rollback");
+                    break;
+                default:
+                    throw new AssertionError("type=" + type);
             }
         } catch (SQLException e) {
             result = new Result("", e);

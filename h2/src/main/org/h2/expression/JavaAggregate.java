@@ -6,9 +6,6 @@
  */
 package org.h2.expression;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
 import org.h2.api.Aggregate;
 import org.h2.api.ErrorCode;
 import org.h2.command.Parser;
@@ -22,6 +19,10 @@ import org.h2.util.StatementBuilder;
 import org.h2.value.DataType;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * This class wraps a user-defined aggregate.
@@ -37,7 +38,7 @@ public class JavaAggregate extends Expression {
     private int lastGroupRowId;
 
     public JavaAggregate(UserAggregate userAggregate, Expression[] args,
-            Select select) {
+                         Select select) {
         this.userAggregate = userAggregate;
         this.args = args;
         this.select = select;
@@ -85,17 +86,17 @@ public class JavaAggregate extends Expression {
 
     @Override
     public boolean isEverything(ExpressionVisitor visitor) {
-        switch(visitor.getType()) {
-        case ExpressionVisitor.DETERMINISTIC:
-            // TODO optimization: some functions are deterministic, but we don't
-            // know (no setting for that)
-        case ExpressionVisitor.OPTIMIZABLE_MIN_MAX_COUNT_ALL:
-            // user defined aggregate functions can not be optimized
-            return false;
-        case ExpressionVisitor.GET_DEPENDENCIES:
-            visitor.addDependency(userAggregate);
-            break;
-        default:
+        switch (visitor.getType()) {
+            case ExpressionVisitor.DETERMINISTIC:
+                // TODO optimization: some functions are deterministic, but we don't
+                // know (no setting for that)
+            case ExpressionVisitor.OPTIMIZABLE_MIN_MAX_COUNT_ALL:
+                // user defined aggregate functions can not be optimized
+                return false;
+            case ExpressionVisitor.GET_DEPENDENCIES:
+                visitor.addDependency(userAggregate);
+                break;
+            default:
         }
         for (Expression e : args) {
             if (e != null && !e.isEverything(visitor)) {

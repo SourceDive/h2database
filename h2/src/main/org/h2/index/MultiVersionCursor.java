@@ -30,7 +30,7 @@ public class MultiVersionCursor implements Cursor {
     private boolean reverse;
 
     MultiVersionCursor(Session session, MultiVersionIndex index, Cursor base,
-            Cursor delta, Object sync) {
+                       Cursor delta, Object sync) {
         this.session = session;
         this.index = index;
         this.baseCursor = base;

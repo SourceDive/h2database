@@ -6,13 +6,13 @@
  */
 package org.h2.expression;
 
-import java.io.IOException;
-import java.sql.ResultSetMetaData;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.value.Transfer;
 import org.h2.value.Value;
+
+import java.io.IOException;
+import java.sql.ResultSetMetaData;
 
 /**
  * A client side (remote) parameter.
@@ -91,7 +91,7 @@ public class ParameterRemote implements ParameterInterface {
      * Write the parameter meta data to the transfer object.
      *
      * @param transfer the transfer object
-     * @param p the parameter
+     * @param p        the parameter
      */
     public static void writeMetaData(Transfer transfer, ParameterInterface p)
             throws IOException {

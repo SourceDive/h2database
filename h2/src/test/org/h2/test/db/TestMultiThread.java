@@ -6,17 +6,14 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Random;
 import org.h2.test.TestAll;
 import org.h2.test.TestBase;
 import org.h2.util.SmallLRUCache;
 import org.h2.util.SynchronizedVerifier;
 import org.h2.util.Task;
+
+import java.sql.*;
+import java.util.Random;
 
 /**
  * Multi-threaded tests.

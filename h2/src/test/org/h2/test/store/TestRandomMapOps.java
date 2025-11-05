@@ -6,16 +6,16 @@
  */
 package org.h2.test.store;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVMapConcurrent;
 import org.h2.mvstore.MVStore;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * Tests the MVStore.
@@ -96,60 +96,60 @@ public class TestRandomMapOps extends TestBase {
             byte[] v = new byte[r.nextInt(10) * 10];
             int type = r.nextInt(12);
             switch (type) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                log(op, k, v, "m.put({0}, {1})");
-                m.put(k, v);
-                map.put(k, v);
-                break;
-            case 4:
-            case 5:
-                log(op, k, v, "m.remove({0})");
-                m.remove(k);
-                map.remove(k);
-                break;
-            case 6:
-                log(op, k, v, "s.compact(90, 1024)");
-                s.compact(90, 1024);
-                break;
-            case 7:
-                log(op, k, v, "m.clear()");
-                m.clear();
-                map.clear();
-                break;
-            case 8:
-                log(op, k, v, "s.commit()");
-                s.commit();
-                break;
-            case 9:
-                log(op, k, v, "s.commit()");
-                s.commit();
-                log(op, k, v, "s.close()");
-                s.close();
-                log(op, k, v, "s = openStore(fileName)");
-                s = openStore(fileName);
-                log(op, k, v, "m = s.openMap(\"data\")");
-                m = s.openMap("data");
-                break;
-            case 10:
-                log(op, k, v, "s.commit()");
-                s.commit();
-                log(op, k, v, "s.compactMoveChunks()");
-                s.compactMoveChunks();
-                break;
-            case 11:
-                log(op, k, v, "m.getKeyIndex({0})");
-                ArrayList<Integer> keyList = new ArrayList<Integer>(map.keySet());
-                int index = Collections.binarySearch(keyList, k, null);
-                int index2 = (int) m.getKeyIndex(k);
-                assertEquals(index, index2);
-                if (index >= 0) {
-                    int k2 = m.getKey(index);
-                    assertEquals(k2, k);
-                }
-                break;
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    log(op, k, v, "m.put({0}, {1})");
+                    m.put(k, v);
+                    map.put(k, v);
+                    break;
+                case 4:
+                case 5:
+                    log(op, k, v, "m.remove({0})");
+                    m.remove(k);
+                    map.remove(k);
+                    break;
+                case 6:
+                    log(op, k, v, "s.compact(90, 1024)");
+                    s.compact(90, 1024);
+                    break;
+                case 7:
+                    log(op, k, v, "m.clear()");
+                    m.clear();
+                    map.clear();
+                    break;
+                case 8:
+                    log(op, k, v, "s.commit()");
+                    s.commit();
+                    break;
+                case 9:
+                    log(op, k, v, "s.commit()");
+                    s.commit();
+                    log(op, k, v, "s.close()");
+                    s.close();
+                    log(op, k, v, "s = openStore(fileName)");
+                    s = openStore(fileName);
+                    log(op, k, v, "m = s.openMap(\"data\")");
+                    m = s.openMap("data");
+                    break;
+                case 10:
+                    log(op, k, v, "s.commit()");
+                    s.commit();
+                    log(op, k, v, "s.compactMoveChunks()");
+                    s.compactMoveChunks();
+                    break;
+                case 11:
+                    log(op, k, v, "m.getKeyIndex({0})");
+                    ArrayList<Integer> keyList = new ArrayList<Integer>(map.keySet());
+                    int index = Collections.binarySearch(keyList, k, null);
+                    int index2 = (int) m.getKeyIndex(k);
+                    assertEquals(index, index2);
+                    if (index >= 0) {
+                        int k2 = m.getKey(index);
+                        assertEquals(k2, k);
+                    }
+                    break;
             }
             assertEqualsMapValues(map.get(k), m.get(k));
             assertEquals(map.ceilingKey(k), m.ceilingKey(k));
@@ -186,9 +186,9 @@ public class TestRandomMapOps extends TestBase {
     /**
      * Log the operation
      *
-     * @param op the operation id
-     * @param k the key
-     * @param v the value
+     * @param op  the operation id
+     * @param k   the key
+     * @param v   the value
      * @param msg the message
      */
     private static void log(int op, int k, byte[] v, String msg) {

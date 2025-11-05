@@ -6,7 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.sql.ResultSet;
 import org.h2.command.CommandInterface;
 import org.h2.command.Prepared;
 import org.h2.engine.Session;
@@ -15,6 +14,8 @@ import org.h2.expression.ExpressionVisitor;
 import org.h2.result.LocalResult;
 import org.h2.result.ResultInterface;
 import org.h2.value.Value;
+
+import java.sql.ResultSet;
 
 /**
  * This class represents the statement
@@ -47,16 +48,16 @@ public class Call extends Prepared {
     public int update() {
         Value v = expression.getValue(session);
         int type = v.getType();
-        switch(type) {
-        case Value.RESULT_SET:
-            // this will throw an exception
-            // methods returning a result set may not be called like this.
-            return super.update();
-        case Value.UNKNOWN:
-        case Value.NULL:
-            return 0;
-        default:
-            return v.getInt();
+        switch (type) {
+            case Value.RESULT_SET:
+                // this will throw an exception
+                // methods returning a result set may not be called like this.
+                return super.update();
+            case Value.UNKNOWN:
+            case Value.NULL:
+                return 0;
+            default:
+                return v.getInt();
         }
     }
 
@@ -70,7 +71,7 @@ public class Call extends Prepared {
             return LocalResult.read(session, rs, maxrows);
         }
         LocalResult result = new LocalResult(session, expressions, 1);
-        Value[] row = { v };
+        Value[] row = {v};
         result.addRow(row);
         result.done();
         return result;
@@ -79,7 +80,7 @@ public class Call extends Prepared {
     @Override
     public void prepare() {
         expression = expression.optimize(session);
-        expressions = new Expression[] { expression };
+        expressions = new Expression[]{expression};
         isResultSet = expression.getType() == Value.RESULT_SET;
         if (isResultSet) {
             prepareAlways = true;

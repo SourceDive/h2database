@@ -6,9 +6,10 @@
  */
 package org.h2.test.unit;
 
-import java.util.Random;
 import org.h2.test.TestBase;
 import org.h2.util.IntArray;
+
+import java.util.Random;
 
 /**
  * Tests the IntArray class.
@@ -32,7 +33,7 @@ public class TestIntArray extends TestBase {
     }
 
     private void testRemoveRange() {
-        IntArray array = new IntArray(new int[] {1, 2, 3, 4, 5});
+        IntArray array = new IntArray(new int[]{1, 2, 3, 4, 5});
         array.removeRange(1, 3);
         assertEquals(3, array.size());
         assertEquals(1, array.get(0));
@@ -54,25 +55,25 @@ public class TestIntArray extends TestBase {
             int v = random.nextInt(100);
             int op = random.nextInt(4);
             switch (op) {
-            case 0:
-                array.add(v);
-                test = add(test, v);
-                break;
-            case 1:
-                if (test.length > idx) {
-                    assertEquals(get(test, idx), array.get(idx));
-                }
-                break;
-            case 2:
-                if (test.length > 0) {
-                    array.remove(idx);
-                    test = remove(test, idx);
-                }
-                break;
-            case 3:
-                assertEquals(test.length, array.size());
-                break;
-            default:
+                case 0:
+                    array.add(v);
+                    test = add(test, v);
+                    break;
+                case 1:
+                    if (test.length > idx) {
+                        assertEquals(get(test, idx), array.get(idx));
+                    }
+                    break;
+                case 2:
+                    if (test.length > 0) {
+                        array.remove(idx);
+                        test = remove(test, idx);
+                    }
+                    break;
+                case 3:
+                    assertEquals(test.length, array.size());
+                    break;
+                default:
             }
             assertEquals(test.length, array.size());
             for (int j = 0; j < test.length; j++) {

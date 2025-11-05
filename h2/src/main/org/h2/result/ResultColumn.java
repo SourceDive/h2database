@@ -6,9 +6,9 @@
  */
 package org.h2.result;
 
-import java.io.IOException;
-
 import org.h2.value.Transfer;
+
+import java.io.IOException;
 
 /**
  * A result set column of a remote result.
@@ -86,9 +86,9 @@ public class ResultColumn {
     /**
      * Write a result column to the given output.
      *
-     * @param out the object to where to write the data
+     * @param out    the object to where to write the data
      * @param result the result
-     * @param i the column index
+     * @param i      the column index
      */
     public static void writeColumn(Transfer out, ResultInterface result, int i)
             throws IOException {

@@ -6,9 +6,6 @@
  */
 package org.h2.result;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
@@ -18,6 +15,10 @@ import org.h2.util.ValueHashMap;
 import org.h2.value.DataType;
 import org.h2.value.Value;
 import org.h2.value.ValueArray;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * A local result set contains all row data of a result set.
@@ -54,12 +55,12 @@ public class LocalResult implements ResultInterface, ResultTarget {
     /**
      * Construct a local result object.
      *
-     * @param session the session
-     * @param expressions the expression array
+     * @param session            the session
+     * @param expressions        the expression array
      * @param visibleColumnCount the number of visible columns
      */
     public LocalResult(Session session, Expression[] expressions,
-            int visibleColumnCount) {
+                       int visibleColumnCount) {
         this.session = session;
         if (session == null) {
             this.maxMemoryRows = Integer.MAX_VALUE;
@@ -77,7 +78,7 @@ public class LocalResult implements ResultInterface, ResultTarget {
      * set.
      *
      * @param session the session
-     * @param rs the result set
+     * @param rs      the result set
      * @param maxrows the maximum number of rows to read (0 for no limit)
      * @return the local result set
      */

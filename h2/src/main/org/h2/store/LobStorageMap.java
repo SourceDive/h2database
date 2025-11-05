@@ -6,15 +6,6 @@
  */
 package org.h2.store;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map.Entry;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
@@ -28,6 +19,11 @@ import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.value.Value;
 import org.h2.value.ValueLobDb;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map.Entry;
 
 /**
  * This class stores LOB objects in the database, in maps. This is the back-end
@@ -44,7 +40,7 @@ public class LobStorageMap implements LobStorageInterface {
     /**
      * The lob metadata map. It contains the mapping from the lob id
      * (which is a long) to the stream store id (which is a byte array).
-     *
+     * <p>
      * Key: lobId (long)
      * Value: { streamStoreId (byte[]), tableId (int),
      * byteCount (long), hash (long) }.
@@ -55,7 +51,7 @@ public class LobStorageMap implements LobStorageInterface {
      * The reference map. It is used to remove data from the stream store: if no
      * more entries for the given streamStoreId exist, the data is removed from
      * the stream store.
-     *
+     * <p>
      * Key: { streamStoreId (byte[]), lobId (long) }.
      * Value: true (boolean).
      */
@@ -63,7 +59,7 @@ public class LobStorageMap implements LobStorageInterface {
 
     /**
      * The stream store data map.
-     *
+     * <p>
      * Key: stream store block id (long).
      * Value: data (byte[]).
      */
@@ -177,9 +173,9 @@ public class LobStorageMap implements LobStorageInterface {
         long lobId = generateLobId();
         long length = streamStore.length(streamStoreId);
         int tableId = LobStorageFrontend.TABLE_TEMP;
-        Object[] value = new Object[] { streamStoreId, tableId, length, 0 };
+        Object[] value = new Object[]{streamStoreId, tableId, length, 0};
         lobMap.put(lobId, value);
-        Object[] key = new Object[] { streamStoreId, lobId };
+        Object[] key = new Object[]{streamStoreId, lobId};
         refMap.put(key, Boolean.TRUE);
         ValueLobDb lob = ValueLobDb.create(
                 type, database, tableId, lobId, null, length);
@@ -209,7 +205,7 @@ public class LobStorageMap implements LobStorageInterface {
         long lobId = generateLobId();
         value[1] = tableId;
         lobMap.put(lobId, value);
-        Object[] key = new Object[] { streamStoreId, lobId };
+        Object[] key = new Object[]{streamStoreId, lobId};
         refMap.put(key, Boolean.TRUE);
         ValueLobDb lob = ValueLobDb.create(
                 type, database, tableId, lobId, null, length);
@@ -274,10 +270,10 @@ public class LobStorageMap implements LobStorageInterface {
         }
         Object[] value = lobMap.remove(lobId);
         byte[] streamStoreId = (byte[]) value[0];
-        Object[] key = new Object[] {streamStoreId, lobId };
+        Object[] key = new Object[]{streamStoreId, lobId};
         refMap.remove(key);
         // check if there are more entries for this streamStoreId
-        key = new Object[] {streamStoreId, 0 };
+        key = new Object[]{streamStoreId, 0};
         value = refMap.ceilingKey(key);
         boolean hasMoreEntries = false;
         if (value != null) {

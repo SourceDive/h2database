@@ -6,13 +6,9 @@
  */
 package org.h2.samples;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.h2.tools.TriggerAdapter;
+
+import java.sql.*;
 
 /**
  * This sample application shows how to use triggers to create updatable views.
@@ -67,7 +63,7 @@ public class UpdatableView extends TriggerAdapter {
 
     @Override
     public void init(Connection conn, String schemaName, String triggerName,
-            String tableName, boolean before, int type) throws SQLException {
+                     String tableName, boolean before, int type) throws SQLException {
         prepDelete = conn.prepareStatement("delete from test where id = ?");
         prepInsert = conn.prepareStatement("insert into test values(?, ?)");
         super.init(conn, schemaName, triggerName, tableName, before, type);

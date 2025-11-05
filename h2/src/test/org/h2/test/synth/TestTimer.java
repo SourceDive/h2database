@@ -6,16 +6,16 @@
  */
 package org.h2.test.synth;
 
+import org.h2.test.TestBase;
+import org.h2.tools.Backup;
+import org.h2.tools.DeleteDbFiles;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Random;
-
-import org.h2.test.TestBase;
-import org.h2.tools.Backup;
-import org.h2.tools.DeleteDbFiles;
 
 /**
  * A recovery test that checks the consistency of a database (if it exists),
@@ -53,42 +53,42 @@ public class TestTimer extends TestBase {
             int action = random.nextInt(10);
             int x = max == 0 ? 0 : random.nextInt(max);
             switch (action) {
-            case 0:
-            case 1:
-            case 2:
-                stat.execute("INSERT INTO TEST VALUES(NULL, 'Hello')");
-                ResultSet rs = stat.getGeneratedKeys();
-                rs.next();
-                int i = rs.getInt(1);
-                max = i;
-                count++;
-                break;
-            case 3:
-            case 4:
-                if (count == 0) {
+                case 0:
+                case 1:
+                case 2:
+                    stat.execute("INSERT INTO TEST VALUES(NULL, 'Hello')");
+                    ResultSet rs = stat.getGeneratedKeys();
+                    rs.next();
+                    int i = rs.getInt(1);
+                    max = i;
+                    count++;
                     break;
-                }
-                stat.execute("UPDATE TEST SET NAME=NAME||'+' WHERE ID=" + x);
-                break;
-            case 5:
-            case 6:
-                if (count == 0) {
+                case 3:
+                case 4:
+                    if (count == 0) {
+                        break;
+                    }
+                    stat.execute("UPDATE TEST SET NAME=NAME||'+' WHERE ID=" + x);
                     break;
-                }
-                count -= stat.executeUpdate("DELETE FROM TEST WHERE ID=" + x);
-                break;
-            case 7:
-                rs = stat.executeQuery("SELECT COUNT(*) FROM TEST");
-                rs.next();
-                int c = rs.getInt(1);
-                assertEquals(count, c);
-                long time = System.currentTimeMillis();
-                if (time > startTime + 5000) {
-                    println("rows: " + count);
-                    startTime = time;
-                }
-                break;
-            default:
+                case 5:
+                case 6:
+                    if (count == 0) {
+                        break;
+                    }
+                    count -= stat.executeUpdate("DELETE FROM TEST WHERE ID=" + x);
+                    break;
+                case 7:
+                    rs = stat.executeQuery("SELECT COUNT(*) FROM TEST");
+                    rs.next();
+                    int c = rs.getInt(1);
+                    assertEquals(count, c);
+                    long time = System.currentTimeMillis();
+                    if (time > startTime + 5000) {
+                        println("rows: " + count);
+                        startTime = time;
+                    }
+                    break;
+                default:
             }
         }
     }
@@ -126,7 +126,7 @@ public class TestTimer extends TestBase {
 
     private void backup() {
         println("backup");
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             String s = "timer." + i + ".zip";
             File f = new File(s);
             if (f.exists()) {

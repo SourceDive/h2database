@@ -35,7 +35,7 @@ public class Customer {
         Customer[] list = {
                 new Customer("ALFKI", "WA"),
                 new Customer("ANATR", "WA"),
-                new Customer("ANTON", "CA") };
+                new Customer("ANTON", "CA")};
         return Arrays.asList(list);
     }
 

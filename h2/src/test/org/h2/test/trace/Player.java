@@ -21,13 +21,14 @@
  */
 package org.h2.test.trace;
 
+import org.h2.store.fs.FileUtils;
+import org.h2.util.New;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.HashMap;
-import org.h2.store.fs.FileUtils;
-import org.h2.util.New;
 
 /**
  * This tool can re-run Java style log files. There is no size limit.
@@ -50,7 +51,7 @@ public class Player {
     // TODO support SQLXML
 
     private static final String[] IMPORTED_PACKAGES = {
-        "", "java.lang.", "java.sql.", "javax.sql." };
+            "", "java.lang.", "java.sql.", "javax.sql."};
     private boolean trace;
     private final HashMap<String, Object> objects = New.hashMap();
 
@@ -73,7 +74,7 @@ public class Player {
      * Execute a trace file.
      *
      * @param fileName the file name
-     * @param trace print debug information
+     * @param trace    print debug information
      */
     public static void execute(String fileName, boolean trace) throws IOException {
         Player player = new Player();
@@ -162,7 +163,7 @@ public class Player {
      * Assign an object to a variable.
      *
      * @param variableName the variable name
-     * @param obj the object
+     * @param obj          the object
      */
     void assign(String variableName, Object obj) {
         objects.put(variableName, obj);

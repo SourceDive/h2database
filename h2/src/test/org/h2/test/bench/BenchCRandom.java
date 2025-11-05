@@ -20,7 +20,7 @@ public class BenchCRandom {
     /**
      * Get a non-uniform random integer value between min and max.
      *
-     * @param a the bit mask
+     * @param a   the bit mask
      * @param min the minimum value
      * @param max the maximum value
      * @return the random value
@@ -46,7 +46,7 @@ public class BenchCRandom {
      * Generate a boolean array with this many items set to true (randomly
      * distributed).
      *
-     * @param length the size of the array
+     * @param length    the size of the array
      * @param trueCount the number of true elements
      * @return the boolean array
      */
@@ -64,7 +64,7 @@ public class BenchCRandom {
     /**
      * Replace a random part of the string with another text.
      *
-     * @param text the original text
+     * @param text        the original text
      * @param replacement the replacement
      * @return the patched string
      */
@@ -102,7 +102,7 @@ public class BenchCRandom {
         String city = getString(10, 20);
         String state = getString(2);
         String zip = getNumberString(9, 9);
-        return new String[] { str1, str2, city, state, zip };
+        return new String[]{str1, str2, city, state, zip};
     }
 
     /**
@@ -168,8 +168,8 @@ public class BenchCRandom {
      * @return the name
      */
     String getLastname(int i) {
-        String[] n = { "BAR", "OUGHT", "ABLE", "PRI", "PRES", "ESE", "ANTI",
-                "CALLY", "ATION", "EING" };
+        String[] n = {"BAR", "OUGHT", "ABLE", "PRI", "PRES", "ESE", "ANTI",
+                "CALLY", "ATION", "EING"};
         StringBuilder buff = new StringBuilder();
         buff.append(n[i / 100]);
         buff.append(n[(i / 10) % 10]);

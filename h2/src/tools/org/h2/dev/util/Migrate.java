@@ -6,19 +6,13 @@
  */
 package org.h2.dev.util;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.RandomAccessFile;
+import org.h2.engine.Constants;
+import org.h2.tools.RunScript;
+
+import java.io.*;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.h2.engine.Constants;
-import org.h2.tools.RunScript;
 
 /**
  * Migrate a H2 database version 1.1.x (page store not enabled) to 1.2.x (page
@@ -32,7 +26,7 @@ import org.h2.tools.RunScript;
 public class Migrate {
 
     private static final String USER = "sa";
-    private static final String PASSWORD  = "sa";
+    private static final String PASSWORD = "sa";
     private static final File OLD_H2_FILE = new File("./h2-1.2.127.jar");
     private static final String DOWNLOAD_URL =
             "http://repo2.maven.org/maven2/com/h2database/h2/1.2.127/h2-1.2.127.jar";
@@ -56,16 +50,16 @@ public class Migrate {
     /**
      * Migrate a database.
      *
-     * @param file the database file (must end with .data.db) or directory
+     * @param file      the database file (must end with .data.db) or directory
      * @param recursive if the file parameter is in fact a directory (in which
-     *            case the directory is scanned recursively)
-     * @param user the user name of the database
-     * @param password the password
-     * @param runQuiet to run in quiet mode
+     *                  case the directory is scanned recursively)
+     * @param user      the user name of the database
+     * @param password  the password
+     * @param runQuiet  to run in quiet mode
      * @throws Exception if conversion fails
      */
     public void execute(File file, boolean recursive, String user,
-            String password, boolean runQuiet) throws Exception {
+                        String password, boolean runQuiet) throws Exception {
         String pathToJavaExe = getJavaExecutablePath();
         this.quiet = runQuiet;
         if (file.isDirectory() && recursive) {
@@ -83,7 +77,7 @@ public class Migrate {
         }
         String url = "jdbc:h2:" + file.getAbsolutePath();
         url = url.substring(0, url.length() - ".data.db".length());
-        exec(new String[] {
+        exec(new String[]{
                 pathToJavaExe,
                 "-Xmx128m",
                 "-cp", OLD_H2_FILE.getAbsolutePath(),
@@ -191,7 +185,7 @@ public class Migrate {
         for (byte c : value) {
             int x = c & 0xff;
             buff.append(Integer.toString(x >> 4, 16)).
-                append(Integer.toString(x & 0xf, 16));
+                    append(Integer.toString(x & 0xf, 16));
         }
         return buff.toString();
     }
@@ -241,7 +235,7 @@ public class Migrate {
                     throw new RuntimeException(e);
                 }
             }
-        } .start();
+        }.start();
     }
 
 }

@@ -6,12 +6,13 @@
  */
 package org.h2.store;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.util.BitField;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An input stream that reads from a page store.
@@ -29,7 +30,7 @@ public class PageInputStream extends InputStream {
     private int dataPos;
     private boolean endOfFile;
     private int remaining;
-    private final byte[] buffer = { 0 };
+    private final byte[] buffer = {0};
     private int logKey;
 
     PageInputStream(PageStore store, int logKey, int firstTrunkPage, int dataPage) {
@@ -148,7 +149,7 @@ public class PageInputStream extends InputStream {
                 break;
             }
             pages.set(t.getPos());
-            for (int i = 0;; i++) {
+            for (int i = 0; ; i++) {
                 int n = t.getPageData(i);
                 if (n == -1) {
                     break;

@@ -6,23 +6,19 @@
  */
 package org.h2.store.fs;
 
+import org.h2.api.ErrorCode;
+import org.h2.compress.CompressLZF;
+import org.h2.message.DbException;
+import org.h2.util.MathUtils;
+import org.h2.util.New;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.h2.api.ErrorCode;
-import org.h2.compress.CompressLZF;
-import org.h2.message.DbException;
-import org.h2.util.MathUtils;
-import org.h2.util.New;
+import java.util.*;
 
 /**
  * This file system keeps files fully in memory. There is an option to compress
@@ -316,7 +312,7 @@ class FileNioMem extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         if (shared) {
             if (!data.lockShared()) {
                 return null;
@@ -365,7 +361,7 @@ class FileNioMemData {
     private static final ByteBuffer COMPRESSED_EMPTY_BLOCK;
 
     private static final Cache<CompressItem, CompressItem> COMPRESS_LATER =
-        new Cache<CompressItem, CompressItem>(CACHE_SIZE);
+            new Cache<CompressItem, CompressItem>(CACHE_SIZE);
 
     private String name;
     private final boolean compress;
@@ -580,10 +576,10 @@ class FileNioMemData {
     /**
      * Read or write.
      *
-     * @param pos the position
-     * @param b the byte array
-     * @param off the offset within the byte array
-     * @param len the number of bytes
+     * @param pos   the position
+     * @param b     the byte array
+     * @param off   the offset within the byte array
+     * @param len   the number of bytes
      * @param write true for writing
      * @return the new position
      */

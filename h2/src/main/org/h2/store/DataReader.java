@@ -6,11 +6,12 @@
  */
 package org.h2.store;
 
+import org.h2.util.IOUtils;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import org.h2.util.IOUtils;
 
 /**
  * This class is backed by an input stream and supports reading values and
@@ -81,7 +82,7 @@ public class DataReader extends Reader {
             return x;
         }
         x &= 0x7f;
-        for (int s = 7;; s += 7) {
+        for (int s = 7; ; s += 7) {
             long b = readByte();
             x |= (b & 0x7f) << s;
             if (b >= 0) {
@@ -113,7 +114,7 @@ public class DataReader extends Reader {
      * Read a number of bytes.
      *
      * @param buff the target buffer
-     * @param len the number of bytes to read
+     * @param len  the number of bytes to read
      */
     public void readFully(byte[] buff, int len) throws IOException {
         int got = IOUtils.readFully(in, buff, len);

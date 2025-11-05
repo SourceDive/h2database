@@ -107,7 +107,7 @@ public class Chunk {
     /**
      * Read the header from the byte buffer.
      *
-     * @param buff the source buffer
+     * @param buff  the source buffer
      * @param start the start of the chunk in the file
      * @return the chunk
      */
@@ -135,7 +135,7 @@ public class Chunk {
     /**
      * Write the chunk header.
      *
-     * @param buff the target buffer
+     * @param buff      the target buffer
      * @param minLength the minimum length
      */
     void writeChunkHeader(WriteBuffer buff, int minLength) {

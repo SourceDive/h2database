@@ -45,12 +45,12 @@ public class BenchCThread {
      * Process the list of operations (a 'deck') in random order.
      */
     void process() throws SQLException {
-        int[] deck = { OP_NEW_ORDER, OP_NEW_ORDER, OP_NEW_ORDER,
+        int[] deck = {OP_NEW_ORDER, OP_NEW_ORDER, OP_NEW_ORDER,
                 OP_NEW_ORDER, OP_NEW_ORDER, OP_NEW_ORDER, OP_NEW_ORDER,
                 OP_NEW_ORDER, OP_NEW_ORDER, OP_NEW_ORDER, OP_PAYMENT,
                 OP_PAYMENT, OP_PAYMENT, OP_PAYMENT, OP_PAYMENT, OP_PAYMENT,
                 OP_PAYMENT, OP_PAYMENT, OP_PAYMENT, OP_PAYMENT,
-                OP_ORDER_STATUS, OP_DELIVERY, OP_STOCK_LEVEL };
+                OP_ORDER_STATUS, OP_DELIVERY, OP_STOCK_LEVEL};
         int len = deck.length;
         for (int i = 0; i < len; i++) {
             int temp = deck[i];
@@ -60,23 +60,23 @@ public class BenchCThread {
         }
         for (int op : deck) {
             switch (op) {
-            case OP_NEW_ORDER:
-                processNewOrder();
-                break;
-            case OP_PAYMENT:
-                processPayment();
-                break;
-            case OP_ORDER_STATUS:
-                processOrderStatus();
-                break;
-            case OP_DELIVERY:
-                processDelivery();
-                break;
-            case OP_STOCK_LEVEL:
-                processStockLevel();
-                break;
-            default:
-                throw new AssertionError("op=" + op);
+                case OP_NEW_ORDER:
+                    processNewOrder();
+                    break;
+                case OP_PAYMENT:
+                    processPayment();
+                    break;
+                case OP_ORDER_STATUS:
+                    processOrderStatus();
+                    break;
+                case OP_DELIVERY:
+                    processDelivery();
+                    break;
+                case OP_STOCK_LEVEL:
+                    processStockLevel();
+                    break;
+                default:
+                    throw new AssertionError("op=" + op);
             }
         }
     }

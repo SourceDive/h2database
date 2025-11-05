@@ -6,13 +6,15 @@
  */
 package org.h2.test.jaqu;
 
-import static org.h2.jaqu.Define.primaryKey;
-import static org.h2.jaqu.Define.tableName;
+import org.h2.jaqu.Table;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import org.h2.jaqu.Table;
+
+import static org.h2.jaqu.Define.primaryKey;
+import static org.h2.jaqu.Define.tableName;
 
 /**
  * A table containing order data.
@@ -25,7 +27,7 @@ public class Order implements Table {
     public BigDecimal total;
 
     public Order(String customerId, Integer orderId,
-            String total, String orderDate) {
+                 String total, String orderDate) {
         this.customerId = customerId;
         this.orderId = orderId;
         this.total = new BigDecimal(total);
@@ -51,7 +53,7 @@ public class Order implements Table {
                 new Order("ANATR", 10759, "320.00", "2007-04-01"),
                 new Order("ANTON", 10365, "403.20", "2007-02-13"),
                 new Order("ANTON", 10682, "375.50", "2007-03-13"),
-                new Order("ANTON", 10355, "480.00", "2007-04-11") };
+                new Order("ANTON", 10355, "480.00", "2007-04-11")};
         return Arrays.asList(list);
     }
 

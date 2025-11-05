@@ -6,13 +6,7 @@
  */
 package org.h2.engine;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -24,11 +18,11 @@ public class QueryStatisticsData {
 
     private static final Comparator<QueryEntry> QUERY_ENTRY_COMPARATOR =
             new Comparator<QueryEntry>() {
-        @Override
-        public int compare(QueryEntry o1, QueryEntry o2) {
-            return (int) Math.signum(o1.lastUpdateTime - o2.lastUpdateTime);
-        }
-    };
+                @Override
+                public int compare(QueryEntry o1, QueryEntry o2) {
+                    return (int) Math.signum(o1.lastUpdateTime - o2.lastUpdateTime);
+                }
+            };
 
     private final HashMap<String, QueryEntry> map =
             new HashMap<String, QueryEntry>();
@@ -46,13 +40,13 @@ public class QueryStatisticsData {
     /**
      * Update query statistics.
      *
-     * @param sqlStatement the statement being executed
+     * @param sqlStatement  the statement being executed
      * @param executionTime the time in milliseconds the query/update took to
-     *            execute
-     * @param rowCount the query or update row count
+     *                      execute
+     * @param rowCount      the query or update row count
      */
     public synchronized void update(String sqlStatement, long executionTime,
-            int rowCount) {
+                                    int rowCount) {
         QueryEntry entry = map.get(sqlStatement);
         if (entry == null) {
             entry = new QueryEntry();
@@ -74,7 +68,7 @@ public class QueryStatisticsData {
             // Loop over the map using the set and remove
             // the oldest 1/3 of the entries.
             for (Iterator<Entry<String, QueryEntry>> it =
-                    map.entrySet().iterator(); it.hasNext();) {
+                 map.entrySet().iterator(); it.hasNext(); ) {
                 Entry<String, QueryEntry> mapEntry = it.next();
                 if (oldestSet.contains(mapEntry.getValue())) {
                     it.remove();

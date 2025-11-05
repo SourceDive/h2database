@@ -6,7 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.ArrayList;
 import org.h2.engine.Session;
 import org.h2.message.DbException;
 import org.h2.result.Row;
@@ -16,6 +15,8 @@ import org.h2.table.Column;
 import org.h2.table.IndexColumn;
 import org.h2.table.MetaTable;
 import org.h2.table.TableFilter;
+
+import java.util.ArrayList;
 
 /**
  * The index implementation for meta data tables.
@@ -54,7 +55,7 @@ public class MetaIndex extends BaseIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         if (scan) {
             return 10 * MetaTable.ROW_COUNT_APPROXIMATION;
         }

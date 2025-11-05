@@ -87,7 +87,7 @@ public class Delete extends Prepared {
                 }
             }
             int rowScanCount = 0;
-            for (rows.reset(); rows.hasNext();) {
+            for (rows.reset(); rows.hasNext(); ) {
                 if ((++rowScanCount & 127) == 0) {
                     checkCanceled();
                 }
@@ -96,7 +96,7 @@ public class Delete extends Prepared {
                 session.log(table, UndoLogRecord.DELETE, row);
             }
             if (table.fireRow()) {
-                for (rows.reset(); rows.hasNext();) {
+                for (rows.reset(); rows.hasNext(); ) {
                     Row row = rows.next();
                     table.fireAfterRow(session, row, null, false);
                 }

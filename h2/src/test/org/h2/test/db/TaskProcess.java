@@ -6,19 +6,13 @@
  */
 package org.h2.test.db;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import org.h2.test.utils.SelfDestructor;
+import org.h2.util.StringUtils;
+import org.h2.util.Task;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.h2.test.utils.SelfDestructor;
-import org.h2.util.Task;
-import org.h2.util.StringUtils;
 
 /**
  * A task that is run as an external process. This class communicates over
@@ -69,7 +63,7 @@ public class TaskProcess {
             if (line == null) {
                 throw new RuntimeException(
                         "No reply from process, command: " +
-                        StringUtils.arrayCombine(procDef, ' '));
+                                StringUtils.arrayCombine(procDef, ' '));
             } else if (line.startsWith("running")) {
                 traceOperation("got reply: " + line);
             } else if (line.startsWith("init error")) {

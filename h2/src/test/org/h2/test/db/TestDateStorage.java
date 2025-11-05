@@ -6,20 +6,15 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.TimeZone;
-
 import org.h2.engine.SysProperties;
 import org.h2.test.TestBase;
 import org.h2.test.unit.TestDate;
 import org.h2.util.DateTimeUtils;
 import org.h2.value.ValueTimestamp;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.TimeZone;
 
 /**
  * Tests the date transfer and storage.

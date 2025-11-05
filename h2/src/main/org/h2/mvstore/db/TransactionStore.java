@@ -6,22 +6,17 @@
  */
 package org.h2.mvstore.db;
 
+import org.h2.mvstore.*;
+import org.h2.mvstore.type.DataType;
+import org.h2.mvstore.type.ObjectDataType;
+import org.h2.util.New;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-
-import org.h2.mvstore.Cursor;
-import org.h2.mvstore.DataUtils;
-import org.h2.mvstore.MVMap;
-import org.h2.mvstore.MVMapConcurrent;
-import org.h2.mvstore.MVStore;
-import org.h2.mvstore.WriteBuffer;
-import org.h2.mvstore.type.DataType;
-import org.h2.mvstore.type.ObjectDataType;
-import org.h2.util.New;
 
 /**
  * A store that supports concurrent transactions.
@@ -85,7 +80,7 @@ public class TransactionStore {
     /**
      * Create a new transaction store.
      *
-     * @param store the store
+     * @param store    the store
      * @param dataType the data type for map keys and values
      */
     public TransactionStore(MVStore store, DataType dataType) {
@@ -99,7 +94,7 @@ public class TransactionStore {
         });
         MVMap.Builder<Long, Object[]> builder =
                 new MVMap.Builder<Long, Object[]>().
-                valueType(undoLogValueType);
+                        valueType(undoLogValueType);
         undoLog = store.openMap("undoLog", builder);
         // remove all temporary maps
         if (undoLog.getValueType() != undoLogValueType) {
@@ -131,7 +126,7 @@ public class TransactionStore {
      * Combine the transaction id and the log id to an operation id.
      *
      * @param transactionId the transaction id
-     * @param logId the log id
+     * @param logId         the log id
      * @return the operation id
      */
     static long getOperationId(int transactionId, long logId) {
@@ -236,7 +231,7 @@ public class TransactionStore {
     synchronized void storeTransaction(Transaction t) {
         if (t.getStatus() == Transaction.STATUS_PREPARED ||
                 t.getName() != null) {
-            Object[] v = { t.getStatus(), t.getName() };
+            Object[] v = {t.getStatus(), t.getName()};
             preparedTransactions.put(t.getId(), v);
         }
     }
@@ -244,23 +239,23 @@ public class TransactionStore {
     /**
      * Log an entry.
      *
-     * @param t the transaction
-     * @param logId the log id
-     * @param mapId the map id
-     * @param key the key
+     * @param t        the transaction
+     * @param logId    the log id
+     * @param mapId    the map id
+     * @param key      the key
      * @param oldValue the old value
      */
     void log(Transaction t, long logId, int mapId,
-            Object key, Object oldValue) {
+             Object key, Object oldValue) {
         Long undoKey = getOperationId(t.getId(), logId);
-        Object[] log = new Object[] { mapId, key, oldValue };
+        Object[] log = new Object[]{mapId, key, oldValue};
         synchronized (undoLog) {
             if (logId == 0) {
                 if (undoLog.containsKey(undoKey)) {
                     throw DataUtils.newIllegalStateException(
                             DataUtils.ERROR_TRANSACTION_STILL_OPEN,
                             "An old transaction with the same id " +
-                            "is still open: {0}",
+                                    "is still open: {0}",
                             t.getId());
                 }
             }
@@ -271,11 +266,11 @@ public class TransactionStore {
     /**
      * Remove a log entry.
      *
-     * @param t the transaction
+     * @param t     the transaction
      * @param logId the log id
      */
     public void logUndo(Transaction t, long logId) {
-        long[] undoKey = { t.getId(), logId };
+        long[] undoKey = {t.getId(), logId};
         synchronized (undoLog) {
             undoLog.remove(undoKey);
         }
@@ -296,7 +291,7 @@ public class TransactionStore {
     /**
      * Commit a transaction.
      *
-     * @param t the transaction
+     * @param t        the transaction
      * @param maxLogId the last log id
      */
     void commit(Transaction t, long maxLogId) {
@@ -346,14 +341,14 @@ public class TransactionStore {
     /**
      * Open the map with the given name.
      *
-     * @param <K> the key type
-     * @param name the map name
-     * @param keyType the key type
+     * @param <K>       the key type
+     * @param name      the map name
+     * @param keyType   the key type
      * @param valueType the value type
      * @return the map
      */
     synchronized <K> MVMap<K, VersionedValue> openMap(String name,
-            DataType keyType, DataType valueType) {
+                                                      DataType keyType, DataType valueType) {
         if (keyType == null) {
             keyType = new ObjectDataType();
         }
@@ -365,12 +360,12 @@ public class TransactionStore {
         if (CONCURRENT) {
             MVMapConcurrent.Builder<K, VersionedValue> builder =
                     new MVMapConcurrent.Builder<K, VersionedValue>().
-                    keyType(keyType).valueType(vt);
+                            keyType(keyType).valueType(vt);
             map = store.openMap(name, builder);
         } else {
             MVMap.Builder<K, VersionedValue> builder =
                     new MVMap.Builder<K, VersionedValue>().
-                    keyType(keyType).valueType(vt);
+                            keyType(keyType).valueType(vt);
             map = store.openMap(name, builder);
         }
         @SuppressWarnings("unchecked")
@@ -398,7 +393,7 @@ public class TransactionStore {
         VersionedValueType vt = new VersionedValueType(dataType);
         MVMap.Builder<Object, VersionedValue> mapBuilder =
                 new MVMap.Builder<Object, VersionedValue>().
-                keyType(dataType).valueType(vt);
+                        keyType(dataType).valueType(vt);
         map = store.openMap(mapName, mapBuilder);
         maps.put(mapId, map);
         return map;
@@ -423,7 +418,7 @@ public class TransactionStore {
     MVMap<Object, Integer> openTempMap(String mapName) {
         MVMap.Builder<Object, Integer> mapBuilder =
                 new MVMap.Builder<Object, Integer>().
-                keyType(dataType);
+                        keyType(dataType);
         return store.openMap(mapName, mapBuilder);
     }
 
@@ -457,9 +452,9 @@ public class TransactionStore {
     /**
      * Rollback to an old savepoint.
      *
-     * @param t the transaction
+     * @param t        the transaction
      * @param maxLogId the last log id
-     * @param toLogId the log id to roll back to
+     * @param toLogId  the log id to roll back to
      */
     void rollbackTo(Transaction t, long maxLogId, long toLogId) {
         // TODO could synchronize on blocks (100 at a time or so)
@@ -499,13 +494,13 @@ public class TransactionStore {
      * Get the changes of the given transaction, starting from the latest log id
      * back to the given log id.
      *
-     * @param t the transaction
+     * @param t        the transaction
      * @param maxLogId the maximum log id
-     * @param toLogId the minimum log id
+     * @param toLogId  the minimum log id
      * @return the changes
      */
     Iterator<Change> getChanges(final Transaction t, final long maxLogId,
-            final long toLogId) {
+                                final long toLogId) {
         return new Iterator<Change>() {
 
             private long logId = maxLogId - 1;
@@ -641,7 +636,7 @@ public class TransactionStore {
         private String name;
 
         Transaction(TransactionStore store, int transactionId, int status,
-                String name, long logId) {
+                    String name, long logId) {
             this.store = store;
             this.transactionId = transactionId;
             this.status = status;
@@ -683,8 +678,8 @@ public class TransactionStore {
         /**
          * Add a log entry.
          *
-         * @param mapId the map id
-         * @param key the key
+         * @param mapId    the map id
+         * @param key      the key
          * @param oldValue the old value
          */
         void log(int mapId, Object key, Object oldValue) {
@@ -703,8 +698,8 @@ public class TransactionStore {
         /**
          * Open a data map.
          *
-         * @param <K> the key type
-         * @param <V> the value type
+         * @param <K>  the key type
+         * @param <V>  the value type
          * @param name the name of the map
          * @return the transaction map
          */
@@ -715,15 +710,15 @@ public class TransactionStore {
         /**
          * Open the map to store the data.
          *
-         * @param <K> the key type
-         * @param <V> the value type
-         * @param name the name of the map
-         * @param keyType the key data type
+         * @param <K>       the key type
+         * @param <V>       the value type
+         * @param name      the name of the map
+         * @param keyType   the key data type
          * @param valueType the value data type
          * @return the transaction map
          */
         public <K, V> TransactionMap<K, V> openMap(String name,
-                DataType keyType, DataType valueType) {
+                                                   DataType keyType, DataType valueType) {
             checkNotClosed();
             MVMap<K, VersionedValue> map = store.openMap(name, keyType,
                     valueType);
@@ -791,7 +786,7 @@ public class TransactionStore {
          * the change is the value before the change was applied.
          *
          * @param savepointId the savepoint id, 0 meaning the beginning of the
-         *            transaction
+         *                    transaction
          * @return the changes
          */
         public Iterator<Change> getChanges(long savepointId) {
@@ -856,7 +851,7 @@ public class TransactionStore {
         private Transaction transaction;
 
         TransactionMap(Transaction transaction, MVMap<K, VersionedValue> map,
-                int mapId) {
+                       int mapId) {
             this.transaction = transaction;
             this.map = map;
             this.mapId = mapId;
@@ -876,11 +871,11 @@ public class TransactionStore {
          * Get a clone of this map for the given transaction.
          *
          * @param transaction the transaction
-         * @param savepoint the savepoint
+         * @param savepoint   the savepoint
          * @return the map
          */
         public TransactionMap<K, V> getInstance(Transaction transaction,
-                long savepoint) {
+                                                long savepoint) {
             TransactionMap<K, V> m =
                     new TransactionMap<K, V>(transaction, map, mapId);
             m.setSavepoint(savepoint);
@@ -978,7 +973,7 @@ public class TransactionStore {
          * If the row is locked, this method will retry until the row could be
          * updated or until a lock timeout.
          *
-         * @param key the key
+         * @param key   the key
          * @param value the new value (not null)
          * @return the old value
          * @throws IllegalStateException if a lock timeout occurs
@@ -991,7 +986,7 @@ public class TransactionStore {
         /**
          * Update the value for the given key, without adding an undo log entry.
          *
-         * @param key the key
+         * @param key   the key
          * @param value the value
          * @return the old value
          */
@@ -1034,7 +1029,7 @@ public class TransactionStore {
          * This will fail if the row is locked by another transaction (that
          * means, if another open transaction changed the row).
          *
-         * @param key the key
+         * @param key   the key
          * @param value the new value
          * @return whether the entry could be updated
          */
@@ -1048,12 +1043,12 @@ public class TransactionStore {
          * then the value is only changed if it was not changed after opening
          * the map.
          *
-         * @param key the key
-         * @param value the new value (null to remove the value)
+         * @param key             the key
+         * @param value           the new value (null to remove the value)
          * @param onlyIfUnchanged only set the value if it was not changed (by
-         *            this or another transaction) since the map was opened
+         *                        this or another transaction) since the map was opened
          * @return true if the value was set, false if there was a concurrent
-         *         update
+         * update
          */
         public boolean trySet(K key, V value, boolean onlyIfUnchanged) {
             VersionedValue current = map.get(key);
@@ -1154,7 +1149,7 @@ public class TransactionStore {
         /**
          * Get the value for the given key.
          *
-         * @param key the key
+         * @param key      the key
          * @param maxLogId the maximum log id
          * @return the value or null
          */
@@ -1190,9 +1185,9 @@ public class TransactionStore {
         /**
          * Get the versioned value for the given key.
          *
-         * @param key the key
+         * @param key    the key
          * @param maxLog the maximum log id of the entry
-         * @param data the value stored in the main map
+         * @param data   the value stored in the main map
          * @return the value
          */
         VersionedValue getValue(K key, long maxLog, VersionedValue data) {
@@ -1330,7 +1325,7 @@ public class TransactionStore {
          * Get one of the previous or next keys. There might be no value
          * available for the returned key.
          *
-         * @param key the key (may not be null)
+         * @param key    the key (may not be null)
          * @param offset how many keys to skip (-1 for previous, 1 for next)
          * @return the key
          */
@@ -1373,9 +1368,9 @@ public class TransactionStore {
         /**
          * Iterate over keys.
          *
-         * @param from the first key to return
+         * @param from               the first key to return
          * @param includeUncommitted whether uncommitted entries should be
-         *            included
+         *                           included
          * @return the iterator
          */
         public Iterator<K> keyIterator(K from, boolean includeUncommitted) {
@@ -1404,8 +1399,7 @@ public class TransactionStore {
                         VersionedValue data = cursor.getValue();
                         data = getValue(key, readLogId, data);
                         if (data != null && data.value != null) {
-                            @SuppressWarnings("unchecked")
-                            final V value = (V) data.value;
+                            @SuppressWarnings("unchecked") final V value = (V) data.value;
                             current = new DataUtils.MapEntry<K, V>(key, value);
                             return;
                         }
@@ -1437,13 +1431,13 @@ public class TransactionStore {
         /**
          * Iterate over keys.
          *
-         * @param iterator the iterator to wrap
+         * @param iterator           the iterator to wrap
          * @param includeUncommitted whether uncommitted entries should be
-         *            included
+         *                           included
          * @return the iterator
          */
         public Iterator<K> wrapIterator(final Iterator<K> iterator,
-                final boolean includeUncommitted) {
+                                        final boolean includeUncommitted) {
             // TODO duplicate code for wrapIterator and entryIterator
             return new Iterator<K>() {
                 private K current;
@@ -1515,8 +1509,8 @@ public class TransactionStore {
         public String toString() {
             return value + (operationId == 0 ? "" : (
                     " " +
-                    getTransactionId(operationId) + "/" +
-                    getLogId(operationId)));
+                            getTransactionId(operationId) + "/" +
+                            getLogId(operationId)));
         }
 
     }
@@ -1665,7 +1659,7 @@ public class TransactionStore {
 
         @Override
         public void read(ByteBuffer buff, Object[] obj,
-                int len, boolean key) {
+                         int len, boolean key) {
             for (int i = 0; i < len; i++) {
                 obj[i] = read(buff);
             }
@@ -1673,7 +1667,7 @@ public class TransactionStore {
 
         @Override
         public void write(WriteBuffer buff, Object[] obj,
-                int len, boolean key) {
+                          int len, boolean key) {
             for (int i = 0; i < len; i++) {
                 write(buff, obj[i]);
             }

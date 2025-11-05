@@ -6,26 +6,20 @@
  */
 package org.h2.fulltext;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.*;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 import org.h2.api.Trigger;
 import org.h2.command.Parser;
 import org.h2.engine.Session;
@@ -37,14 +31,12 @@ import org.h2.util.New;
 import org.h2.util.StatementBuilder;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
 import java.io.File;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
-import org.apache.lucene.index.IndexWriter;
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This class implements the full text search based on Apache Lucene.
@@ -123,13 +115,13 @@ public class FullTextLucene extends FullText {
      * Create a new full text index for a table and column list. Each table may
      * only have one index at any time.
      *
-     * @param conn the connection
-     * @param schema the schema name of the table (case sensitive)
-     * @param table the table name (case sensitive)
+     * @param conn       the connection
+     * @param schema     the schema name of the table (case sensitive)
+     * @param table      the table name (case sensitive)
      * @param columnList the column list (null for all columns)
      */
     public static void createIndex(Connection conn, String schema,
-            String table, String columnList) throws SQLException {
+                                   String table, String columnList) throws SQLException {
         init(conn);
         PreparedStatement prep = conn.prepareStatement("INSERT INTO " + SCHEMA
                 + ".INDEXES(SCHEMA, TABLE, COLUMNS) VALUES(?, ?, ?)");
@@ -145,9 +137,9 @@ public class FullTextLucene extends FullText {
      * Drop an existing full text index for a table. This method returns
      * silently if no index for this table exists.
      *
-     * @param conn the connection
+     * @param conn   the connection
      * @param schema the schema name of the table (case sensitive)
-     * @param table the table name (case sensitive)
+     * @param table  the table name (case sensitive)
      */
     public static void dropIndex(Connection conn, String schema, String table)
             throws SQLException {
@@ -206,14 +198,14 @@ public class FullTextLucene extends FullText {
      * </li><li>SCORE (float) the relevance score as returned by Lucene.
      * </li></ul>
      *
-     * @param conn the connection
-     * @param text the search query
-     * @param limit the maximum number of rows or 0 for no limit
+     * @param conn   the connection
+     * @param text   the search query
+     * @param limit  the maximum number of rows or 0 for no limit
      * @param offset the offset or 0 for no offset
      * @return the result set
      */
     public static ResultSet search(Connection conn, String text, int limit,
-            int offset) throws SQLException {
+                                   int offset) throws SQLException {
         return search(conn, text, limit, offset, false);
     }
 
@@ -231,14 +223,14 @@ public class FullTextLucene extends FullText {
      * <li>SCORE (float) the relevance score as returned by Lucene.</li>
      * </ul>
      *
-     * @param conn the connection
-     * @param text the search query
-     * @param limit the maximum number of rows or 0 for no limit
+     * @param conn   the connection
+     * @param text   the search query
+     * @param limit  the maximum number of rows or 0 for no limit
      * @param offset the offset or 0 for no offset
      * @return the result set
      */
     public static ResultSet searchData(Connection conn, String text, int limit,
-            int offset) throws SQLException {
+                                       int offset) throws SQLException {
         return search(conn, text, limit, offset, true);
     }
 
@@ -258,17 +250,17 @@ public class FullTextLucene extends FullText {
     /**
      * Create the trigger.
      *
-     * @param conn the database connection
+     * @param conn   the database connection
      * @param schema the schema name
-     * @param table the table name
+     * @param table  the table name
      */
     protected static void createTrigger(Connection conn, String schema,
-            String table) throws SQLException {
+                                        String table) throws SQLException {
         createOrDropTrigger(conn, schema, table, true);
     }
 
     private static void createOrDropTrigger(Connection conn,
-            String schema, String table, boolean create) throws SQLException {
+                                            String schema, String table, boolean create) throws SQLException {
         Statement stat = conn.createStatement();
         String trigger = StringUtils.quoteIdentifier(schema) + "." +
                 StringUtils.quoteIdentifier(TRIGGER_PREFIX + table);
@@ -279,13 +271,13 @@ public class FullTextLucene extends FullText {
             // the trigger is also called on rollback because transaction
             // rollback will not undo the changes in the Lucene index
             buff.append(trigger).
-                append(" AFTER INSERT, UPDATE, DELETE, ROLLBACK ON ").
-                append(StringUtils.quoteIdentifier(schema)).
-                append('.').
-                append(StringUtils.quoteIdentifier(table)).
-                append(" FOR EACH ROW CALL \"").
-                append(FullTextLucene.FullTextTrigger.class.getName()).
-                append('\"');
+                    append(" AFTER INSERT, UPDATE, DELETE, ROLLBACK ON ").
+                    append(StringUtils.quoteIdentifier(schema)).
+                    append('.').
+                    append(StringUtils.quoteIdentifier(table)).
+                    append(" FOR EACH ROW CALL \"").
+                    append(FullTextLucene.FullTextTrigger.class.getName()).
+                    append('\"');
             stat.execute(buff.toString());
         }
     }
@@ -350,12 +342,12 @@ public class FullTextLucene extends FullText {
     /**
      * Add the existing data to the index.
      *
-     * @param conn the database connection
+     * @param conn   the database connection
      * @param schema the schema name
-     * @param table the table name
+     * @param table  the table name
      */
     protected static void indexExistingRows(Connection conn, String schema,
-            String table) throws SQLException {
+                                            String table) throws SQLException {
         FullTextLucene.FullTextTrigger existing = new FullTextLucene.FullTextTrigger();
         existing.init(conn, schema, null, table, false, Trigger.INSERT);
         String sql = "SELECT * FROM " + StringUtils.quoteIdentifier(schema) +
@@ -387,7 +379,7 @@ public class FullTextLucene extends FullText {
      * Close the index writer and searcher and remove them from the index access
      * set.
      *
-     * @param access the index writer/searcher wrapper
+     * @param access    the index writer/searcher wrapper
      * @param indexPath the index path
      */
     protected static void removeIndexAccess(IndexAccess access, String indexPath)
@@ -407,15 +399,15 @@ public class FullTextLucene extends FullText {
     /**
      * Do the search.
      *
-     * @param conn the database connection
-     * @param text the query
-     * @param limit the limit
+     * @param conn   the database connection
+     * @param text   the query
+     * @param limit  the limit
      * @param offset the offset
-     * @param data whether the raw data should be returned
+     * @param data   whether the raw data should be returned
      * @return the result set
      */
     protected static ResultSet search(Connection conn, String text,
-            int limit, int offset, boolean data) throws SQLException {
+                                      int limit, int offset, boolean data) throws SQLException {
         SimpleResultSet result = createResultSet(data);
         if (conn.getMetaData().getURL().startsWith("jdbc:columnlist:")) {
             // this is just to query the result set columns
@@ -444,8 +436,8 @@ public class FullTextLucene extends FullText {
                 limit = docs.totalHits;
             }
             for (int i = 0, len = docs.scoreDocs.length;
-                    i < limit && i + offset < docs.totalHits
-                    && i + offset < len; i++) {
+                 i < limit && i + offset < docs.totalHits
+                         && i + offset < len; i++) {
                 ScoreDoc sd = docs.scoreDocs[i + offset];
                 Document doc = searcher.doc(sd.doc);
                 float score = sd.score;
@@ -496,7 +488,7 @@ public class FullTextLucene extends FullText {
          */
         @Override
         public void init(Connection conn, String schemaName, String triggerName,
-                String tableName, boolean before, int type) throws SQLException {
+                         String tableName, boolean before, int type) throws SQLException {
             this.schema = schemaName;
             this.table = tableName;
             this.indexPath = getIndexPath(conn);
@@ -535,7 +527,7 @@ public class FullTextLucene extends FullText {
             ArrayList<String> indexList = New.arrayList();
             PreparedStatement prep = conn.prepareStatement(
                     "SELECT COLUMNS FROM " + SCHEMA
-                    + ".INDEXES WHERE SCHEMA=? AND TABLE=?");
+                            + ".INDEXES WHERE SCHEMA=? AND TABLE=?");
             prep.setString(1, schemaName);
             prep.setString(2, tableName);
             rs = prep.executeQuery();
@@ -618,7 +610,7 @@ public class FullTextLucene extends FullText {
         /**
          * Add a row to the index.
          *
-         * @param row the row
+         * @param row         the row
          * @param commitIndex whether to commit the changes to the Lucene index
          */
         protected void insert(Object[] row, boolean commitIndex) throws SQLException {
@@ -662,7 +654,7 @@ public class FullTextLucene extends FullText {
         /**
          * Delete a row from the index.
          *
-         * @param row the row
+         * @param row         the row
          * @param commitIndex whether to commit the changes to the Lucene index
          */
         protected void delete(Object[] row, boolean commitIndex) throws SQLException {

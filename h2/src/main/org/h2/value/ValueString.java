@@ -6,12 +6,12 @@
  */
 package org.h2.value;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import org.h2.engine.SysProperties;
 import org.h2.util.MathUtils;
 import org.h2.util.StringUtils;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Implementation of the VARCHAR data type.
@@ -138,9 +138,9 @@ public class ValueString extends Value {
     /**
      * Get or create a string value for the given string.
      *
-     * @param s the string
+     * @param s                       the string
      * @param treatEmptyStringsAsNull whether or not to treat empty strings as
-     *            NULL
+     *                                NULL
      * @return the value
      */
     public static Value get(String s, boolean treatEmptyStringsAsNull) {

@@ -6,18 +6,14 @@
  */
 package org.h2.test.synth;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.test.utils.FilePathDebug;
 import org.h2.util.New;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Tests that use the debug file system to simulate power failure.
@@ -48,7 +44,7 @@ public class TestPowerOffFs2 extends TestBase {
         fs = FilePathDebug.register();
         url = "jdbc:h2:debug:memFS:powerOffFs;FILE_LOCK=NO;" +
                 "TRACE_LEVEL_FILE=0;WRITE_DELAY=0;CACHE_SIZE=32";
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             test(i);
         }
     }
@@ -88,7 +84,7 @@ public class TestPowerOffFs2 extends TestBase {
         connections.clear();
         tables.clear();
         Random random = new Random(x);
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             if (i > 200 && connections.size() > 1 && tables.size() > 1) {
                 fs.setPowerOffCount(100);
             }

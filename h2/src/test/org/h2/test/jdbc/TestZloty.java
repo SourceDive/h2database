@@ -6,14 +6,14 @@
  */
 package org.h2.test.jdbc;
 
+import org.h2.api.ErrorCode;
+import org.h2.test.TestBase;
+
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.h2.api.ErrorCode;
-import org.h2.test.TestBase;
 
 /**
  * Tests a custom BigDecimal implementation, as well
@@ -63,7 +63,7 @@ public class TestZloty extends TestBase {
                 "CREATE TABLE TEST(ID INT, DATA BINARY)");
         PreparedStatement prep = conn.prepareStatement(
                 "INSERT INTO TEST VALUES(?, ?)");
-        byte[] shared = { 0 };
+        byte[] shared = {0};
         prep.setInt(1, 0);
         prep.setBytes(2, shared);
         prep.execute();

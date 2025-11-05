@@ -6,22 +6,14 @@
  */
 package org.h2.test.unit;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Random;
 import org.h2.test.TestBase;
 import org.h2.util.IOUtils;
 import org.h2.util.Utils;
+
+import java.io.*;
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Tests reflection utilities.
@@ -62,7 +54,7 @@ public class TestUtils extends TestBase {
             assertEquals(0, IOUtils.readFully(in, buffer, -2));
             assertEquals(0, IOUtils.readFully(in, buffer, -1));
             assertEquals(0, IOUtils.readFully(in, buffer, 0));
-            for (int j = 1, off = 0;; j += 1) {
+            for (int j = 1, off = 0; ; j += 1) {
                 int read = Math.max(0, Math.min(i - off, j));
                 int l = IOUtils.readFully(in, buffer, j);
                 assertEquals(read, l);
@@ -80,7 +72,7 @@ public class TestUtils extends TestBase {
             assertEquals(0, IOUtils.readFully(in, buffer, -2));
             assertEquals(0, IOUtils.readFully(in, buffer, -1));
             assertEquals(0, IOUtils.readFully(in, buffer, 0));
-            for (int j = 1, off = 0;; j += 1) {
+            for (int j = 1, off = 0; ; j += 1) {
                 int read = Math.max(0, Math.min(i - off, j));
                 int l = IOUtils.readFully(in, buffer, j);
                 assertEquals(read, l);
@@ -117,13 +109,13 @@ public class TestUtils extends TestBase {
                 return o1.compareTo(o2);
             }
         };
-        Integer[] arr = new Integer[] {};
+        Integer[] arr = new Integer[]{};
         Utils.sortTopN(arr, 0, 5, comp);
 
-        arr = new Integer[] { 1 };
+        arr = new Integer[]{1};
         Utils.sortTopN(arr, 0, 5, comp);
 
-        arr = new Integer[] { 3, 5, 1, 4, 2 };
+        arr = new Integer[]{3, 5, 1, 4, 2};
         Utils.sortTopN(arr, 0, 2, comp);
         assertEquals(arr[0].intValue(), 1);
         assertEquals(arr[1].intValue(), 2);

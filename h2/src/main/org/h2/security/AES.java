@@ -71,7 +71,7 @@ public class AES implements BlockCipher {
             FT3[i] = rot8(FT2[i]);
             y = RS[i];
             RT0[i] = mul(pow, log, 0x0b, y) ^ (mul(pow, log, 0x0d, y) << 8)
-                ^ (mul(pow, log, 0x09, y) << 16) ^ (mul(pow, log, 0x0e, y) << 24);
+                    ^ (mul(pow, log, 0x09, y) << 16) ^ (mul(pow, log, 0x0e, y) << 24);
             RT1[i] = rot8(RT0[i]);
             RT2[i] = rot8(RT1[i]);
             RT3[i] = rot8(RT2[i]);
@@ -224,14 +224,22 @@ public class AES implements BlockCipher {
                 | (FS[(y0 >> 8) & 255] << 8) | FS[y1 & 255]) ^ k[42];
         x3 = ((FS[(y3 >> 24) & 255] << 24) | (FS[(y0 >> 16) & 255] << 16)
                 | (FS[(y1 >> 8) & 255] << 8) | FS[y2 & 255]) ^ k[43];
-        out[off] = (byte) (x0 >> 24); out[off+1] = (byte) (x0 >> 16);
-        out[off+2] = (byte) (x0 >> 8); out[off+3] = (byte) x0;
-        out[off+4] = (byte) (x1 >> 24); out[off+5] = (byte) (x1 >> 16);
-        out[off+6] = (byte) (x1 >> 8); out[off+7] = (byte) x1;
-        out[off+8] = (byte) (x2 >> 24); out[off+9] = (byte) (x2 >> 16);
-        out[off+10] = (byte) (x2 >> 8); out[off+11] = (byte) x2;
-        out[off+12] = (byte) (x3 >> 24); out[off+13] = (byte) (x3 >> 16);
-        out[off+14] = (byte) (x3 >> 8); out[off+15] = (byte) x3;
+        out[off] = (byte) (x0 >> 24);
+        out[off + 1] = (byte) (x0 >> 16);
+        out[off + 2] = (byte) (x0 >> 8);
+        out[off + 3] = (byte) x0;
+        out[off + 4] = (byte) (x1 >> 24);
+        out[off + 5] = (byte) (x1 >> 16);
+        out[off + 6] = (byte) (x1 >> 8);
+        out[off + 7] = (byte) x1;
+        out[off + 8] = (byte) (x2 >> 24);
+        out[off + 9] = (byte) (x2 >> 16);
+        out[off + 10] = (byte) (x2 >> 8);
+        out[off + 11] = (byte) x2;
+        out[off + 12] = (byte) (x3 >> 24);
+        out[off + 13] = (byte) (x3 >> 16);
+        out[off + 14] = (byte) (x3 >> 8);
+        out[off + 15] = (byte) x3;
     }
 
     private void decryptBlock(byte[] in, byte[] out, int off) {
@@ -326,13 +334,20 @@ public class AES implements BlockCipher {
                 | (RS[(y1 >> 8) & 255] << 8) | RS[y0 & 255]) ^ k[43];
         out[off] = (byte) (x0 >> 24);
         out[off + 1] = (byte) (x0 >> 16);
-        out[off+2] = (byte) (x0 >> 8); out[off+3] = (byte) x0;
-        out[off+4] = (byte) (x1 >> 24); out[off+5] = (byte) (x1 >> 16);
-        out[off+6] = (byte) (x1 >> 8); out[off+7] = (byte) x1;
-        out[off+8] = (byte) (x2 >> 24); out[off+9] = (byte) (x2 >> 16);
-        out[off+10] = (byte) (x2 >> 8); out[off+11] = (byte) x2;
-        out[off+12] = (byte) (x3 >> 24); out[off+13] = (byte) (x3 >> 16);
-        out[off+14] = (byte) (x3 >> 8); out[off+15] = (byte) x3;
+        out[off + 2] = (byte) (x0 >> 8);
+        out[off + 3] = (byte) x0;
+        out[off + 4] = (byte) (x1 >> 24);
+        out[off + 5] = (byte) (x1 >> 16);
+        out[off + 6] = (byte) (x1 >> 8);
+        out[off + 7] = (byte) x1;
+        out[off + 8] = (byte) (x2 >> 24);
+        out[off + 9] = (byte) (x2 >> 16);
+        out[off + 10] = (byte) (x2 >> 8);
+        out[off + 11] = (byte) x2;
+        out[off + 12] = (byte) (x3 >> 24);
+        out[off + 13] = (byte) (x3 >> 16);
+        out[off + 14] = (byte) (x3 >> 8);
+        out[off + 15] = (byte) x3;
     }
 
     @Override

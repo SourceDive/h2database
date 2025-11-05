@@ -6,15 +6,11 @@
  */
 package org.h2.test.unit;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.util.Task;
+
+import java.sql.*;
 
 /**
  * Test concurrent access to JDBC objects.
@@ -40,13 +36,13 @@ public class TestConcurrent extends TestBase {
             stat.execute("create table test(id int primary key)");
             String sql = "";
             switch (x % 6) {
-            case 0:
-                sql = "select 1";
-                break;
-            case 1:
-            case 2:
-                sql = "delete from test";
-                break;
+                case 0:
+                    sql = "select 1";
+                    break;
+                case 1:
+                case 2:
+                    sql = "delete from test";
+                    break;
             }
             final PreparedStatement prep = conn.prepareStatement(sql);
             Task t = new Task() {
@@ -54,24 +50,24 @@ public class TestConcurrent extends TestBase {
                 public void call() throws SQLException {
                     while (!conn.isClosed()) {
                         switch (x % 6) {
-                        case 0:
-                            prep.executeQuery();
-                            break;
-                        case 1:
-                            prep.execute();
-                            break;
-                        case 2:
-                            prep.executeUpdate();
-                            break;
-                        case 3:
-                            stat.executeQuery("select 1");
-                            break;
-                        case 4:
-                            stat.execute("select 1");
-                            break;
-                        case 5:
-                            stat.execute("delete from test");
-                            break;
+                            case 0:
+                                prep.executeQuery();
+                                break;
+                            case 1:
+                                prep.execute();
+                                break;
+                            case 2:
+                                prep.executeUpdate();
+                                break;
+                            case 3:
+                                stat.executeQuery("select 1");
+                                break;
+                            case 4:
+                                stat.execute("select 1");
+                                break;
+                            case 5:
+                                stat.execute("delete from test");
+                                break;
                         }
                     }
                 }

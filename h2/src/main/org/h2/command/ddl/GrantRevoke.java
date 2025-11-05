@@ -6,18 +6,14 @@
  */
 package org.h2.command.ddl;
 
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
-import org.h2.engine.Database;
-import org.h2.engine.Right;
-import org.h2.engine.RightOwner;
-import org.h2.engine.Role;
-import org.h2.engine.Session;
+import org.h2.engine.*;
 import org.h2.message.DbException;
 import org.h2.table.Table;
 import org.h2.util.New;
+
+import java.util.ArrayList;
 
 /**
  * This class represents the statements

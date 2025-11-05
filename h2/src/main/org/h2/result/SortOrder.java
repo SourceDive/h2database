@@ -6,10 +6,6 @@
  */
 package org.h2.result;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
 import org.h2.command.dml.SelectOrderBy;
 import org.h2.engine.Database;
 import org.h2.engine.SysProperties;
@@ -22,6 +18,10 @@ import org.h2.util.StringUtils;
 import org.h2.util.Utils;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * A sort order represents an ORDER BY clause in a query.
@@ -76,13 +76,13 @@ public class SortOrder implements Comparator<Value[]> {
     /**
      * Construct a new sort order object.
      *
-     * @param database the database
+     * @param database           the database
      * @param queryColumnIndexes the column index list
-     * @param sortType the sort order bit masks
-     * @param orderList the original query order list (if this is a query)
+     * @param sortType           the sort order bit masks
+     * @param orderList          the original query order list (if this is a query)
      */
     public SortOrder(Database database, int[] queryColumnIndexes,
-            int[] sortType, ArrayList<SelectOrderBy> orderList) {
+                     int[] sortType, ArrayList<SelectOrderBy> orderList) {
         this.database = database;
         this.queryColumnIndexes = queryColumnIndexes;
         this.sortTypes = sortType;
@@ -93,7 +93,7 @@ public class SortOrder implements Comparator<Value[]> {
      * Create the SQL snippet that describes this sort order.
      * This is the SQL snippet that usually appears after the ORDER BY clause.
      *
-     * @param list the expression list
+     * @param list    the expression list
      * @param visible the number of columns in the select list
      * @return the SQL snippet
      */
@@ -123,10 +123,10 @@ public class SortOrder implements Comparator<Value[]> {
     /**
      * Compare two expressions where one of them is NULL.
      *
-     * @param aNull whether the first expression is null
+     * @param aNull    whether the first expression is null
      * @param sortType the sort bit mask to use
      * @return the result of the comparison (-1 meaning the first expression
-     *         should appear before the second, 0 if they are equal)
+     * should appear before the second, 0 if they are equal)
      */
     public static int compareNull(boolean aNull, int sortType) {
         if ((sortType & NULLS_FIRST) != 0) {
@@ -181,9 +181,9 @@ public class SortOrder implements Comparator<Value[]> {
     /**
      * Sort a list of rows using offset and limit.
      *
-     * @param rows the list of rows
+     * @param rows   the list of rows
      * @param offset the offset
-     * @param limit the limit
+     * @param limit  the limit
      */
     public void sort(ArrayList<Value[]> rows, int offset, int limit) {
         int rowsSize = rows.size();
@@ -226,7 +226,7 @@ public class SortOrder implements Comparator<Value[]> {
      * Get the column for the given table filter, if the sort column is for this
      * filter.
      *
-     * @param index the column index (0, 1,..)
+     * @param index  the column index (0, 1,..)
      * @param filter the table filter
      * @return the column, or null
      */

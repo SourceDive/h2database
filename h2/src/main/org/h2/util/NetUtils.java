@@ -6,19 +6,13 @@
  */
 package org.h2.util;
 
-import java.io.IOException;
-import java.net.BindException;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.SysProperties;
 import org.h2.message.DbException;
 import org.h2.security.CipherFactory;
+
+import java.io.IOException;
+import java.net.*;
 
 /**
  * This utility class contains socket helper functions.
@@ -39,7 +33,7 @@ public class NetUtils {
      * this port.
      *
      * @param port the port
-     * @param ssl if SSL should be used
+     * @param ssl  if SSL should be used
      * @return the socket
      */
     public static Socket createLoopbackSocket(int port, boolean ssl)
@@ -80,14 +74,14 @@ public class NetUtils {
     /**
      * Create a client socket that is connected to the given address and port.
      *
-     * @param server to connect to (including an optional port)
+     * @param server      to connect to (including an optional port)
      * @param defaultPort the default port (if not specified in the server
-     *            address)
-     * @param ssl if SSL should be used
+     *                    address)
+     * @param ssl         if SSL should be used
      * @return the socket
      */
     public static Socket createSocket(String server, int defaultPort,
-            boolean ssl) throws IOException {
+                                      boolean ssl) throws IOException {
         int port = defaultPort;
         // IPv6: RFC 2732 format is '[a:b:c:d:e:f:g:h]' or
         // '[a:b:c:d:e:f:g:h]:port'
@@ -107,14 +101,14 @@ public class NetUtils {
      * Create a client socket that is connected to the given address and port.
      *
      * @param address the address to connect to
-     * @param port the port
-     * @param ssl if SSL should be used
+     * @param port    the port
+     * @param ssl     if SSL should be used
      * @return the socket
      */
     public static Socket createSocket(InetAddress address, int port, boolean ssl)
             throws IOException {
         long start = System.currentTimeMillis();
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             try {
                 if (ssl) {
                     return CipherFactory.createSocket(address, port);
@@ -150,7 +144,7 @@ public class NetUtils {
      * set.
      *
      * @param port the port to listen on
-     * @param ssl if SSL should be used
+     * @param ssl  if SSL should be used
      * @return the server socket
      */
     public static ServerSocket createServerSocket(int port, boolean ssl) {

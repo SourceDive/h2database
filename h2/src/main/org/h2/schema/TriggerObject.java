@@ -6,9 +6,6 @@
  */
 package org.h2.schema;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.h2.api.ErrorCode;
 import org.h2.api.Trigger;
 import org.h2.command.Parser;
@@ -18,13 +15,16 @@ import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.result.Row;
 import org.h2.table.Table;
-import org.h2.util.Utils;
 import org.h2.util.StatementBuilder;
+import org.h2.util.Utils;
 import org.h2.value.DataType;
 import org.h2.value.Value;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 /**
- *A trigger is created using the statement
+ * A trigger is created using the statement
  * CREATE TRIGGER
  */
 public class TriggerObject extends SchemaObjectBase {
@@ -75,7 +75,7 @@ public class TriggerObject extends SchemaObjectBase {
             // try again later
             triggerCallback = null;
             throw DbException.get(ErrorCode.ERROR_CREATING_TRIGGER_OBJECT_3, e, getName(),
-                            triggerClassName, e.toString());
+                    triggerClassName, e.toString());
         }
     }
 
@@ -83,8 +83,8 @@ public class TriggerObject extends SchemaObjectBase {
      * Set the trigger class name and load the class if possible.
      *
      * @param triggerClassName the name of the trigger class
-     * @param force whether exceptions (due to missing class or access rights)
-     *            should be ignored
+     * @param force            whether exceptions (due to missing class or access rights)
+     *                         should be ignored
      */
     public void setTriggerClassName(String triggerClassName, boolean force) {
         this.triggerClassName = triggerClassName;
@@ -102,8 +102,8 @@ public class TriggerObject extends SchemaObjectBase {
      * trigger is not defined for the given action. This method is called before
      * or after any rows have been processed, once for each statement.
      *
-     * @param session the session
-     * @param type the trigger type
+     * @param session      the session
+     * @param type         the trigger type
      * @param beforeAction if this method is called before applying the changes
      */
     public void fire(Session session, int type, boolean beforeAction) {
@@ -121,7 +121,7 @@ public class TriggerObject extends SchemaObjectBase {
             triggerCallback.fire(c2, null, null);
         } catch (Throwable e) {
             throw DbException.get(ErrorCode.ERROR_EXECUTING_TRIGGER_3, e, getName(),
-                            triggerClassName, e.toString());
+                    triggerClassName, e.toString());
         } finally {
             session.setLastScopeIdentity(identity);
             if (type != Trigger.SELECT) {
@@ -148,16 +148,16 @@ public class TriggerObject extends SchemaObjectBase {
      * This method is called before or after a row is processed, possibly many
      * times for each statement.
      *
-     * @param session the session
-     * @param oldRow the old row
-     * @param newRow the new row
+     * @param session      the session
+     * @param oldRow       the old row
+     * @param newRow       the new row
      * @param beforeAction true if this method is called before the operation is
-     *            applied
-     * @param rollback when the operation occurred within a rollback
+     *                     applied
+     * @param rollback     when the operation occurred within a rollback
      * @return true if no further action is required (for 'instead of' triggers)
      */
     public boolean fireRow(Session session, Row oldRow, Row newRow,
-            boolean beforeAction, boolean rollback) {
+                           boolean beforeAction, boolean rollback) {
         if (!rowBased || before != beforeAction) {
             return false;
         }

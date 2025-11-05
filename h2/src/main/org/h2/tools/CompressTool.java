@@ -6,28 +6,17 @@
  */
 package org.h2.tools;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.InflaterInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
 import org.h2.api.ErrorCode;
-import org.h2.compress.CompressDeflate;
-import org.h2.compress.CompressLZF;
-import org.h2.compress.CompressNo;
-import org.h2.compress.Compressor;
-import org.h2.compress.LZFInputStream;
-import org.h2.compress.LZFOutputStream;
+import org.h2.compress.*;
 import org.h2.engine.Constants;
 import org.h2.message.DbException;
 import org.h2.mvstore.DataUtils;
 import org.h2.util.StringUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.*;
 
 /**
  * A tool to losslessly compress data, and expand the compressed data again.
@@ -67,7 +56,7 @@ public class CompressTool {
      * Compressed the data using the specified algorithm. If no algorithm is
      * supplied, LZF is used
      *
-     * @param in the byte array with the original data
+     * @param in        the byte array with the original data
      * @param algorithm the algorithm (LZF, DEFLATE)
      * @return the compressed data
      */
@@ -85,7 +74,7 @@ public class CompressTool {
     }
 
     private static int compress(byte[] in, int len, Compressor compress,
-            byte[] out) {
+                                byte[] out) {
         int newLen = 0;
         out[0] = (byte) compress.getAlgorithm();
         int start = 1 + writeVariableInt(out, 1, len);
@@ -137,7 +126,7 @@ public class CompressTool {
      * Read a variable size integer using Rice coding.
      *
      * @param buff the buffer
-     * @param pos the position
+     * @param pos  the position
      * @return the integer
      */
     public static int readVariableInt(byte[] buff, int pos) {
@@ -170,8 +159,8 @@ public class CompressTool {
      * Negative values need 5 bytes.
      *
      * @param buff the buffer
-     * @param pos the position
-     * @param x the value
+     * @param pos  the position
+     * @param x    the value
      * @return the number of bytes written (0-5)
      */
     public static int writeVariableInt(byte[] buff, int pos, int x) {
@@ -269,16 +258,16 @@ public class CompressTool {
 
     private static Compressor getCompressor(int algorithm) {
         switch (algorithm) {
-        case Compressor.NO:
-            return new CompressNo();
-        case Compressor.LZF:
-            return new CompressLZF();
-        case Compressor.DEFLATE:
-            return new CompressDeflate();
-        default:
-            throw DbException.get(
-                    ErrorCode.UNSUPPORTED_COMPRESSION_ALGORITHM_1,
-                    "" + algorithm);
+            case Compressor.NO:
+                return new CompressNo();
+            case Compressor.LZF:
+                return new CompressLZF();
+            case Compressor.DEFLATE:
+                return new CompressDeflate();
+            default:
+                throw DbException.get(
+                        ErrorCode.UNSUPPORTED_COMPRESSION_ALGORITHM_1,
+                        "" + algorithm);
         }
     }
 
@@ -286,7 +275,7 @@ public class CompressTool {
      * INTERNAL
      */
     public static OutputStream wrapOutputStream(OutputStream out,
-            String compressionAlgorithm, String entryName) {
+                                                String compressionAlgorithm, String entryName) {
         try {
             if ("GZIP".equals(compressionAlgorithm)) {
                 out = new GZIPOutputStream(out);
@@ -313,7 +302,7 @@ public class CompressTool {
      * INTERNAL
      */
     public static InputStream wrapInputStream(InputStream in,
-            String compressionAlgorithm, String entryName) {
+                                              String compressionAlgorithm, String entryName) {
         try {
             if ("GZIP".equals(compressionAlgorithm)) {
                 in = new GZIPInputStream(in);

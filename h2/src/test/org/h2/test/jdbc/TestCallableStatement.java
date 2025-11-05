@@ -6,28 +6,19 @@
  */
 package org.h2.test.jdbc;
 
-import java.io.ByteArrayInputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLXML;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Collections;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.tools.SimpleResultSet;
 import org.h2.util.IOUtils;
 import org.h2.util.Utils;
+
+import java.io.ByteArrayInputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.*;
+import java.util.Collections;
 
 /**
  * Tests for the CallableStatement class.
@@ -238,7 +229,7 @@ public class TestCallableStatement extends TestBase {
         assertEquals("Hello", rs.getString(2));
         assertFalse(rs.next());
         stat.execute("CREATE ALIAS testCall FOR \"" +
-                    getClass().getName() + ".testCall\"");
+                getClass().getName() + ".testCall\"");
         call = conn.prepareCall("{CALL testCall(?, ?, ?, ?)}");
         call.setInt("A", 50);
         call.setString("B", "abc");
@@ -389,6 +380,7 @@ public class TestCallableStatement extends TestBase {
 
     /**
      * Class factory unit test
+     *
      * @param b boolean value
      * @return !b
      */
@@ -400,14 +392,14 @@ public class TestCallableStatement extends TestBase {
      * This method is called via reflection from the database.
      *
      * @param conn the connection
-     * @param a the value a
-     * @param b the value b
-     * @param c the value c
-     * @param d the value d
+     * @param a    the value a
+     * @param b    the value b
+     * @param c    the value c
+     * @param d    the value d
      * @return a result set
      */
     public static ResultSet testCall(Connection conn, int a, String b,
-            Timestamp c, Timestamp d) throws SQLException {
+                                     Timestamp c, Timestamp d) throws SQLException {
         SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("A", Types.INTEGER, 0, 0);
         rs.addColumn("B", Types.VARCHAR, 0, 0);

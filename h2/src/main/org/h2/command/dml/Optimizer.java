@@ -6,7 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.util.Random;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
 import org.h2.table.Plan;
@@ -14,6 +13,8 @@ import org.h2.table.PlanItem;
 import org.h2.table.TableFilter;
 import org.h2.util.BitField;
 import org.h2.util.Permutations;
+
+import java.util.Random;
 
 /**
  * The optimizer is responsible to find the best execution plan
@@ -130,7 +131,7 @@ class Optimizer {
                             break;
                         }
                         list[i] = filters[j];
-                        Plan part = new Plan(list, i+1, condition);
+                        Plan part = new Plan(list, i + 1, condition);
                         double costNow = part.calculateCost(session);
                         if (costPart < 0 || costNow < costPart) {
                             costPart = costNow;

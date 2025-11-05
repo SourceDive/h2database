@@ -6,10 +6,10 @@
  */
 package org.h2.test.unit;
 
-import java.util.Random;
-
 import org.h2.test.TestBase;
 import org.h2.util.StringUtils;
+
+import java.util.Random;
 
 /**
  * Tests the string cache facility.
@@ -21,8 +21,8 @@ public class TestStringCache extends TestBase {
      */
     volatile boolean stop;
     private final Random random = new Random(1);
-    private final String[] some = { null, "", "ABC",
-            "this is a medium sized string", "1", "2" };
+    private final String[] some = {null, "", "ABC",
+            "this is a medium sized string", "1", "2"};
     private boolean returnNew;
     private boolean useIntern;
 

@@ -6,14 +6,15 @@
  */
 package org.h2.test.synth;
 
+import org.h2.store.FileLister;
+import org.h2.test.TestBase;
+import org.h2.test.utils.SelfDestructor;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Random;
-import org.h2.store.FileLister;
-import org.h2.test.TestBase;
-import org.h2.test.utils.SelfDestructor;
 
 /**
  * Test application for TestKill.
@@ -48,7 +49,7 @@ public class TestKillProcess {
             conn1.setAutoCommit(false);
             long time = System.currentTimeMillis();
             String d = null;
-            for (int i = 0;; i++) {
+            for (int i = 0; ; i++) {
                 long t = System.currentTimeMillis();
                 if (t > time + 1000) {
                     ArrayList<String> list = FileLister.getDatabaseFiles(
@@ -77,10 +78,10 @@ public class TestKillProcess {
                     account = random.nextInt(accounts);
                     conn1.createStatement().execute(
                             "UPDATE TEST_A SET DATA='" + d +
-                            "' WHERE ID=" + account);
+                                    "' WHERE ID=" + account);
                     conn1.createStatement().execute(
                             "UPDATE TEST_B SET DATA='" + d +
-                            "' WHERE ID=" + account);
+                                    "' WHERE ID=" + account);
                 }
             }
         } catch (Throwable e) {

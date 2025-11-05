@@ -6,12 +6,13 @@
  */
 package org.h2.test.unit;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.ArrayList;
 import org.h2.test.TestBase;
 import org.h2.test.utils.SelfDestructor;
 import org.h2.util.New;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.ArrayList;
 
 /**
  * Tests database file locking.
@@ -56,7 +57,7 @@ public class TestFileLockProcess extends TestBase {
             return;
         }
         deleteDb("lock");
-        String url = "jdbc:h2:"+getBaseDir()+"/lock";
+        String url = "jdbc:h2:" + getBaseDir() + "/lock";
 
         println("socket");
         test(4, url + ";file_lock=socket");
@@ -74,9 +75,9 @@ public class TestFileLockProcess extends TestBase {
         url = getURL(url, true);
         Connection conn = getConnection(url);
         String selfDestruct = SelfDestructor.getPropertyString(60);
-        String[] procDef = { "java", selfDestruct,
+        String[] procDef = {"java", selfDestruct,
                 "-cp", getClassPath(),
-                getClass().getName(), url };
+                getClass().getName(), url};
         ArrayList<Process> processes = New.arrayList();
         for (int i = 0; i < count; i++) {
             Thread.sleep(100);

@@ -6,8 +6,8 @@
  */
 package org.h2.api;
 
-import org.h2.table.Table;
 import org.h2.command.ddl.CreateTableData;
+import org.h2.table.Table;
 
 /**
  * A class that implements this interface can create custom table

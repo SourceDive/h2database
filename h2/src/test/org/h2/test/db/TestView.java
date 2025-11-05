@@ -6,14 +6,10 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
+
+import java.sql.*;
 
 /**
  * Test for views.
@@ -149,7 +145,7 @@ public class TestView extends TestBase {
         stat.execute("create table test(id int primary key) as select 1");
         PreparedStatement prep = conn.prepareStatement(
                 "select * from test t where t.id in " +
-                "(select t2.id from test t2 where t2.id in (?, ?))");
+                        "(select t2.id from test t2 where t2.id in (?, ?))");
         prep.setInt(1, 1);
         prep.setInt(2, 2);
         prep.execute();
@@ -209,7 +205,7 @@ public class TestView extends TestBase {
         s.execute("create view t1 as select * from t0");
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, s).execute(
                 "create table t2(id int primary key, " +
-                "col1 int not null, foreign key (col1) references t1(id))");
+                        "col1 int not null, foreign key (col1) references t1(id))");
         conn.close();
         deleteDb("view");
     }

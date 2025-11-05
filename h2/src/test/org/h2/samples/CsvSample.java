@@ -6,14 +6,14 @@
  */
 package org.h2.samples;
 
+import org.h2.store.fs.FileUtils;
+import org.h2.tools.Csv;
+import org.h2.tools.SimpleResultSet;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import org.h2.store.fs.FileUtils;
-import org.h2.tools.Csv;
-import org.h2.tools.SimpleResultSet;
 
 /**
  * This sample application shows how to use the CSV tool
@@ -58,7 +58,7 @@ public class CsvSample {
             for (int i = 0; i < meta.getColumnCount(); i++) {
                 System.out.println(
                         meta.getColumnLabel(i + 1) + ": " +
-                        rs.getString(i + 1));
+                                rs.getString(i + 1));
             }
             System.out.println();
         }

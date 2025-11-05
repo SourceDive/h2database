@@ -6,6 +6,15 @@
  */
 package org.h2.test.store;
 
+import org.h2.mvstore.*;
+import org.h2.mvstore.type.DataType;
+import org.h2.mvstore.type.ObjectDataType;
+import org.h2.mvstore.type.StringDataType;
+import org.h2.store.fs.FilePath;
+import org.h2.store.fs.FileUtils;
+import org.h2.test.TestBase;
+import org.h2.test.utils.AssertThrows;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -15,21 +24,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.h2.mvstore.Chunk;
-import org.h2.mvstore.Cursor;
-import org.h2.mvstore.DataUtils;
-import org.h2.mvstore.FileStore;
-import org.h2.mvstore.MVMap;
-import org.h2.mvstore.MVStore;
-import org.h2.mvstore.OffHeapStore;
-import org.h2.mvstore.type.DataType;
-import org.h2.mvstore.type.ObjectDataType;
-import org.h2.mvstore.type.StringDataType;
-import org.h2.store.fs.FilePath;
-import org.h2.store.fs.FileUtils;
-import org.h2.test.TestBase;
-import org.h2.test.utils.AssertThrows;
 
 /**
  * Tests the MVStore.
@@ -279,8 +273,8 @@ public class TestMVStore extends TestBase {
         String fileName = getBaseDir() + "/testCloseMap.h3";
         FileUtils.delete(fileName);
         MVStore s = new MVStore.Builder().
-            fileName(fileName).
-            open();
+                fileName(fileName).
+                open();
         MVMap<Integer, Integer> map;
 
         map = s.openMap("data");
@@ -1061,7 +1055,7 @@ public class TestMVStore extends TestBase {
         Map<Object, Object> map;
         s = new MVStore.Builder().fileName(fileName).open();
         map = s.openMap("test");
-        map.put(1,  "Hello");
+        map.put(1, "Hello");
         map.put("2", 200);
         map.put(new Object[1], new Object[]{1, "2"});
         s.close();
@@ -1232,7 +1226,7 @@ public class TestMVStore extends TestBase {
         assertEquals("Hallo", mOld.get("1"));
         assertEquals("Welt", mOld.get("2"));
 
-        m.put("1",  "Hi");
+        m.put("1", "Hi");
         assertEquals("Welt", m.remove("2"));
         s.close();
 
@@ -1391,7 +1385,7 @@ public class TestMVStore extends TestBase {
         assertNull(m0.get("1"));
         assertEquals("Hello", m.get("1"));
         assertFalse(m0.isReadOnly());
-        m.put("1",  "Hallo");
+        m.put("1", "Hallo");
         s.commit();
         long v3 = s.getCurrentVersion();
         assertEquals(3, v3);
@@ -1401,7 +1395,7 @@ public class TestMVStore extends TestBase {
         s.setRetentionTime(45000);
         assertEquals(3, s.getCurrentVersion());
         m = s.openMap("data");
-        m.put("1",  "Hi");
+        m.put("1", "Hi");
         s.close();
 
         s = openStore(fileName);
@@ -1537,15 +1531,15 @@ public class TestMVStore extends TestBase {
             MVStore s = openStore(fileName, 40);
             MVMap<Integer, Object[]> m = s.openMap("data",
                     new MVMap.Builder<Integer, Object[]>()
-                            .valueType(new RowDataType(new DataType[] {
+                            .valueType(new RowDataType(new DataType[]{
                                     new ObjectDataType(),
                                     StringDataType.INSTANCE,
-                                    StringDataType.INSTANCE })));
+                                    StringDataType.INSTANCE})));
 
             // Profiler prof = new Profiler();
             // prof.startCollecting();
             // long t = System.currentTimeMillis();
-            for (int i = 0; i < len;) {
+            for (int i = 0; i < len; ) {
                 Object[] o = new Object[3];
                 o[0] = i;
                 o[1] = "Hello World";
@@ -1750,38 +1744,38 @@ public class TestMVStore extends TestBase {
             int v = r.nextInt();
             boolean compareAll;
             switch (r.nextInt(3)) {
-            case 0:
-                log(i + ": put " + k + " = " + v);
-                expected = map.put(k, v);
-                got = m.put(k, v);
-                if (expected == null) {
-                    assertNull(got);
-                } else {
-                    assertEquals(expected, got);
-                }
-                compareAll = true;
-                break;
-            case 1:
-                log(i + ": remove " + k);
-                expected = map.remove(k);
-                got = m.remove(k);
-                if (expected == null) {
-                    assertNull(got);
-                } else {
-                    assertEquals(expected, got);
-                }
-                compareAll = true;
-                break;
-            default:
-                Integer a = map.get(k);
-                Integer b = m.get(k);
-                if (a == null || b == null) {
-                    assertTrue(a == b);
-                } else {
-                    assertEquals(a.intValue(), b.intValue());
-                }
-                compareAll = false;
-                break;
+                case 0:
+                    log(i + ": put " + k + " = " + v);
+                    expected = map.put(k, v);
+                    got = m.put(k, v);
+                    if (expected == null) {
+                        assertNull(got);
+                    } else {
+                        assertEquals(expected, got);
+                    }
+                    compareAll = true;
+                    break;
+                case 1:
+                    log(i + ": remove " + k);
+                    expected = map.remove(k);
+                    got = m.remove(k);
+                    if (expected == null) {
+                        assertNull(got);
+                    } else {
+                        assertEquals(expected, got);
+                    }
+                    compareAll = true;
+                    break;
+                default:
+                    Integer a = map.get(k);
+                    Integer b = m.get(k);
+                    if (a == null || b == null) {
+                        assertTrue(a == b);
+                    } else {
+                        assertEquals(a.intValue(), b.intValue());
+                    }
+                    compareAll = false;
+                    break;
             }
             if (compareAll) {
                 Iterator<Integer> it = m.keyIterator(null);
@@ -1906,7 +1900,7 @@ public class TestMVStore extends TestBase {
         MVMap<Integer, String> map = store.openMap("test");
         long last = System.currentTimeMillis();
         String data = new String(new char[2500]).replace((char) 0, 'x');
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             map.put(i, data);
             if (i % 10000 == 0) {
                 store.commit();
@@ -1939,7 +1933,7 @@ public class TestMVStore extends TestBase {
     /**
      * Open a store for the given file name, using a small page size.
      *
-     * @param fileName the file name (null for in-memory)
+     * @param fileName      the file name (null for in-memory)
      * @param pageSplitSize the page split size
      * @return the store
      */

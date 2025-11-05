@@ -59,7 +59,7 @@ public class Right extends DbObjectBase {
     }
 
     public Right(Database db, int id, RightOwner grantee, int grantedRight,
-            Table grantedRightOnTable) {
+                 Table grantedRightOnTable) {
         initDbObjectBase(db, id, "" + id, Trace.USER);
         this.grantee = grantee;
         this.grantedRight = grantedRight;
@@ -67,7 +67,7 @@ public class Right extends DbObjectBase {
     }
 
     private static boolean appendRight(StringBuilder buff, int right, int mask,
-            String name, boolean comma) {
+                                       String name, boolean comma) {
         if ((right & mask) != 0) {
             if (comma) {
                 buff.append(", ");

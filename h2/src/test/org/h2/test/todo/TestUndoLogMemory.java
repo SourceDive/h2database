@@ -6,12 +6,9 @@
  */
 package org.h2.test.todo;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.h2.tools.DeleteDbFiles;
+
+import java.sql.*;
 
 /**
  * A test to reproduce out of memory using a large operation.
@@ -62,7 +59,7 @@ public class TestUndoLogMemory {
         // INSERT problem
         System.out.println("insert---");
         stat.execute(
-            "insert into test(id) select x from system_range(1, "+count+")");
+                "insert into test(id) select x from system_range(1, " + count + ")");
         System.out.println("delete---");
         stat.execute("delete from test");
 

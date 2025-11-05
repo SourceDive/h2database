@@ -6,13 +6,13 @@
  */
 package org.h2.value;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
-
 import org.h2.engine.SysProperties;
 import org.h2.store.DataHandler;
 import org.h2.util.Utils;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * Implementation of the OBJECT data type.
@@ -32,13 +32,13 @@ public class ValueJavaObject extends ValueBytes {
      * Get or create a java object value for the given byte array.
      * Do not clone the data.
      *
-     * @param javaObject the object
-     * @param b the byte array
+     * @param javaObject  the object
+     * @param b           the byte array
      * @param dataHandler provides the object serializer
      * @return the value
      */
     public static ValueJavaObject getNoCopy(Object javaObject, byte[] b,
-            DataHandler dataHandler) {
+                                            DataHandler dataHandler) {
         if (b != null && b.length == 0) {
             return EMPTY;
         }

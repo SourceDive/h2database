@@ -6,15 +6,11 @@
  */
 package org.h2.android;
 
-import org.h2.result.ResultInterface;
 import android.content.ContentResolver;
-import android.database.AbstractWindowedCursor;
-import android.database.CharArrayBuffer;
-import android.database.ContentObserver;
-import android.database.CursorWindow;
-import android.database.DataSetObserver;
+import android.database.*;
 import android.net.Uri;
 import android.os.Bundle;
+import org.h2.result.ResultInterface;
 
 /**
  * A cursor implementation.
@@ -25,7 +21,7 @@ public class H2Cursor extends AbstractWindowedCursor {
     private ResultInterface result;
 
     H2Cursor(H2Database db, H2CursorDriver driver, String editTable,
-            H2Query query) {
+             H2Query query) {
         this.database = db;
         // TODO
     }

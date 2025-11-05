@@ -247,28 +247,28 @@ public class StreamStore {
         ByteBuffer idBuffer = ByteBuffer.wrap(id);
         while (idBuffer.hasRemaining()) {
             switch (idBuffer.get()) {
-            case 0:
-                // in-place: 0, len (int), data
-                int len = DataUtils.readVarInt(idBuffer);
-                idBuffer.position(idBuffer.position() + len);
-                break;
-            case 1:
-                // block: 1, len (int), blockId (long)
-                DataUtils.readVarInt(idBuffer);
-                long k = DataUtils.readVarLong(idBuffer);
-                map.remove(k);
-                break;
-            case 2:
-                // indirect: 2, total len (long), blockId (long)
-                DataUtils.readVarLong(idBuffer);
-                long k2 = DataUtils.readVarLong(idBuffer);
-                // recurse
-                remove(map.get(k2));
-                map.remove(k2);
-                break;
-            default:
-                throw DataUtils.newIllegalArgumentException(
-                        "Unsupported id {0}", Arrays.toString(id));
+                case 0:
+                    // in-place: 0, len (int), data
+                    int len = DataUtils.readVarInt(idBuffer);
+                    idBuffer.position(idBuffer.position() + len);
+                    break;
+                case 1:
+                    // block: 1, len (int), blockId (long)
+                    DataUtils.readVarInt(idBuffer);
+                    long k = DataUtils.readVarLong(idBuffer);
+                    map.remove(k);
+                    break;
+                case 2:
+                    // indirect: 2, total len (long), blockId (long)
+                    DataUtils.readVarLong(idBuffer);
+                    long k2 = DataUtils.readVarLong(idBuffer);
+                    // recurse
+                    remove(map.get(k2));
+                    map.remove(k2);
+                    break;
+                default:
+                    throw DataUtils.newIllegalArgumentException(
+                            "Unsupported id {0}", Arrays.toString(id));
             }
         }
     }
@@ -285,25 +285,25 @@ public class StreamStore {
         long length = 0;
         while (idBuffer.hasRemaining()) {
             switch (idBuffer.get()) {
-            case 0:
-                // in-place: 0, len (int), data
-                int len = DataUtils.readVarInt(idBuffer);
-                idBuffer.position(idBuffer.position() + len);
-                length += len;
-                break;
-            case 1:
-                // block: 1, len (int), blockId (long)
-                length += DataUtils.readVarInt(idBuffer);
-                DataUtils.readVarLong(idBuffer);
-                break;
-            case 2:
-                // indirect: 2, total len (long), blockId (long)
-                length += DataUtils.readVarLong(idBuffer);
-                DataUtils.readVarLong(idBuffer);
-                break;
-            default:
-                throw DataUtils.newIllegalArgumentException(
-                        "Unsupported id {0}", Arrays.toString(id));
+                case 0:
+                    // in-place: 0, len (int), data
+                    int len = DataUtils.readVarInt(idBuffer);
+                    idBuffer.position(idBuffer.position() + len);
+                    length += len;
+                    break;
+                case 1:
+                    // block: 1, len (int), blockId (long)
+                    length += DataUtils.readVarInt(idBuffer);
+                    DataUtils.readVarLong(idBuffer);
+                    break;
+                case 2:
+                    // indirect: 2, total len (long), blockId (long)
+                    length += DataUtils.readVarLong(idBuffer);
+                    DataUtils.readVarLong(idBuffer);
+                    break;
+                default:
+                    throw DataUtils.newIllegalArgumentException(
+                            "Unsupported id {0}", Arrays.toString(id));
             }
         }
         return length;
@@ -429,50 +429,50 @@ public class StreamStore {
         private ByteArrayInputStream nextBuffer() {
             while (idBuffer.hasRemaining()) {
                 switch (idBuffer.get()) {
-                case 0: {
-                    int len = DataUtils.readVarInt(idBuffer);
-                    if (skip >= len) {
-                        skip -= len;
-                        idBuffer.position(idBuffer.position() + len);
-                        continue;
+                    case 0: {
+                        int len = DataUtils.readVarInt(idBuffer);
+                        if (skip >= len) {
+                            skip -= len;
+                            idBuffer.position(idBuffer.position() + len);
+                            continue;
+                        }
+                        int p = (int) (idBuffer.position() + skip);
+                        int l = (int) (len - skip);
+                        idBuffer.position(p + l);
+                        return new ByteArrayInputStream(idBuffer.array(), p, l);
                     }
-                    int p = (int) (idBuffer.position() + skip);
-                    int l = (int) (len - skip);
-                    idBuffer.position(p + l);
-                    return new ByteArrayInputStream(idBuffer.array(), p, l);
-                }
-                case 1: {
-                    int len = DataUtils.readVarInt(idBuffer);
-                    long key = DataUtils.readVarLong(idBuffer);
-                    if (skip >= len) {
-                        skip -= len;
-                        continue;
+                    case 1: {
+                        int len = DataUtils.readVarInt(idBuffer);
+                        long key = DataUtils.readVarLong(idBuffer);
+                        if (skip >= len) {
+                            skip -= len;
+                            continue;
+                        }
+                        byte[] data = store.getBlock(key);
+                        int s = (int) skip;
+                        skip = 0;
+                        return new ByteArrayInputStream(data, s, data.length - s);
                     }
-                    byte[] data = store.getBlock(key);
-                    int s = (int) skip;
-                    skip = 0;
-                    return new ByteArrayInputStream(data, s, data.length - s);
-                }
-                case 2: {
-                    long len = DataUtils.readVarLong(idBuffer);
-                    long key = DataUtils.readVarLong(idBuffer);
-                    if (skip >= len) {
-                        skip -= len;
-                        continue;
+                    case 2: {
+                        long len = DataUtils.readVarLong(idBuffer);
+                        long key = DataUtils.readVarLong(idBuffer);
+                        if (skip >= len) {
+                            skip -= len;
+                            continue;
+                        }
+                        byte[] k = store.getBlock(key);
+                        ByteBuffer newBuffer = ByteBuffer.allocate(k.length
+                                + idBuffer.limit() - idBuffer.position());
+                        newBuffer.put(k);
+                        newBuffer.put(idBuffer);
+                        newBuffer.flip();
+                        idBuffer = newBuffer;
+                        return nextBuffer();
                     }
-                    byte[] k = store.getBlock(key);
-                    ByteBuffer newBuffer = ByteBuffer.allocate(k.length
-                            + idBuffer.limit() - idBuffer.position());
-                    newBuffer.put(k);
-                    newBuffer.put(idBuffer);
-                    newBuffer.flip();
-                    idBuffer = newBuffer;
-                    return nextBuffer();
-                }
-                default:
-                    throw DataUtils.newIllegalArgumentException(
-                            "Unsupported id {0}",
-                            Arrays.toString(idBuffer.array()));
+                    default:
+                        throw DataUtils.newIllegalArgumentException(
+                                "Unsupported id {0}",
+                                Arrays.toString(idBuffer.array()));
                 }
             }
             return null;

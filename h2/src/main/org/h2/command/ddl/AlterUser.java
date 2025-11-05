@@ -78,35 +78,35 @@ public class AlterUser extends DefineCommand {
         session.commit(true);
         Database db = session.getDatabase();
         switch (type) {
-        case CommandInterface.ALTER_USER_SET_PASSWORD:
-            if (user != session.getUser()) {
+            case CommandInterface.ALTER_USER_SET_PASSWORD:
+                if (user != session.getUser()) {
+                    session.getUser().checkAdmin();
+                }
+                if (hash != null && salt != null) {
+                    user.setSaltAndHash(getByteArray(salt), getByteArray(hash));
+                } else {
+                    String name = newName == null ? user.getName() : newName;
+                    char[] passwordChars = getCharArray(password);
+                    byte[] userPasswordHash = SHA256.getKeyPasswordHash(name, passwordChars);
+                    user.setUserPasswordHash(userPasswordHash);
+                }
+                break;
+            case CommandInterface.ALTER_USER_RENAME:
                 session.getUser().checkAdmin();
-            }
-            if (hash != null && salt != null) {
-                user.setSaltAndHash(getByteArray(salt), getByteArray(hash));
-            } else {
-                String name = newName == null ? user.getName() : newName;
-                char[] passwordChars = getCharArray(password);
-                byte[] userPasswordHash = SHA256.getKeyPasswordHash(name, passwordChars);
-                user.setUserPasswordHash(userPasswordHash);
-            }
-            break;
-        case CommandInterface.ALTER_USER_RENAME:
-            session.getUser().checkAdmin();
-            if (db.findUser(newName) != null || newName.equals(user.getName())) {
-                throw DbException.get(ErrorCode.USER_ALREADY_EXISTS_1, newName);
-            }
-            db.renameDatabaseObject(session, user, newName);
-            break;
-        case CommandInterface.ALTER_USER_ADMIN:
-            session.getUser().checkAdmin();
-            if (!admin) {
-                user.checkOwnsNoSchemas();
-            }
-            user.setAdmin(admin);
-            break;
-        default:
-            DbException.throwInternalError("type=" + type);
+                if (db.findUser(newName) != null || newName.equals(user.getName())) {
+                    throw DbException.get(ErrorCode.USER_ALREADY_EXISTS_1, newName);
+                }
+                db.renameDatabaseObject(session, user, newName);
+                break;
+            case CommandInterface.ALTER_USER_ADMIN:
+                session.getUser().checkAdmin();
+                if (!admin) {
+                    user.checkOwnsNoSchemas();
+                }
+                user.setAdmin(admin);
+                break;
+            default:
+                DbException.throwInternalError("type=" + type);
         }
         db.update(session, user);
         return 0;

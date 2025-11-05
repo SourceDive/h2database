@@ -6,17 +6,6 @@
  */
 package org.h2.test.store;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -28,6 +17,13 @@ import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.util.New;
 import org.h2.util.Task;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Test concurrent transactions.
@@ -190,7 +186,7 @@ public class TestTransactionStore extends TestBase {
         FileUtils.delete(fileName);
         Random r = new Random(0);
 
-        for (int i = 0; i < 10;) {
+        for (int i = 0; i < 10; ) {
             MVStore s;
             TransactionStore ts;
             Transaction tx;
@@ -636,70 +632,70 @@ public class TestTransactionStore extends TestBase {
                 buff.append(i).append(": [" + connIndex + "]: ");
                 ResultSet rs = null;
                 switch (r.nextInt(7)) {
-                case 0:
-                    buff.append("commit");
-                    stat.getConnection().commit();
-                    transaction.commit();
-                    transactions.set(connIndex, null);
-                    break;
-                case 1:
-                    buff.append("rollback");
-                    stat.getConnection().rollback();
-                    transaction.rollback();
-                    transactions.set(connIndex, null);
-                    break;
-                case 2:
-                    // insert or update
-                    String old = map.get(x);
-                    if (old == null) {
-                        buff.append("insert " + x + "=" + y);
-                        if (map.tryPut(x, "" + y)) {
-                            stat.execute("insert into test values(" + x + ", '" + y + "')");
-                        } else {
-                            buff.append(" -> row was locked");
-                            // the statement would time out in PostgreSQL
-                            // TODO test sometimes if timeout occurs
-                        }
-                    } else {
-                        buff.append("update " + x + "=" + y + " (old:" + old + ")");
-                        if (map.tryPut(x, "" + y)) {
-                            int c = stat.executeUpdate("update test set name = '" + y
-                                    + "' where id = " + x);
-                            assertEquals(1, c);
-                        } else {
-                            buff.append(" -> row was locked");
-                            // the statement would time out in PostgreSQL
-                            // TODO test sometimes if timeout occurs
-                        }
-                    }
-                    break;
-                case 3:
-                    buff.append("delete " + x);
-                    try {
-                        int c = stat.executeUpdate("delete from test where id = " + x);
-                        if (c == 1) {
-                            map.remove(x);
-                        } else {
-                            assertNull(map.get(x));
-                        }
-                    } catch (SQLException e) {
-                        assertTrue(map.get(x) != null);
-                        assertFalse(map.tryRemove(x));
-                        // PostgreSQL needs to rollback
-                        buff.append(" -> rollback");
+                    case 0:
+                        buff.append("commit");
+                        stat.getConnection().commit();
+                        transaction.commit();
+                        transactions.set(connIndex, null);
+                        break;
+                    case 1:
+                        buff.append("rollback");
                         stat.getConnection().rollback();
                         transaction.rollback();
                         transactions.set(connIndex, null);
-                    }
-                    break;
-                case 4:
-                case 5:
-                case 6:
-                    rs = stat.executeQuery("select * from test where id = " + x);
-                    String expected = rs.next() ? rs.getString(2) : null;
-                    buff.append("select " + x + "=" + expected);
-                    assertEquals("i:" + i, expected, map.get(x));
-                    break;
+                        break;
+                    case 2:
+                        // insert or update
+                        String old = map.get(x);
+                        if (old == null) {
+                            buff.append("insert " + x + "=" + y);
+                            if (map.tryPut(x, "" + y)) {
+                                stat.execute("insert into test values(" + x + ", '" + y + "')");
+                            } else {
+                                buff.append(" -> row was locked");
+                                // the statement would time out in PostgreSQL
+                                // TODO test sometimes if timeout occurs
+                            }
+                        } else {
+                            buff.append("update " + x + "=" + y + " (old:" + old + ")");
+                            if (map.tryPut(x, "" + y)) {
+                                int c = stat.executeUpdate("update test set name = '" + y
+                                        + "' where id = " + x);
+                                assertEquals(1, c);
+                            } else {
+                                buff.append(" -> row was locked");
+                                // the statement would time out in PostgreSQL
+                                // TODO test sometimes if timeout occurs
+                            }
+                        }
+                        break;
+                    case 3:
+                        buff.append("delete " + x);
+                        try {
+                            int c = stat.executeUpdate("delete from test where id = " + x);
+                            if (c == 1) {
+                                map.remove(x);
+                            } else {
+                                assertNull(map.get(x));
+                            }
+                        } catch (SQLException e) {
+                            assertTrue(map.get(x) != null);
+                            assertFalse(map.tryRemove(x));
+                            // PostgreSQL needs to rollback
+                            buff.append(" -> rollback");
+                            stat.getConnection().rollback();
+                            transaction.rollback();
+                            transactions.set(connIndex, null);
+                        }
+                        break;
+                    case 4:
+                    case 5:
+                    case 6:
+                        rs = stat.executeQuery("select * from test where id = " + x);
+                        String expected = rs.next() ? rs.getString(2) : null;
+                        buff.append("select " + x + "=" + expected);
+                        assertEquals("i:" + i, expected, map.get(x));
+                        break;
                 }
                 buff.append('\n');
             }

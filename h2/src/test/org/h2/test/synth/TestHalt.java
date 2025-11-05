@@ -6,18 +6,6 @@
  */
 package org.h2.test.synth;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-
 import org.h2.test.TestAll;
 import org.h2.test.TestBase;
 import org.h2.test.utils.SelfDestructor;
@@ -25,6 +13,14 @@ import org.h2.tools.Backup;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.util.IOUtils;
 import org.h2.util.StringUtils;
+
+import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 
 /**
  * Tests database recovery by destroying a process that writes to the database.
@@ -122,7 +118,7 @@ public abstract class TestHalt extends TestBase {
 
     @Override
     public void test() {
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             operations = OP_INSERT | i;
             flags = i >> 4;
             // flags |= FLAG_NO_DELAY; // | FLAG_LOBS;
@@ -233,7 +229,7 @@ public abstract class TestHalt extends TestBase {
             // String classPath = "-cp
             // .;D:/data/java/hsqldb.jar;D:/data/java/derby.jar";
             String selfDestruct = SelfDestructor.getPropertyString(60);
-            String[] procDef = { "java", selfDestruct,
+            String[] procDef = {"java", selfDestruct,
                     "-cp", getClassPath(),
                     getClass().getName(), "" + operations, "" + flags, "" + testValue};
             traceOperation("start: " + StringUtils.arrayCombine(procDef, ' '));
@@ -245,7 +241,7 @@ public abstract class TestHalt extends TestBase {
             if (s == null) {
                 throw new IOException(
                         "No reply from process, command: " +
-                        StringUtils.arrayCombine(procDef, ' '));
+                                StringUtils.arrayCombine(procDef, ' '));
             } else if (s.startsWith("READY")) {
                 traceOperation("got reply: " + s);
             }

@@ -41,8 +41,8 @@ public class New {
     /**
      * Create a new HashMap.
      *
-     * @param <K> the key type
-     * @param <V> the value type
+     * @param <K>             the key type
+     * @param <V>             the value type
      * @param initialCapacity the initial capacity
      * @return the object
      */
@@ -64,7 +64,7 @@ public class New {
      * Create a new ArrayList.
      *
      * @param <T> the type
-     * @param c the collection
+     * @param c   the collection
      * @return the object
      */
     public static <T> ArrayList<T> arrayList(Collection<T> c) {
@@ -74,7 +74,7 @@ public class New {
     /**
      * Create a new ArrayList.
      *
-     * @param <T> the type
+     * @param <T>             the type
      * @param initialCapacity the initial capacity
      * @return the object
      */

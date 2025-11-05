@@ -6,22 +6,18 @@
  */
 package org.h2.test.synth;
 
-import java.io.File;
-import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import org.h2.api.ErrorCode;
 import org.h2.store.fs.FileUtils;
 import org.h2.test.TestBase;
 import org.h2.util.New;
 import org.h2.util.ScriptReader;
+
+import java.io.File;
+import java.io.StringReader;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 /**
  * Tests nested joins and right outer joins.
@@ -171,7 +167,7 @@ public class TestNestedJoins extends TestBase {
     }
 
     private void appendRandomJoin(Random random, StringBuilder buff, int min,
-            int max) {
+                                  int max) {
         if (min == max) {
             buff.append("t" + min);
             return;
@@ -181,15 +177,15 @@ public class TestNestedJoins extends TestBase {
         int left = min + (m == min ? 0 : random.nextInt(m - min));
         appendRandomJoin(random, buff, min, m);
         switch (random.nextInt(3)) {
-        case 0:
-            buff.append(" inner join ");
-            break;
-        case 1:
-            buff.append(" left outer join ");
-            break;
-        case 2:
-            buff.append(" right outer join ");
-            break;
+            case 0:
+                buff.append(" inner join ");
+                break;
+            case 1:
+                buff.append(" left outer join ");
+                break;
+            case 2:
+                buff.append(" right outer join ");
+                break;
         }
         m++;
         int right = m + (m == max ? 0 : random.nextInt(max - m));
@@ -381,7 +377,7 @@ public class TestNestedJoins extends TestBase {
         stat.execute("insert into t4 values(1,1), (2,2), (3,3), (4,4)");
         rs = stat.executeQuery(
                 "explain select distinct t1.a, t2.a, t3.a from t1 " +
-                "right outer join t3 on t1.b=t3.a right outer join t2 on t2.b=t1.a");
+                        "right outer join t3 on t1.b=t3.a right outer join t2 on t2.b=t1.a");
         assertTrue(rs.next());
         sql = cleanRemarks(rs.getString(1));
         assertEquals("SELECT DISTINCT T1.A, T2.A, T3.A FROM PUBLIC.T2 " +
@@ -591,10 +587,10 @@ public class TestNestedJoins extends TestBase {
         stat.execute("insert into b values(3, 'a')");
         rs = stat.executeQuery(
                 "explain select a.pk, a_base.pk, b.pk, b_base.pk " +
-                "from a " +
-                "inner join base a_base on a.pk = a_base.pk " +
-                "left outer join (b inner join base b_base " +
-                "on b.pk = b_base.pk and b_base.deleted = 0) on 1=1");
+                        "from a " +
+                        "inner join base a_base on a.pk = a_base.pk " +
+                        "left outer join (b inner join base b_base " +
+                        "on b.pk = b_base.pk and b_base.deleted = 0) on 1=1");
         assertTrue(rs.next());
         sql = cleanRemarks(rs.getString(1));
         assertEquals("SELECT A.PK, A_BASE.PK, B.PK, B_BASE.PK " +
@@ -606,9 +602,9 @@ public class TestNestedJoins extends TestBase {
                 "WHERE A.PK = A_BASE.PK", sql);
         rs = stat.executeQuery(
                 "select a.pk, a_base.pk, b.pk, b_base.pk from a " +
-                "inner join base a_base on a.pk = a_base.pk " +
-                "left outer join (b inner join base b_base " +
-                "on b.pk = b_base.pk and b_base.deleted = 0) on 1=1");
+                        "inner join base a_base on a.pk = a_base.pk " +
+                        "left outer join (b inner join base b_base " +
+                        "on b.pk = b_base.pk and b_base.deleted = 0) on 1=1");
         // expected: 1    1   3   3
         assertTrue(rs.next());
         assertEquals("1", rs.getString(1));

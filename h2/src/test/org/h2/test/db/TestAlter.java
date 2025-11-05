@@ -6,14 +6,10 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
+
+import java.sql.*;
 
 /**
  * Test ALTER statements.
@@ -125,7 +121,7 @@ public class TestAlter extends TestBase {
         stat = conn.createStatement();
         stat.execute("insert into test values(1)");
         assertThrows(ErrorCode.CHECK_CONSTRAINT_VIOLATED_1, stat).
-            execute("insert into test values(3)");
+                execute("insert into test values(3)");
         stat.execute("drop table test");
     }
 

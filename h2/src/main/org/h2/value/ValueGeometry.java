@@ -6,23 +6,14 @@
  */
 package org.h2.value;
 
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.io.*;
+import org.h2.message.DbException;
+import org.h2.util.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
-
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFilter;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import org.h2.message.DbException;
-import org.h2.util.StringUtils;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKBReader;
-import com.vividsolutions.jts.io.WKBWriter;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.WKTWriter;
 
 /**
  * Implementation of the GEOMETRY data type.
@@ -36,7 +27,7 @@ public class ValueGeometry extends Value {
     /**
      * As conversion from/to WKB cost a significant amount of CPU cycles, WKB
      * are kept in ValueGeometry instance.
-     *
+     * <p>
      * We always calculate the WKB, because not all WKT values can be
      * represented in WKB, but since we persist it in WKB format, it has to be
      * valid in WKB
@@ -54,7 +45,7 @@ public class ValueGeometry extends Value {
     /**
      * Create a new geometry objects.
      *
-     * @param bytes the bytes (always known)
+     * @param bytes    the bytes (always known)
      * @param geometry the geometry object (may be null)
      */
     private ValueGeometry(byte[] bytes, Geometry geometry) {
@@ -67,7 +58,7 @@ public class ValueGeometry extends Value {
      * Get or create a geometry value for the given geometry.
      *
      * @param o the geometry object (of type
-     *            com.vividsolutions.jts.geom.Geometry)
+     *          com.vividsolutions.jts.geom.Geometry)
      * @return the value
      */
     public static ValueGeometry getFromGeometry(Object o) {
@@ -110,7 +101,7 @@ public class ValueGeometry extends Value {
     /**
      * Get or create a geometry value for the given geometry.
      *
-     * @param s the WKT representation of the geometry
+     * @param s    the WKT representation of the geometry
      * @param srid the srid of the object
      * @return the value
      */

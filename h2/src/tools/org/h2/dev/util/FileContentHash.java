@@ -6,6 +6,11 @@
  */
 package org.h2.dev.util;
 
+import org.h2.store.fs.FileUtils;
+import org.h2.util.New;
+import org.h2.util.SortedProperties;
+import org.h2.util.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -13,11 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import org.h2.store.fs.FileUtils;
-import org.h2.util.New;
-import org.h2.util.SortedProperties;
-import org.h2.util.StringUtils;
 
 /**
  * A utility to calculate the content hash of files. It should help detect
@@ -149,7 +149,7 @@ public class FileContentHash {
         if (old != null) {
             System.out.println("Collision: " + old + "\n" + path + "\n");
         } else {
-            hashes.put(s,  path);
+            hashes.put(s, path);
         }
     }
 

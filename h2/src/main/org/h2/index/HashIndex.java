@@ -32,7 +32,7 @@ public class HashIndex extends BaseIndex {
     private ValueHashMap<Long> rows;
 
     public HashIndex(RegularTable table, int id, String indexName,
-            IndexColumn[] columns, IndexType indexType) {
+                     IndexColumn[] columns, IndexType indexType) {
         initBaseIndex(table, id, indexName, columns, indexType);
         this.indexColumn = columns[0].column.getColumnId();
         this.tableData = table;
@@ -115,7 +115,7 @@ public class HashIndex extends BaseIndex {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         for (Column column : columns) {
             int index = column.getColumnId();
             int mask = masks[index];

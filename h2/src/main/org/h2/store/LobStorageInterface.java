@@ -6,11 +6,12 @@
  */
 package org.h2.store;
 
+import org.h2.value.Value;
+import org.h2.value.ValueLobDb;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import org.h2.value.Value;
-import org.h2.value.ValueLobDb;
 
 /**
  * A mechanism to store and retrieve lob data.
@@ -20,7 +21,7 @@ public interface LobStorageInterface {
     /**
      * Create a CLOB object.
      *
-     * @param reader the reader
+     * @param reader    the reader
      * @param maxLength the maximum length (-1 if not known)
      * @return the LOB
      */
@@ -29,7 +30,7 @@ public interface LobStorageInterface {
     /**
      * Create a BLOB object.
      *
-     * @param in the input stream
+     * @param in        the input stream
      * @param maxLength the maximum length (-1 if not known)
      * @return the LOB
      */
@@ -38,9 +39,9 @@ public interface LobStorageInterface {
     /**
      * Copy a lob.
      *
-     * @param old the old lob
+     * @param old     the old lob
      * @param tableId the new table id
-     * @param length the length
+     * @param length  the length
      * @return the new lob
      */
     ValueLobDb copyLob(ValueLobDb old, int tableId, long length);
@@ -48,8 +49,8 @@ public interface LobStorageInterface {
     /**
      * Get the input stream for the given lob.
      *
-     * @param lob the lob id
-     * @param hmac the message authentication code (for remote input streams)
+     * @param lob       the lob id
+     * @param hmac      the message authentication code (for remote input streams)
      * @param byteCount the number of bytes to read, or -1 if not known
      * @return the stream
      */
@@ -59,7 +60,7 @@ public interface LobStorageInterface {
     /**
      * Set the table reference of this lob.
      *
-     * @param lob the lob
+     * @param lob   the lob
      * @param table the table
      */
     void setTable(ValueLobDb lob, int table);

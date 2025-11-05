@@ -6,10 +6,11 @@
  */
 package org.h2.mvstore;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import org.h2.compress.Compressor;
 import org.h2.mvstore.type.DataType;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * A page (a node or a leaf).
@@ -110,7 +111,7 @@ public class Page {
     /**
      * Create a new, empty page.
      *
-     * @param map the map
+     * @param map     the map
      * @param version the version
      * @return the new page
      */
@@ -124,24 +125,24 @@ public class Page {
     /**
      * Create a new page. The arrays are not cloned.
      *
-     * @param map the map
-     * @param version the version
-     * @param keyCount the number of keys
-     * @param keys the keys
-     * @param values the values
-     * @param childCount the number of children
-     * @param children the children
+     * @param map           the map
+     * @param version       the version
+     * @param keyCount      the number of keys
+     * @param keys          the keys
+     * @param values        the values
+     * @param childCount    the number of children
+     * @param children      the children
      * @param childrenPages the children pages
-     * @param counts the children counts
-     * @param totalCount the total number of keys
-     * @param sharedFlags which arrays are shared
-     * @param memory the memory used in bytes
+     * @param counts        the children counts
+     * @param totalCount    the total number of keys
+     * @param sharedFlags   which arrays are shared
+     * @param memory        the memory used in bytes
      * @return the page
      */
     public static Page create(MVMap<?, ?> map, long version, int keyCount,
-            Object[] keys, Object[] values, int childCount, long[] children,
-            Page[] childrenPages, long[] counts, long totalCount,
-            int sharedFlags, int memory) {
+                              Object[] keys, Object[] values, int childCount, long[] children,
+                              Page[] childrenPages, long[] counts, long totalCount,
+                              int sharedFlags, int memory) {
         Page p = new Page(map, version);
         // the position is 0
         p.keyCount = keyCount;
@@ -169,14 +170,14 @@ public class Page {
      * Read a page.
      *
      * @param fileStore the file store
-     * @param map the map
-     * @param pos the page position
-     * @param filePos the position in the file
-     * @param fileSize the file size (to avoid reading past EOF)
+     * @param map       the map
+     * @param pos       the page position
+     * @param filePos   the position in the file
+     * @param fileSize  the file size (to avoid reading past EOF)
      * @return the page
      */
     static Page read(FileStore fileStore, MVMap<?, ?> map,
-            long pos, long filePos, long fileSize) {
+                     long pos, long filePos, long fileSize) {
         ByteBuffer buff;
         int maxLength = DataUtils.getPageMaxLength(pos);
         if (maxLength == DataUtils.PAGE_LARGE) {
@@ -473,7 +474,7 @@ public class Page {
      * Replace the child page.
      *
      * @param index the index
-     * @param c the new child page
+     * @param c     the new child page
      */
     public void setChild(int index, Page c) {
         if (c != childrenPages[index] || c.getPos() != children[index]) {
@@ -492,7 +493,7 @@ public class Page {
      * Update the (descendant) count for the given child, if there was a change.
      *
      * @param index the index
-     * @param c the new child page
+     * @param c     the new child page
      */
     public void setCounts(int index, Page c) {
         setCounts(index, c.totalCount);
@@ -520,7 +521,7 @@ public class Page {
      * Replace the key.
      *
      * @param index the index
-     * @param key the new key
+     * @param key   the new key
      */
     public void setKey(int index, Object key) {
         if ((sharedFlags & SHARED_KEYS) != 0) {
@@ -585,7 +586,7 @@ public class Page {
      * Insert a key-value pair into this leaf.
      *
      * @param index the index
-     * @param key the key
+     * @param key   the key
      * @param value the value
      */
     public void insertLeaf(int index, Object key, Object value) {
@@ -617,8 +618,8 @@ public class Page {
     /**
      * Insert a child into this node.
      *
-     * @param index the index
-     * @param key the key
+     * @param index     the index
+     * @param key       the key
      * @param childPage the child page
      */
     public void insertNode(int index, Object key, Page childPage) {
@@ -723,9 +724,9 @@ public class Page {
     /**
      * Read the page from the buffer.
      *
-     * @param buff the buffer
-     * @param chunkId the chunk id
-     * @param offset the offset within the chunk
+     * @param buff      the buffer
+     * @param chunkId   the chunk id
+     * @param offset    the offset within the chunk
      * @param maxLength the maximum length
      */
     void read(ByteBuffer buff, int chunkId, int offset, int maxLength) {
@@ -806,7 +807,7 @@ public class Page {
      * Store the page and update the position.
      *
      * @param chunk the chunk
-     * @param buff the target buffer
+     * @param buff  the target buffer
      * @return the position of the buffer just after the type
      */
     private int write(Chunk chunk, WriteBuffer buff) {
@@ -815,9 +816,9 @@ public class Page {
         int type = children != null ? DataUtils.PAGE_TYPE_NODE
                 : DataUtils.PAGE_TYPE_LEAF;
         buff.putInt(0).
-            putShort((byte) 0).
-            putVarInt(map.getId()).
-            putVarInt(len);
+                putShort((byte) 0).
+                putVarInt(map.getId()).
+                putVarInt(len);
         int typePos = buff.position();
         buff.put((byte) type);
         if (type == DataUtils.PAGE_TYPE_NODE) {
@@ -852,10 +853,10 @@ public class Page {
                 int plus = DataUtils.getVarIntLen(compLen - expLen);
                 if (compLen + plus < expLen) {
                     buff.position(typePos).
-                        put((byte) (type + compressType));
+                            put((byte) (type + compressType));
                     buff.position(compressStart).
-                        putVarInt(expLen - compLen).
-                        put(comp, 0, compLen);
+                            putVarInt(expLen - compLen).
+                            put(comp, 0, compLen);
                 }
             }
         }
@@ -865,7 +866,7 @@ public class Page {
                 ^ DataUtils.getCheckValue(start)
                 ^ DataUtils.getCheckValue(pageLength);
         buff.putInt(start, pageLength).
-            putShort(start + 4, (short) check);
+                putShort(start + 4, (short) check);
         if (pos != 0) {
             throw DataUtils.newIllegalStateException(
                     DataUtils.ERROR_INTERNAL, "Page already stored");
@@ -892,7 +893,7 @@ public class Page {
      * update the position and the children.
      *
      * @param chunk the chunk
-     * @param buff the target buffer
+     * @param buff  the target buffer
      */
     void writeUnsavedRecursive(Chunk chunk, WriteBuffer buff) {
         if (pos != 0) {

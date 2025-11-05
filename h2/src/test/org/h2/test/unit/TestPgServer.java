@@ -6,24 +6,11 @@
  */
 package org.h2.test.unit;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ParameterMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.h2.test.TestBase;
 import org.h2.tools.Server;
+
+import java.sql.*;
+import java.util.concurrent.*;
 
 /**
  * Tests the PostgreSQL server protocol compliant implementation.
@@ -200,7 +187,7 @@ public class TestPgServer extends TestBase {
         assertFalse(rs.next());
         prep = conn.prepareStatement(
                 "select * from test " +
-                "where id = ? and name = ?");
+                        "where id = ? and name = ?");
         prep.setInt(1, 1);
         prep.setString(2, "Hello");
         rs = prep.executeQuery();
@@ -310,20 +297,20 @@ public class TestPgServer extends TestBase {
         rs.next();
         int indexId = rs.getInt(1);
 
-        rs = stat.executeQuery("select pg_get_indexdef("+indexId+", 0, false)");
+        rs = stat.executeQuery("select pg_get_indexdef(" + indexId + ", 0, false)");
         rs.next();
         assertEquals(
                 "CREATE INDEX PUBLIC.IDX_TEST_NAME ON PUBLIC.TEST(NAME, ID)",
                 rs.getString(1));
-        rs = stat.executeQuery("select pg_get_indexdef("+indexId+", null, false)");
+        rs = stat.executeQuery("select pg_get_indexdef(" + indexId + ", null, false)");
         rs.next();
         assertEquals(
                 "CREATE INDEX PUBLIC.IDX_TEST_NAME ON PUBLIC.TEST(NAME, ID)",
                 rs.getString(1));
-        rs = stat.executeQuery("select pg_get_indexdef("+indexId+", 1, false)");
+        rs = stat.executeQuery("select pg_get_indexdef(" + indexId + ", 1, false)");
         rs.next();
         assertEquals("NAME", rs.getString(1));
-        rs = stat.executeQuery("select pg_get_indexdef("+indexId+", 2, false)");
+        rs = stat.executeQuery("select pg_get_indexdef(" + indexId + ", 2, false)");
         rs.next();
         assertEquals("ID", rs.getString(1));
 
@@ -347,7 +334,7 @@ public class TestPgServer extends TestBase {
             stat.execute("create table test(id int primary key, name varchar)");
             ResultSet rs = stat.executeQuery(
                     "select storage_type from information_schema.tables " +
-                    "where table_name = 'TEST'");
+                            "where table_name = 'TEST'");
             assertTrue(rs.next());
             assertEquals("MEMORY", rs.getString(1));
 
@@ -372,8 +359,8 @@ public class TestPgServer extends TestBase {
 
             stat.execute(
                     "create table test(x1 varchar, x2 int, " +
-                    "x3 smallint, x4 bigint, x5 double, x6 float, " +
-                    "x7 real, x8 boolean, x9 char, x10 bytea)");
+                            "x3 smallint, x4 bigint, x5 double, x6 float, " +
+                            "x7 real, x8 boolean, x9 char, x10 bytea)");
 
             PreparedStatement ps = conn.prepareStatement(
                     "insert into test values (?,?,?,?,?,?,?,?,?,?)");
@@ -386,7 +373,7 @@ public class TestPgServer extends TestBase {
             ps.setDouble(7, 123.456);
             ps.setBoolean(8, true);
             ps.setByte(9, (byte) 0xfe);
-            ps.setBytes(10, new byte[] { 'a', (byte) 0xfe, '\127' });
+            ps.setBytes(10, new byte[]{'a', (byte) 0xfe, '\127'});
             ps.execute();
 
             ResultSet rs = stat.executeQuery("select * from test");
@@ -400,7 +387,7 @@ public class TestPgServer extends TestBase {
             assertEquals(123.456, rs.getDouble(7));
             assertEquals(true, rs.getBoolean(8));
             assertEquals((byte) 0xfe, rs.getByte(9));
-            assertEquals(new byte[] { 'a', (byte) 0xfe, '\127' },
+            assertEquals(new byte[]{'a', (byte) 0xfe, '\127'},
                     rs.getBytes(10));
 
             conn.close();

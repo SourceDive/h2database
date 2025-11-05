@@ -6,8 +6,8 @@
  */
 package org.h2.engine;
 
-import org.h2.api.AggregateFunction;
 import org.h2.api.Aggregate;
+import org.h2.api.AggregateFunction;
 import org.h2.command.Parser;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
@@ -27,7 +27,7 @@ public class UserAggregate extends DbObjectBase {
     private Class<?> javaClass;
 
     public UserAggregate(Database db, int id, String name, String className,
-            boolean force) {
+                         boolean force) {
         initDbObjectBase(db, id, name, Trace.FUNCTION);
         this.className = className;
         if (!force) {
@@ -114,7 +114,7 @@ public class UserAggregate extends DbObjectBase {
             for (int i = 0; i < inputTypes.length; i++) {
                 sqlTypes[i] = DataType.convertTypeToSQLType(inputTypes[i]);
             }
-            return  DataType.convertSQLTypeToValueType(aggregateFunction.getType(sqlTypes));
+            return DataType.convertSQLTypeToValueType(aggregateFunction.getType(sqlTypes));
         }
 
         @Override

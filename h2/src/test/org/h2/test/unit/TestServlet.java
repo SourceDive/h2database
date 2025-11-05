@@ -6,6 +6,15 @@
  */
 package org.h2.test.unit;
 
+import org.h2.api.ErrorCode;
+import org.h2.server.web.DbStarter;
+import org.h2.test.TestBase;
+import org.h2.util.New;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
@@ -16,16 +25,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-
-import org.h2.api.ErrorCode;
-import org.h2.server.web.DbStarter;
-import org.h2.test.TestBase;
-import org.h2.util.New;
 
 /**
  * Tests the DbStarter servlet.
@@ -64,7 +63,7 @@ public class TestServlet extends TestBase {
         /**
          * Set an initialization parameter.
          *
-         * @param key the parameter key
+         * @param key   the parameter key
          * @param value the value
          */
         void setInitParameter(String key, String value) {

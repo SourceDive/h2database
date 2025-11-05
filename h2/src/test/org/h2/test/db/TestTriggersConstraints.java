@@ -6,19 +6,15 @@
  */
 package org.h2.test.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.h2.api.ErrorCode;
 import org.h2.api.Trigger;
 import org.h2.test.TestBase;
 import org.h2.tools.TriggerAdapter;
 import org.h2.util.Task;
+
+import java.sql.*;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Tests for trigger and constraints.
@@ -130,7 +126,7 @@ public class TestTriggersConstraints extends TestBase implements Trigger {
         stat.execute("create table message(name varchar)");
         stat.execute(
                 "create trigger test_insert before insert, update, delete on test " +
-                "for each row call \"" + TestTriggerAdapter.class.getName() + "\"");
+                        "for each row call \"" + TestTriggerAdapter.class.getName() + "\"");
         stat.execute("insert into test values(1, 'hello', 'abcd')");
         ResultSet rs;
         rs = stat.executeQuery("select * from test");
@@ -261,7 +257,7 @@ public class TestTriggersConstraints extends TestBase implements Trigger {
 
         @Override
         public void init(Connection conn, String schemaName,
-                String triggerName, String tableName, boolean before, int type)
+                         String triggerName, String tableName, boolean before, int type)
                 throws SQLException {
             prepInsert = conn.prepareStatement("insert into test values(?)");
         }
@@ -328,7 +324,7 @@ public class TestTriggersConstraints extends TestBase implements Trigger {
 
         @Override
         public void init(Connection conn, String schemaName,
-                String triggerName, String tableName, boolean before, int type)
+                         String triggerName, String tableName, boolean before, int type)
                 throws SQLException {
             prepMeta = conn.prepareStatement("insert into meta_tables " +
                     "select table_name from information_schema.tables " +
@@ -370,7 +366,7 @@ public class TestTriggersConstraints extends TestBase implements Trigger {
 
         @Override
         public void init(Connection conn, String schemaName,
-                String triggerName, String tableName, boolean before, int type) {
+                         String triggerName, String tableName, boolean before, int type) {
             // nothing to do
         }
 
@@ -440,8 +436,8 @@ public class TestTriggersConstraints extends TestBase implements Trigger {
         stat.execute("insert into departments(id, company_id) "
                 + "values(20, 1)");
         assertThrows(ErrorCode.CHECK_CONSTRAINT_INVALID, stat)
-            .execute("insert into connections(id, company_id, first, second) "
-                + "values(100, 1, 10, 20)");
+                .execute("insert into connections(id, company_id, first, second) "
+                        + "values(100, 1, 10, 20)");
 
         stat.execute("drop table connections");
         stat.execute("drop table departments");
@@ -507,20 +503,20 @@ public class TestTriggersConstraints extends TestBase implements Trigger {
         stat.execute("INSERT INTO TEST VALUES(1, 'Hello')");
         ResultSet rs;
         rs = stat.executeQuery("SCRIPT");
-        checkRows(rs, new String[] {
+        checkRows(rs, new String[]{
                 "CREATE FORCE TRIGGER PUBLIC.INS_BEFORE " +
-                    "BEFORE INSERT ON PUBLIC.TEST " +
-                    "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
+                        "BEFORE INSERT ON PUBLIC.TEST " +
+                        "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
                 "CREATE FORCE TRIGGER PUBLIC.INS_AFTER " +
-                    "AFTER INSERT ON PUBLIC.TEST " +
-                    "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
+                        "AFTER INSERT ON PUBLIC.TEST " +
+                        "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
                 "CREATE FORCE TRIGGER PUBLIC.UPD_BEFORE " +
-                    "BEFORE UPDATE ON PUBLIC.TEST " +
-                    "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
+                        "BEFORE UPDATE ON PUBLIC.TEST " +
+                        "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
                 "CREATE FORCE TRIGGER PUBLIC.INS_AFTER_ROLLBACK " +
-                    "AFTER INSERT, ROLLBACK ON PUBLIC.TEST " +
-                    "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
-                        });
+                        "AFTER INSERT, ROLLBACK ON PUBLIC.TEST " +
+                        "FOR EACH ROW NOWAIT CALL \"" + getClass().getName() + "\";",
+        });
         while (rs.next()) {
             String sql = rs.getString(1);
             if (sql.startsWith("CREATE TRIGGER")) {
@@ -610,7 +606,7 @@ public class TestTriggersConstraints extends TestBase implements Trigger {
 
     @Override
     public void init(Connection conn, String schemaName, String trigger,
-            String tableName, boolean before, int type) {
+                     String tableName, boolean before, int type) {
         this.triggerName = trigger;
         if (!"TEST".equals(tableName)) {
             throw new AssertionError("supposed to be TEST");

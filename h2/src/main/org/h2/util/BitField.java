@@ -143,8 +143,8 @@ public final class BitField {
      * Enable or disable a number of bits.
      *
      * @param fromIndex the index of the first bit to enable or disable
-     * @param toIndex one plus the index of the last bit to enable or disable
-     * @param value the new value
+     * @param toIndex   one plus the index of the last bit to enable or disable
+     * @param value     the new value
      */
     public void set(int fromIndex, int toIndex, boolean value) {
         // go backwards so that OutOfMemory happens
@@ -182,7 +182,7 @@ public final class BitField {
             m--;
         }
         maxLength = (m << ADDRESS_BITS) +
-            (64 - Long.numberOfLeadingZeros(data[m]));
+                (64 - Long.numberOfLeadingZeros(data[m]));
         return maxLength;
     }
 

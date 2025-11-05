@@ -6,13 +6,6 @@
  */
 package org.h2.store;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Properties;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Constants;
@@ -27,6 +20,13 @@ import org.h2.util.IOUtils;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Properties;
 
 /**
  * A tool that simulates a crash while writing to the database, and then
@@ -91,7 +91,7 @@ public class RecoverTester implements Recorder {
         try {
             out = new PrintWriter(
                     new OutputStreamWriter(
-                    FileUtils.newOutputStream(fileName + ".log", true)));
+                            FileUtils.newOutputStream(fileName + ".log", true)));
             testDatabase(fileName, out);
         } catch (IOException e) {
             throw DbException.convertIOException(e, null);
@@ -160,7 +160,7 @@ public class RecoverTester implements Recorder {
             // avoid using the Engine class to avoid deadlocks
             Properties p = new Properties();
             ConnectionInfo ci = new ConnectionInfo("jdbc:h2:" +
-                        testDatabase + ";FILE_LOCK=NO", p);
+                    testDatabase + ";FILE_LOCK=NO", p);
             Database database = new Database(ci, null);
             // close the database
             database.removeSession(null);

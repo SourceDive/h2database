@@ -6,36 +6,21 @@
  */
 package org.h2.test.jdbc;
 
+import org.h2.api.ErrorCode;
+import org.h2.api.Trigger;
+import org.h2.test.TestBase;
+import org.h2.util.DateTimeUtils;
+import org.h2.util.Task;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Array;
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.Date;
-import java.sql.ParameterMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import java.util.UUID;
-
-import org.h2.api.ErrorCode;
-import org.h2.api.Trigger;
-import org.h2.test.TestBase;
-import org.h2.util.DateTimeUtils;
-import org.h2.util.Task;
+import java.util.*;
 
 /**
  * Tests for the PreparedStatement implementation.
@@ -101,37 +86,37 @@ public class TestPreparedStatement extends TestBase {
     private void testUnsupportedOperations(Connection conn) throws Exception {
         PreparedStatement prep = conn.prepareStatement("select ? from dual");
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            addBatch("select 1");
+                addBatch("select 1");
 
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            executeUpdate("create table test(id int)");
+                executeUpdate("create table test(id int)");
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            executeUpdate("create table test(id int)", new int[0]);
+                executeUpdate("create table test(id int)", new int[0]);
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            executeUpdate("create table test(id int)", new String[0]);
+                executeUpdate("create table test(id int)", new String[0]);
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            executeUpdate("create table test(id int)", Statement.RETURN_GENERATED_KEYS);
+                executeUpdate("create table test(id int)", Statement.RETURN_GENERATED_KEYS);
 
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            execute("create table test(id int)");
+                execute("create table test(id int)");
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            execute("create table test(id int)", new int[0]);
+                execute("create table test(id int)", new int[0]);
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            execute("create table test(id int)", new String[0]);
+                execute("create table test(id int)", new String[0]);
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            execute("create table test(id int)", Statement.RETURN_GENERATED_KEYS);
+                execute("create table test(id int)", Statement.RETURN_GENERATED_KEYS);
 
         assertThrows(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, prep).
-            executeQuery("select * from dual");
+                executeQuery("select * from dual");
 
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, prep).
-            setURL(1, new URL("http://www.acme.com"));
+                setURL(1, new URL("http://www.acme.com"));
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, prep).
-            setRowId(1, (RowId) null);
+                setRowId(1, (RowId) null);
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, prep).
-            setUnicodeStream(1, (InputStream) null, 0);
+                setUnicodeStream(1, (InputStream) null, 0);
         assertThrows(ErrorCode.FEATURE_NOT_SUPPORTED_1, prep).
-            setArray(1, (Array) null);
+                setArray(1, (Array) null);
 
         ParameterMetaData meta = prep.getParameterMetaData();
         assertTrue(meta.toString(), meta.toString().endsWith("parameterCount=1"));
@@ -472,7 +457,7 @@ public class TestPreparedStatement extends TestBase {
 
     private void testUnknownDataType(Connection conn) throws SQLException {
         assertThrows(ErrorCode.UNKNOWN_DATA_TYPE_1, conn).
-            prepareStatement("SELECT * FROM (SELECT ? FROM DUAL)");
+                prepareStatement("SELECT * FROM (SELECT ? FROM DUAL)");
         PreparedStatement prep = conn.prepareStatement("SELECT -?");
         prep.setInt(1, 1);
         prep.execute();
@@ -538,7 +523,7 @@ public class TestPreparedStatement extends TestBase {
     private void testArray(Connection conn) throws SQLException {
         PreparedStatement prep = conn.prepareStatement(
                 "select * from table(x int = ?) order by x");
-        prep.setObject(1, new Object[] { new BigDecimal("1"), "2" });
+        prep.setObject(1, new Object[]{new BigDecimal("1"), "2"});
         ResultSet rs = prep.executeQuery();
         rs.next();
         assertEquals("1", rs.getString(1));
@@ -592,7 +577,7 @@ public class TestPreparedStatement extends TestBase {
 
         @Override
         public void init(Connection conn, String schemaName,
-                String triggerName, String tableName, boolean before, int type) {
+                         String triggerName, String tableName, boolean before, int type) {
             // ignore
         }
 
@@ -746,8 +731,8 @@ public class TestPreparedStatement extends TestBase {
     }
 
     private void checkParameter(PreparedStatement prep, int index,
-            String className, int type, String typeName, int precision,
-            int scale) throws SQLException {
+                                String className, int type, String typeName, int precision,
+                                int scale) throws SQLException {
         ParameterMetaData meta = prep.getParameterMetaData();
         assertEquals(className, meta.getParameterClassName(index));
         assertEquals(type, meta.getParameterType(index));
@@ -957,13 +942,13 @@ public class TestPreparedStatement extends TestBase {
 
         assertTrue(stat.execute("SELECT * FROM T_INT ORDER BY ID"));
         rs = stat.getResultSet();
-        assertResultSetOrdered(rs, new String[][] { { "1", "0" },
-                { "2", "-1" }, { "3", "3" }, { "4", null }, { "5", "0" },
-                { "6", "-1" }, { "7", "3" }, { "8", null }, { "9", "-4" },
-                { "10", "5" }, { "11", null }, { "12", "1" }, { "13", "0" },
-                { "14", "-20" }, { "15", "100" }, { "16", "30000" },
-                { "17", "-30000" }, { "18", "" + Integer.MAX_VALUE },
-                { "19", "" + Integer.MIN_VALUE }, });
+        assertResultSetOrdered(rs, new String[][]{{"1", "0"},
+                {"2", "-1"}, {"3", "3"}, {"4", null}, {"5", "0"},
+                {"6", "-1"}, {"7", "3"}, {"8", null}, {"9", "-4"},
+                {"10", "5"}, {"11", null}, {"12", "1"}, {"13", "0"},
+                {"14", "-20"}, {"15", "100"}, {"16", "30000"},
+                {"17", "-30000"}, {"18", "" + Integer.MAX_VALUE},
+                {"19", "" + Integer.MIN_VALUE},});
 
         prep = conn.prepareStatement("INSERT INTO T_DECIMAL_0 VALUES(?,?)");
         prep.setInt(1, 1);
@@ -986,8 +971,8 @@ public class TestPreparedStatement extends TestBase {
         prep.executeUpdate();
 
         rs = stat.executeQuery("SELECT VALUE FROM T_DECIMAL_0 ORDER BY ID");
-        checkBigDecimal(rs, new String[] { "" + Long.MAX_VALUE,
-                "" + Long.MIN_VALUE, "10", "-20", "30", "-40" });
+        checkBigDecimal(rs, new String[]{"" + Long.MAX_VALUE,
+                "" + Long.MIN_VALUE, "10", "-20", "30", "-40"});
     }
 
     private void testGetMoreResults(Connection conn) throws SQLException {
@@ -1045,7 +1030,7 @@ public class TestPreparedStatement extends TestBase {
                 "2001-02-03 04:05:06.123456789"));
         prep.setObject(13, new java.util.Date(java.sql.Date.valueOf(
                 "2001-02-03").getTime()));
-        prep.setObject(14, new byte[] { 10, 20, 30 });
+        prep.setObject(14, new byte[]{10, 20, 30});
         prep.setObject(15, new Character('a'), Types.OTHER);
         prep.setObject(16, "2001-01-02", Types.DATE);
         // converting to null seems strange...
@@ -1078,7 +1063,7 @@ public class TestPreparedStatement extends TestBase {
                 java.sql.Timestamp.valueOf("2001-02-03 04:05:06.123456789")));
         assertTrue(rs.getObject(13).equals(
                 java.sql.Timestamp.valueOf("2001-02-03 00:00:00")));
-        assertEquals(new byte[] { 10, 20, 30 }, (byte[]) rs.getObject(14));
+        assertEquals(new byte[]{10, 20, 30}, (byte[]) rs.getObject(14));
         assertTrue(rs.getObject(15).equals('a'));
         assertTrue(rs.getObject(16).equals(
                 java.sql.Date.valueOf("2001-01-02")));
@@ -1126,7 +1111,7 @@ public class TestPreparedStatement extends TestBase {
 
         prep = conn.prepareStatement(
                 "INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
-                new int[] { 1 });
+                new int[]{1});
         prep.execute();
         rs = prep.getGeneratedKeys();
         rs.next();
@@ -1135,7 +1120,7 @@ public class TestPreparedStatement extends TestBase {
 
         prep = conn.prepareStatement(
                 "INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
-                new String[] { "ID" });
+                new String[]{"ID"});
         prep.execute();
         rs = prep.getGeneratedKeys();
         rs.next();

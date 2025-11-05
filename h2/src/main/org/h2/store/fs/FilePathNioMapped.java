@@ -6,6 +6,8 @@
  */
 package org.h2.store.fs;
 
+import org.h2.engine.SysProperties;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -16,8 +18,6 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-
-import org.h2.engine.SysProperties;
 
 /**
  * This file system stores files on disk and uses java.nio to access the files.
@@ -213,7 +213,7 @@ class FileNioMapped extends FileBase {
         checkFileSizeLimit(newLength);
         int oldPos = pos;
         unMap();
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             try {
                 file.setLength(newLength);
                 break;
@@ -249,7 +249,7 @@ class FileNioMapped extends FileBase {
 
     @Override
     public synchronized FileLock tryLock(long position, long size,
-            boolean shared) throws IOException {
+                                         boolean shared) throws IOException {
         return file.getChannel().tryLock(position, size, shared);
     }
 

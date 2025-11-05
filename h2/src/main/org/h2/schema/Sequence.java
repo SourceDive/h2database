@@ -6,14 +6,14 @@
  */
 package org.h2.schema;
 
-import java.math.BigInteger;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.DbObject;
 import org.h2.engine.Session;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.table.Table;
+
+import java.math.BigInteger;
 
 /**
  * A sequence is created using the statement
@@ -38,14 +38,14 @@ public class Sequence extends SchemaObjectBase {
     /**
      * Creates a new sequence for an auto-increment column.
      *
-     * @param schema the schema
-     * @param id the object id
-     * @param name the sequence name
+     * @param schema     the schema
+     * @param id         the object id
+     * @param name       the sequence name
      * @param startValue the first value to return
-     * @param increment the increment count
+     * @param increment  the increment count
      */
     public Sequence(Schema schema, int id, String name, long startValue,
-            long increment) {
+                    long increment) {
         this(schema, id, name, startValue, increment, null, null, null, false,
                 true);
     }
@@ -53,21 +53,21 @@ public class Sequence extends SchemaObjectBase {
     /**
      * Creates a new sequence.
      *
-     * @param schema the schema
-     * @param id the object id
-     * @param name the sequence name
-     * @param startValue the first value to return
-     * @param increment the increment count
-     * @param cacheSize the number of entries to pre-fetch
-     * @param minValue the minimum value
-     * @param maxValue the maximum value
-     * @param cycle whether to jump back to the min value if needed
+     * @param schema         the schema
+     * @param id             the object id
+     * @param name           the sequence name
+     * @param startValue     the first value to return
+     * @param increment      the increment count
+     * @param cacheSize      the number of entries to pre-fetch
+     * @param minValue       the minimum value
+     * @param maxValue       the maximum value
+     * @param cycle          whether to jump back to the min value if needed
      * @param belongsToTable whether this sequence belongs to a table (for
-     *            auto-increment columns)
+     *                       auto-increment columns)
      */
     public Sequence(Schema schema, int id, String name, Long startValue,
-            Long increment, Long cacheSize, Long minValue, Long maxValue,
-            boolean cycle, boolean belongsToTable) {
+                    Long increment, Long cacheSize, Long minValue, Long maxValue,
+                    boolean cycle, boolean belongsToTable) {
         initSchemaObjectBase(schema, id, name, Trace.SEQUENCE);
         this.increment = increment != null ?
                 increment : 1;
@@ -98,12 +98,12 @@ public class Sequence extends SchemaObjectBase {
      * etc).
      *
      * @param startValue the new start value (<code>null</code> if no change)
-     * @param minValue the new min value (<code>null</code> if no change)
-     * @param maxValue the new max value (<code>null</code> if no change)
-     * @param increment the new increment (<code>null</code> if no change)
+     * @param minValue   the new min value (<code>null</code> if no change)
+     * @param maxValue   the new max value (<code>null</code> if no change)
+     * @param increment  the new increment (<code>null</code> if no change)
      */
     public synchronized void modify(Long startValue, Long minValue,
-            Long maxValue, Long increment) {
+                                    Long maxValue, Long increment) {
         if (startValue == null) {
             startValue = this.value;
         }
@@ -135,22 +135,22 @@ public class Sequence extends SchemaObjectBase {
      * increment relative to each other, since each of their respective
      * validities are contingent on the values of the other parameters.
      *
-     * @param value the prospective start value
-     * @param minValue the prospective min value
-     * @param maxValue the prospective max value
+     * @param value     the prospective start value
+     * @param minValue  the prospective min value
+     * @param maxValue  the prospective max value
      * @param increment the prospective increment
      */
     private static boolean isValid(long value, long minValue, long maxValue,
-            long increment) {
+                                   long increment) {
         return minValue <= value &&
-            maxValue >= value &&
-            maxValue > minValue &&
-            increment != 0 &&
-            // Math.abs(increment) < maxValue - minValue
+                maxValue >= value &&
+                maxValue > minValue &&
+                increment != 0 &&
+                // Math.abs(increment) < maxValue - minValue
                 // use BigInteger to avoid overflows when maxValue and minValue
                 // are really big
-            BigInteger.valueOf(increment).abs().compareTo(
-                BigInteger.valueOf(maxValue).subtract(BigInteger.valueOf(minValue))) < 0;
+                BigInteger.valueOf(increment).abs().compareTo(
+                        BigInteger.valueOf(maxValue).subtract(BigInteger.valueOf(minValue))) < 0;
     }
 
     private static long getDefaultMinValue(Long startValue, long increment) {

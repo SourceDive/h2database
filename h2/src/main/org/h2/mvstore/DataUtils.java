@@ -6,6 +6,9 @@
  */
 package org.h2.mvstore;
 
+import org.h2.engine.Constants;
+import org.h2.util.New;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,14 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.h2.engine.Constants;
-import org.h2.util.New;
+import java.util.*;
 
 /**
  * Utility methods
@@ -257,7 +253,7 @@ public class DataUtils {
      * Write a variable size int.
      *
      * @param out the output stream
-     * @param x the value
+     * @param x   the value
      */
     public static void writeVarInt(OutputStream out, int x) throws IOException {
         while ((x & ~0x7f) != 0) {
@@ -271,7 +267,7 @@ public class DataUtils {
      * Write a variable size int.
      *
      * @param buff the source buffer
-     * @param x the value
+     * @param x    the value
      */
     public static void writeVarInt(ByteBuffer buff, int x) {
         while ((x & ~0x7f) != 0) {
@@ -285,12 +281,12 @@ public class DataUtils {
      * Write characters from a string (without the length).
      *
      * @param buff the target buffer
-     * @param s the string
-     * @param len the number of characters
+     * @param s    the string
+     * @param len  the number of characters
      * @return the byte buffer
      */
     public static ByteBuffer writeStringData(ByteBuffer buff,
-            String s, int len) {
+                                             String s, int len) {
         buff = DataUtils.ensureCapacity(buff, 3 * len);
         for (int i = 0; i < len; i++) {
             int c = s.charAt(i);
@@ -312,7 +308,7 @@ public class DataUtils {
      * Read a string.
      *
      * @param buff the source buffer
-     * @param len the number of characters
+     * @param len  the number of characters
      * @return the value
      */
     public static String readString(ByteBuffer buff, int len) {
@@ -335,7 +331,7 @@ public class DataUtils {
      * Write a variable size long.
      *
      * @param buff the target buffer
-     * @param x the value
+     * @param x    the value
      */
     public static void writeVarLong(ByteBuffer buff, long x) {
         while ((x & ~0x7f) != 0) {
@@ -349,7 +345,7 @@ public class DataUtils {
      * Write a variable size long.
      *
      * @param out the output stream
-     * @param x the value
+     * @param x   the value
      */
     public static void writeVarLong(OutputStream out, long x)
             throws IOException {
@@ -363,13 +359,13 @@ public class DataUtils {
     /**
      * Copy the elements of an array, with a gap.
      *
-     * @param src the source array
-     * @param dst the target array
-     * @param oldSize the size of the old array
+     * @param src      the source array
+     * @param dst      the target array
+     * @param oldSize  the size of the old array
      * @param gapIndex the index of the gap
      */
     public static void copyWithGap(Object src, Object dst, int oldSize,
-            int gapIndex) {
+                                   int gapIndex) {
         if (gapIndex > 0) {
             System.arraycopy(src, 0, dst, 0, gapIndex);
         }
@@ -382,13 +378,13 @@ public class DataUtils {
     /**
      * Copy the elements of an array, and remove one element.
      *
-     * @param src the source array
-     * @param dst the target array
-     * @param oldSize the size of the old array
+     * @param src         the source array
+     * @param dst         the target array
+     * @param oldSize     the size of the old array
      * @param removeIndex the index of the entry to remove
      */
     public static void copyExcept(Object src, Object dst, int oldSize,
-            int removeIndex) {
+                                  int removeIndex) {
         if (removeIndex > 0 && oldSize > 0) {
             System.arraycopy(src, 0, dst, 0, removeIndex);
         }
@@ -403,8 +399,8 @@ public class DataUtils {
      * The buffer is rewind after reading.
      *
      * @param file the file channel
-     * @param pos the absolute position within the file
-     * @param dst the byte buffer
+     * @param pos  the absolute position within the file
+     * @param dst  the byte buffer
      * @throws IllegalStateException if some data could not be read
      */
     public static void readFully(FileChannel file, long pos, ByteBuffer dst) {
@@ -427,7 +423,7 @@ public class DataUtils {
             throw newIllegalStateException(
                     ERROR_READING_FAILED,
                     "Reading from {0} failed; file length {1} " +
-                    "read length {2} at {3}",
+                            "read length {2} at {3}",
                     file, size, dst.remaining(), pos, e);
         }
     }
@@ -436,8 +432,8 @@ public class DataUtils {
      * Write to a file channel.
      *
      * @param file the file channel
-     * @param pos the absolute position within the file
-     * @param src the source buffer
+     * @param pos  the absolute position within the file
+     * @param src  the source buffer
      */
     public static void writeFully(FileChannel file, long pos, ByteBuffer src) {
         try {
@@ -538,13 +534,13 @@ public class DataUtils {
      * (node or leaf).
      *
      * @param chunkId the chunk id
-     * @param offset the offset
-     * @param length the length
-     * @param type the page type (1 for node, 0 for leaf)
+     * @param offset  the offset
+     * @param length  the length
+     * @param type    the page type (1 for node, 0 for leaf)
      * @return the position
      */
     public static long getPagePos(int chunkId, int offset,
-            int length, int type) {
+                                  int length, int type) {
         long pos = (long) chunkId << 38;
         pos |= (long) offset << 6;
         pos |= encodeLength(length) << 1;
@@ -568,11 +564,11 @@ public class DataUtils {
      * Append a map to the string builder, sorted by key.
      *
      * @param buff the target buffer
-     * @param map the map
+     * @param map  the map
      * @return the string builder
      */
     public static StringBuilder appendMap(StringBuilder buff,
-            HashMap<String, ?> map) {
+                                          HashMap<String, ?> map) {
         ArrayList<String> list = New.arrayList(map.keySet());
         Collections.sort(list);
         for (String k : list) {
@@ -586,8 +582,8 @@ public class DataUtils {
      * colon. Values that contain a comma or a double quote are enclosed in
      * double quotes, with special characters escaped using a backslash.
      *
-     * @param buff the target buffer
-     * @param key the key
+     * @param buff  the target buffer
+     * @param key   the key
      * @param value the value
      */
     public static void appendMap(StringBuilder buff, String key, Object value) {
@@ -627,7 +623,7 @@ public class DataUtils {
      */
     public static HashMap<String, String> parseMap(String s) {
         HashMap<String, String> map = New.hashMap();
-        for (int i = 0, size = s.length(); i < size;) {
+        for (int i = 0, size = s.length(); i < size; ) {
             int startKey = i;
             i = s.indexOf(':', i);
             if (i < 0) {
@@ -667,7 +663,7 @@ public class DataUtils {
     /**
      * Calculate the Fletcher32 checksum.
      *
-     * @param bytes the bytes
+     * @param bytes  the bytes
      * @param length the message length (if odd, 0 is appended)
      * @return the checksum
      */
@@ -676,7 +672,7 @@ public class DataUtils {
         int i = 0, evenLength = length / 2 * 2;
         while (i < evenLength) {
             // reduce after 360 words (each word is two bytes)
-            for (int end = Math.min(i + 720, evenLength); i < end;) {
+            for (int end = Math.min(i + 720, evenLength); i < end; ) {
                 int x = ((bytes[i++] & 0xff) << 8) | (bytes[i++] & 0xff);
                 s2 += s1 += x;
             }
@@ -696,13 +692,13 @@ public class DataUtils {
     /**
      * Throw an IllegalArgumentException if the argument is invalid.
      *
-     * @param test true if the argument is valid
-     * @param message the message
+     * @param test      true if the argument is valid
+     * @param message   the message
      * @param arguments the arguments
      * @throws IllegalArgumentException if the argument is invalid
      */
     public static void checkArgument(boolean test, String message,
-            Object... arguments) {
+                                     Object... arguments) {
         if (!test) {
             throw newIllegalArgumentException(message, arguments);
         }
@@ -711,14 +707,14 @@ public class DataUtils {
     /**
      * Create a new IllegalArgumentException.
      *
-     * @param message the message
+     * @param message   the message
      * @param arguments the arguments
      * @return the exception
      */
     public static IllegalArgumentException newIllegalArgumentException(
             String message, Object... arguments) {
         return initCause(new IllegalArgumentException(
-                formatMessage(0, message, arguments)),
+                        formatMessage(0, message, arguments)),
                 arguments);
     }
 
@@ -729,7 +725,7 @@ public class DataUtils {
      * @return the exception
      */
     public static UnsupportedOperationException
-            newUnsupportedOperationException(String message) {
+    newUnsupportedOperationException(String message) {
         return new UnsupportedOperationException(formatMessage(0, message));
     }
 
@@ -740,7 +736,7 @@ public class DataUtils {
      * @return the exception
      */
     public static ConcurrentModificationException
-            newConcurrentModificationException(String message) {
+    newConcurrentModificationException(String message) {
         return new ConcurrentModificationException(formatMessage(0, message));
     }
 
@@ -748,14 +744,14 @@ public class DataUtils {
      * Create a new IllegalStateException.
      *
      * @param errorCode the error code
-     * @param message the message
+     * @param message   the message
      * @param arguments the arguments
      * @return the exception
      */
     public static IllegalStateException newIllegalStateException(
             int errorCode, String message, Object... arguments) {
         return initCause(new IllegalStateException(
-                formatMessage(errorCode, message, arguments)),
+                        formatMessage(errorCode, message, arguments)),
                 arguments);
     }
 
@@ -771,7 +767,7 @@ public class DataUtils {
     }
 
     private static String formatMessage(int errorCode, String message,
-            Object... arguments) {
+                                        Object... arguments) {
         // convert arguments to strings, to avoid locale specific formatting
         for (int i = 0; i < arguments.length; i++) {
             Object a = arguments[i];
@@ -841,7 +837,7 @@ public class DataUtils {
      * larger byte buffer is created and the data is copied.
      *
      * @param buff the byte buffer
-     * @param len the minimum remaining capacity
+     * @param len  the minimum remaining capacity
      * @return the byte buffer (possibly a new one)
      */
     public static ByteBuffer ensureCapacity(ByteBuffer buff, int len) {
@@ -865,14 +861,14 @@ public class DataUtils {
     /**
      * Read a hex long value from a map.
      *
-     * @param map the map
-     * @param key the key
+     * @param map          the map
+     * @param key          the key
      * @param defaultValue if the value is null
      * @return the parsed value
      * @throws IllegalStateException if parsing fails
      */
     public static long readHexLong(HashMap<String, ? extends Object> map,
-            String key, long defaultValue) {
+                                   String key, long defaultValue) {
         Object v = map.get(key);
         if (v == null) {
             return defaultValue;
@@ -930,14 +926,14 @@ public class DataUtils {
     /**
      * Read a hex int value from a map.
      *
-     * @param map the map
-     * @param key the key
+     * @param map          the map
+     * @param key          the key
      * @param defaultValue if the value is null
      * @return the parsed value
      * @throws IllegalStateException if parsing fails
      */
     public static int readHexInt(HashMap<String, ? extends Object> map,
-            String key, int defaultValue) {
+                                 String key, int defaultValue) {
         Object v = map.get(key);
         if (v == null) {
             return defaultValue;

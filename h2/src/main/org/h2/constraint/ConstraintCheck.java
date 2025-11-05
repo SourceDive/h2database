@@ -6,9 +6,6 @@
  */
 package org.h2.constraint;
 
-import java.util.HashSet;
-import java.util.Iterator;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
@@ -23,6 +20,9 @@ import org.h2.table.Table;
 import org.h2.table.TableFilter;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * A check constraint.
@@ -70,7 +70,7 @@ public class ConstraintCheck extends Constraint {
     }
 
     @Override
-    public String  getCreateSQLWithoutIndexes() {
+    public String getCreateSQLWithoutIndexes() {
         return getCreateSQL();
     }
 
@@ -123,7 +123,7 @@ public class ConstraintCheck extends Constraint {
     public HashSet<Column> getReferencedColumns(Table table) {
         HashSet<Column> columns = New.hashSet();
         expr.isEverything(ExpressionVisitor.getColumnsVisitor(columns));
-        for (Iterator<Column> it = columns.iterator(); it.hasNext();) {
+        for (Iterator<Column> it = columns.iterator(); it.hasNext(); ) {
             if (it.next().getTable() != table) {
                 it.remove();
             }

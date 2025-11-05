@@ -6,6 +6,13 @@
  */
 package org.h2.message;
 
+import org.h2.api.ErrorCode;
+import org.h2.engine.Constants;
+import org.h2.jdbc.JdbcSQLException;
+import org.h2.store.fs.FileUtils;
+import org.h2.util.IOUtils;
+import org.h2.util.New;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -14,13 +21,6 @@ import java.sql.DriverManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-
-import org.h2.api.ErrorCode;
-import org.h2.engine.Constants;
-import org.h2.jdbc.JdbcSQLException;
-import org.h2.store.fs.FileUtils;
-import org.h2.util.IOUtils;
-import org.h2.util.New;
 
 /**
  * The trace mechanism is the logging facility of this database. There is

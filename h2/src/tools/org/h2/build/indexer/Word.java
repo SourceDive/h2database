@@ -36,7 +36,7 @@ public class Word {
     /**
      * Add a page to this word.
      *
-     * @param page the page
+     * @param page   the page
      * @param weight the weight of this word in this page
      */
     void addPage(Page page, int weight) {

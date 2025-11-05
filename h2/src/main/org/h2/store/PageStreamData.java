@@ -38,8 +38,8 @@ public class PageStreamData extends Page {
     /**
      * Read a stream data page.
      *
-     * @param store the page store
-     * @param data the data
+     * @param store  the page store
+     * @param data   the data
      * @param pageId the page id
      * @return the page
      */
@@ -53,14 +53,14 @@ public class PageStreamData extends Page {
     /**
      * Create a new stream trunk page.
      *
-     * @param store the page store
+     * @param store  the page store
      * @param pageId the page id
-     * @param trunk the trunk page
+     * @param trunk  the trunk page
      * @param logKey the log key
      * @return the page
      */
     static PageStreamData create(PageStore store, int pageId, int trunk,
-            int logKey) {
+                                 int logKey) {
         return new PageStreamData(store, pageId, trunk, logKey);
     }
 
@@ -90,9 +90,9 @@ public class PageStreamData extends Page {
     /**
      * Write the data to the buffer.
      *
-     * @param buff the source data
+     * @param buff   the source data
      * @param offset the offset in the source buffer
-     * @param len the number of bytes to write
+     * @param len    the number of bytes to write
      * @return the number of bytes written
      */
     int write(byte[] buff, int offset, int len) {
@@ -121,9 +121,9 @@ public class PageStreamData extends Page {
      * Read the next bytes from the buffer.
      *
      * @param startPos the position in the data page
-     * @param buff the target buffer
-     * @param off the offset in the target buffer
-     * @param len the number of bytes to read
+     * @param buff     the target buffer
+     * @param off      the offset in the target buffer
+     * @param len      the number of bytes to read
      */
     void read(int startPos, byte[] buff, int off, int len) {
         System.arraycopy(data.getBytes(), startPos, buff, off, len);

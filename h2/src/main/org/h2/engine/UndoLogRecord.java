@@ -40,8 +40,8 @@ public class UndoLogRecord {
      * Create a new undo log record
      *
      * @param table the table
-     * @param op the operation type
-     * @param row the row that was deleted or inserted
+     * @param op    the operation type
+     * @param row   the row that was deleted or inserted
      */
     UndoLogRecord(Table table, short op, Row row) {
         this.table = table;
@@ -82,49 +82,49 @@ public class UndoLogRecord {
     void undo(Session session) {
         Database db = session.getDatabase();
         switch (operation) {
-        case INSERT:
-            if (state == IN_MEMORY_INVALID) {
-                state = IN_MEMORY;
-            }
-            if (db.getLockMode() == Constants.LOCK_MODE_OFF) {
-                if (row.isDeleted()) {
-                    // it might have been deleted by another thread
-                    return;
+            case INSERT:
+                if (state == IN_MEMORY_INVALID) {
+                    state = IN_MEMORY;
                 }
-            }
-            try {
-                row.setDeleted(false);
-                table.removeRow(session, row);
-                table.fireAfterRow(session, row, null, true);
-            } catch (DbException e) {
-                if (session.getDatabase().getLockMode() == Constants.LOCK_MODE_OFF
-                        && e.getErrorCode() == ErrorCode.ROW_NOT_FOUND_WHEN_DELETING_1) {
-                    // it might have been deleted by another thread
-                    // ignore
-                } else {
-                    throw e;
+                if (db.getLockMode() == Constants.LOCK_MODE_OFF) {
+                    if (row.isDeleted()) {
+                        // it might have been deleted by another thread
+                        return;
+                    }
                 }
-            }
-            break;
-        case DELETE:
-            try {
-                table.addRow(session, row);
-                table.fireAfterRow(session, null, row, true);
-                // reset session id, otherwise other session think
-                // that this row was inserted by this session
-                row.commit();
-            } catch (DbException e) {
-                if (session.getDatabase().getLockMode() == Constants.LOCK_MODE_OFF
-                        && e.getSQLException().getErrorCode() == ErrorCode.DUPLICATE_KEY_1) {
-                    // it might have been added by another thread
-                    // ignore
-                } else {
-                    throw e;
+                try {
+                    row.setDeleted(false);
+                    table.removeRow(session, row);
+                    table.fireAfterRow(session, row, null, true);
+                } catch (DbException e) {
+                    if (session.getDatabase().getLockMode() == Constants.LOCK_MODE_OFF
+                            && e.getErrorCode() == ErrorCode.ROW_NOT_FOUND_WHEN_DELETING_1) {
+                        // it might have been deleted by another thread
+                        // ignore
+                    } else {
+                        throw e;
+                    }
                 }
-            }
-            break;
-        default:
-            DbException.throwInternalError("op=" + operation);
+                break;
+            case DELETE:
+                try {
+                    table.addRow(session, row);
+                    table.fireAfterRow(session, null, row, true);
+                    // reset session id, otherwise other session think
+                    // that this row was inserted by this session
+                    row.commit();
+                } catch (DbException e) {
+                    if (session.getDatabase().getLockMode() == Constants.LOCK_MODE_OFF
+                            && e.getSQLException().getErrorCode() == ErrorCode.DUPLICATE_KEY_1) {
+                        // it might have been added by another thread
+                        // ignore
+                    } else {
+                        throw e;
+                    }
+                }
+                break;
+            default:
+                DbException.throwInternalError("op=" + operation);
         }
     }
 
@@ -132,7 +132,7 @@ public class UndoLogRecord {
      * Append the row to the buffer.
      *
      * @param buff the buffer
-     * @param log the undo log
+     * @param log  the undo log
      */
     void append(Data buff, UndoLog log) {
         int p = buff.length();
@@ -158,7 +158,7 @@ public class UndoLogRecord {
      *
      * @param buff the buffer
      * @param file the file
-     * @param log the undo log
+     * @param log  the undo log
      */
     void save(Data buff, FileStore file, UndoLog log) {
         buff.reset();
@@ -173,7 +173,7 @@ public class UndoLogRecord {
      * Load an undo log record row using a buffer.
      *
      * @param buff the buffer
-     * @param log the log
+     * @param log  the log
      * @return the undo log record
      */
     static UndoLogRecord loadFromBuffer(Data buff, UndoLog log) {
@@ -190,7 +190,7 @@ public class UndoLogRecord {
      *
      * @param buff the buffer
      * @param file the source file
-     * @param log the log
+     * @param log  the log
      */
     void load(Data buff, FileStore file, UndoLog log) {
         int min = Constants.FILE_BLOCK_SIZE;

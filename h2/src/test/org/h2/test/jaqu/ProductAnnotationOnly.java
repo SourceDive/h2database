@@ -6,11 +6,12 @@
  */
 package org.h2.test.jaqu;
 
-import java.util.Arrays;
-import java.util.List;
 import org.h2.jaqu.Table.JQColumn;
 import org.h2.jaqu.Table.JQIndex;
 import org.h2.jaqu.Table.JQTable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A table containing product data.
@@ -44,8 +45,8 @@ public class ProductAnnotationOnly {
     }
 
     private ProductAnnotationOnly(int productId, String productName,
-            String category, double unitPrice, int unitsInStock,
-            String unmappedField) {
+                                  String category, double unitPrice, int unitsInStock,
+                                  String unmappedField) {
         this.productId = productId;
         this.productName = productName;
         this.category = category;
@@ -55,8 +56,8 @@ public class ProductAnnotationOnly {
     }
 
     private static ProductAnnotationOnly create(int productId,
-            String productName, String category, double unitPrice,
-            int unitsInStock, String unmappedField) {
+                                                String productName, String category, double unitPrice,
+                                                int unitsInStock, String unmappedField) {
         return new ProductAnnotationOnly(productId, productName, category,
                 unitPrice, unitsInStock, unmappedField);
     }
@@ -83,7 +84,7 @@ public class ProductAnnotationOnly {
                 create(9, "Mishi Kobe Niku", "Meat/Poultry", 97.0, 29,
                         unmappedField),
                 create(10, "Ikura", "Seafood", 31.0, 31,
-                        unmappedField), };
+                        unmappedField),};
         return Arrays.asList(list);
     }
 

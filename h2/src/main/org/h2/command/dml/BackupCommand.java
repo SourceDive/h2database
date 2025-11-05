@@ -6,12 +6,6 @@
  */
 package org.h2.command.dml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import org.h2.api.DatabaseEventListener;
 import org.h2.api.ErrorCode;
 import org.h2.command.CommandInterface;
@@ -28,6 +22,13 @@ import org.h2.store.FileLister;
 import org.h2.store.PageStore;
 import org.h2.store.fs.FileUtils;
 import org.h2.util.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * This class represents the statement
@@ -103,7 +104,7 @@ public class BackupCommand extends Prepared {
     }
 
     private void backupPageStore(ZipOutputStream out, String fileName,
-            PageStore store) throws IOException {
+                                 PageStore store) throws IOException {
         if (store == null) {
             return;
         }
@@ -134,7 +135,7 @@ public class BackupCommand extends Prepared {
     }
 
     private static void backupFile(ZipOutputStream out, String base, String fn,
-            InputStream in) throws IOException {
+                                   InputStream in) throws IOException {
         String f = FileUtils.toRealPath(fn);
         base = FileUtils.toRealPath(base);
         if (!f.startsWith(base)) {

@@ -6,16 +6,17 @@
  */
 package org.h2.test.unit;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.Random;
 import org.h2.message.DbException;
 import org.h2.test.TestBase;
 import org.h2.test.utils.AssertThrows;
 import org.h2.util.DateTimeUtils;
 import org.h2.util.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.Random;
 
 /**
  * Tests string utility methods.
@@ -45,25 +46,31 @@ public class TestStringUtils extends TestBase {
     private void testHex() {
         assertEquals("face",
                 StringUtils.convertBytesToHex(new byte[]
-                        { (byte) 0xfa, (byte) 0xce }));
-        assertEquals(new byte[] { (byte) 0xfa, (byte) 0xce },
+                        {(byte) 0xfa, (byte) 0xce}));
+        assertEquals(new byte[]{(byte) 0xfa, (byte) 0xce},
                 StringUtils.convertHexToBytes("face"));
-        assertEquals(new byte[] { (byte) 0xfa, (byte) 0xce },
+        assertEquals(new byte[]{(byte) 0xfa, (byte) 0xce},
                 StringUtils.convertHexToBytes("fAcE"));
-        assertEquals(new byte[] { (byte) 0xfa, (byte) 0xce },
+        assertEquals(new byte[]{(byte) 0xfa, (byte) 0xce},
                 StringUtils.convertHexToBytes("FaCe"));
-        new AssertThrows(DbException.class) { @Override
-        public void test() {
-            StringUtils.convertHexToBytes("120");
-        }};
-        new AssertThrows(DbException.class) { @Override
-        public void test() {
-            StringUtils.convertHexToBytes("fast");
-        }};
-        new AssertThrows(DbException.class) { @Override
-        public void test() {
-            StringUtils.convertHexToBytes("012=abcf");
-        }};
+        new AssertThrows(DbException.class) {
+            @Override
+            public void test() {
+                StringUtils.convertHexToBytes("120");
+            }
+        };
+        new AssertThrows(DbException.class) {
+            @Override
+            public void test() {
+                StringUtils.convertHexToBytes("fast");
+            }
+        };
+        new AssertThrows(DbException.class) {
+            @Override
+            public void test() {
+                StringUtils.convertHexToBytes("012=abcf");
+            }
+        };
     }
 
     private void testPad() {
@@ -91,24 +98,24 @@ public class TestStringUtils extends TestBase {
         String s = StringUtils.xmlStartDoc()
                 + StringUtils.xmlComment("Test Comment")
                 + StringUtils.xmlNode("rss",
-                    StringUtils.xmlAttr("version", "2.0"),
-                    StringUtils.xmlComment("Test Comment\nZeile2")
-                    + StringUtils.xmlNode("channel", null,
+                StringUtils.xmlAttr("version", "2.0"),
+                StringUtils.xmlComment("Test Comment\nZeile2")
+                        + StringUtils.xmlNode("channel", null,
                         StringUtils.xmlNode("title", null, "H2 Database Engine")
-                        + StringUtils.xmlNode("link", null, "http://www.h2database.com")
-                        + StringUtils.xmlNode("description", null, "H2 Database Engine")
-                        + StringUtils.xmlNode("language", null, "en-us")
-                        + StringUtils.xmlNode("pubDate", null,
-                                DateTimeUtils.formatDateTime(dt,
-                                "EEE, d MMM yyyy HH:mm:ss z", "en", "GMT"))
-                        + StringUtils.xmlNode("lastBuildDate", null,
-                                DateTimeUtils.formatDateTime(dt,
-                                "EEE, d MMM yyyy HH:mm:ss z", "en", "GMT"))
-                        + StringUtils.xmlNode("item", null,
-                                StringUtils.xmlNode("title", null,
-                                "New Version 0.9.9.9.9")
                                 + StringUtils.xmlNode("link", null, "http://www.h2database.com")
-                                + StringUtils.xmlNode("description", null,
+                                + StringUtils.xmlNode("description", null, "H2 Database Engine")
+                                + StringUtils.xmlNode("language", null, "en-us")
+                                + StringUtils.xmlNode("pubDate", null,
+                                DateTimeUtils.formatDateTime(dt,
+                                        "EEE, d MMM yyyy HH:mm:ss z", "en", "GMT"))
+                                + StringUtils.xmlNode("lastBuildDate", null,
+                                DateTimeUtils.formatDateTime(dt,
+                                        "EEE, d MMM yyyy HH:mm:ss z", "en", "GMT"))
+                                + StringUtils.xmlNode("item", null,
+                                StringUtils.xmlNode("title", null,
+                                        "New Version 0.9.9.9.9")
+                                        + StringUtils.xmlNode("link", null, "http://www.h2database.com")
+                                        + StringUtils.xmlNode("description", null,
                                         StringUtils.xmlCData("\nNew Features\nTest\n")))));
         assertEquals(
                 s,
@@ -182,7 +189,7 @@ public class TestStringUtils extends TestBase {
         assertEquals(3,
                 StringUtils.arraySplit("ABC,DEF,G\\,HI", ',', false).length);
         assertEquals(
-                StringUtils.arrayCombine(new String[] { "", " ", "," }, ','),
+                StringUtils.arrayCombine(new String[]{"", " ", ","}, ','),
                 ", ,\\,");
         Random random = new Random(1);
         for (int i = 0; i < 100; i++) {

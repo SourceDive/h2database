@@ -6,16 +6,13 @@
  */
 package org.h2.test.jaqu;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.h2.jaqu.Db;
-import org.h2.jaqu.DbInspector;
-import org.h2.jaqu.DbUpgrader;
-import org.h2.jaqu.DbVersion;
+import org.h2.jaqu.*;
 import org.h2.jaqu.Table.JQDatabase;
-import org.h2.jaqu.ValidationRemark;
 import org.h2.test.TestBase;
 import org.h2.test.jaqu.SupportedTypes.SupportedTypes2;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Test that the mapping between classes and tables is done correctly.
@@ -141,13 +138,13 @@ public class ModelsTest extends TestBase {
      * A sample database upgrader class.
      */
     @JQDatabase(version = 2)
-    class TestDbUpgrader implements DbUpgrader  {
+    class TestDbUpgrader implements DbUpgrader {
         final AtomicInteger oldVersion = new AtomicInteger(0);
         final AtomicInteger newVersion = new AtomicInteger(0);
 
         @Override
         public boolean upgradeTable(Db db, String schema, String table,
-                int fromVersion, int toVersion) {
+                                    int fromVersion, int toVersion) {
             // just claims success on upgrade request
             oldVersion.set(fromVersion);
             newVersion.set(toVersion);

@@ -6,15 +6,15 @@
  */
 package org.h2.samples;
 
+import org.h2.store.fs.FileUtils;
+import org.h2.tools.DeleteDbFiles;
+import org.h2.tools.RunScript;
+import org.h2.tools.Script;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.store.fs.FileUtils;
-import org.h2.tools.Script;
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.RunScript;
 
 /**
  * This sample application shows how to compact the database files.
@@ -46,13 +46,13 @@ public class Compact {
     /**
      * Utility method to compact a database.
      *
-     * @param dir the directory
-     * @param dbName the database name
-     * @param user the user name
+     * @param dir      the directory
+     * @param dbName   the database name
+     * @param user     the user name
      * @param password the password
      */
     public static void compact(String dir, String dbName,
-            String user, String password) throws SQLException {
+                               String user, String password) throws SQLException {
         String url = "jdbc:h2:" + dir + "/" + dbName;
         String file = "data/test.sql";
         Script.execute(url, user, password, file);

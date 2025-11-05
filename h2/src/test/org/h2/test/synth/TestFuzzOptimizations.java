@@ -6,6 +6,11 @@
  */
 package org.h2.test.synth;
 
+import org.h2.test.TestBase;
+import org.h2.test.db.Db;
+import org.h2.test.db.Db.Prepared;
+import org.h2.util.New;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,11 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import org.h2.test.TestBase;
-import org.h2.test.db.Db;
-import org.h2.test.db.Db.Prepared;
-import org.h2.util.New;
 
 /**
  * This test executes random SQL statements to test if optimizations are working
@@ -96,10 +96,10 @@ public class TestFuzzOptimizations extends TestBase {
         p.execute();
 
         Random seedGenerator = new Random();
-        String[] columns = new String[] { "a", "b", "c" };
-        String[] values = new String[] { null, "0", "0", "1", "2", "10", "a", "?" };
-        String[] compares = new String[] { "in(", "not in(", "=", "=", ">",
-                "<", ">=", "<=", "<>", "in(select", "not in(select" };
+        String[] columns = new String[]{"a", "b", "c"};
+        String[] values = new String[]{null, "0", "0", "1", "2", "10", "a", "?"};
+        String[] compares = new String[]{"in(", "not in(", "=", "=", ">",
+                "<", ">=", "<=", "<>", "in(select", "not in(select"};
         int size = getSize(100, 1000);
         for (int i = 0; i < size; i++) {
             long seed = seedGenerator.nextLong();
@@ -111,10 +111,10 @@ public class TestFuzzOptimizations extends TestBase {
             //   System.out.println(condition + " " + params);
             PreparedStatement prep0 = conn.prepareStatement(
                     "select * from test0 where " + condition
-                    + " order by 1, 2, 3");
+                            + " order by 1, 2, 3");
             PreparedStatement prep1 = conn.prepareStatement(
                     "select * from test1 where " + condition
-                    + " order by 1, 2, 3");
+                            + " order by 1, 2, 3");
             for (int j = 0; j < params.size(); j++) {
                 prep0.setString(j + 1, params.get(j));
                 prep1.setString(j + 1, params.get(j));
@@ -136,7 +136,7 @@ public class TestFuzzOptimizations extends TestBase {
     }
 
     private String getRandomCondition(Random random, ArrayList<String> params,
-            String[] columns, String[] compares, String[] values) {
+                                      String[] columns, String[] compares, String[] values) {
         int comp = 1 + random.nextInt(4);
         StringBuilder buff = new StringBuilder();
         for (int j = 0; j < comp; j++) {
@@ -147,7 +147,7 @@ public class TestFuzzOptimizations extends TestBase {
             String compare = compares[random.nextInt(compares.length)];
             buff.append(column).append(' ').append(compare);
             if (compare.endsWith("in(")) {
-                int len = 1+random.nextInt(3);
+                int len = 1 + random.nextInt(3);
                 for (int k = 0; k < len; k++) {
                     if (k > 0) {
                         buff.append(", ");
@@ -192,15 +192,15 @@ public class TestFuzzOptimizations extends TestBase {
         println("seed: " + seed);
         for (int i = 0; i < 100; i++) {
             String column = random.nextBoolean() ? "A" : "B";
-            String value = new String[] { "NULL", "0", "A", "B" }[random.nextInt(4)];
+            String value = new String[]{"NULL", "0", "A", "B"}[random.nextInt(4)];
             String compare = random.nextBoolean() ? "A" : "B";
             int x = random.nextInt(3);
             String sql1 = "SELECT * FROM TEST T WHERE " + column + "+0 " +
-                "IN(SELECT " + value +
-                " FROM TEST I WHERE I." + compare + "=?) ORDER BY 1, 2";
+                    "IN(SELECT " + value +
+                    " FROM TEST I WHERE I." + compare + "=?) ORDER BY 1, 2";
             String sql2 = "SELECT * FROM TEST T WHERE " + column + " " +
-                "IN(SELECT " + value +
-                " FROM TEST I WHERE I." + compare + "=?) ORDER BY 1, 2";
+                    "IN(SELECT " + value +
+                    " FROM TEST I WHERE I." + compare + "=?) ORDER BY 1, 2";
             List<Map<String, Object>> a = db.prepare(sql1).set(x).query();
             List<Map<String, Object>> b = db.prepare(sql2).set(x).query();
             assertTrue("seed: " + seed + " sql: " + sql1 +
@@ -217,9 +217,9 @@ public class TestFuzzOptimizations extends TestBase {
         println("seed: " + seed);
         for (int i = 0; i < 100; i++) {
             Prepared p = db.prepare("INSERT INTO TEST VALUES(?, ?, ?)");
-            p.set(new String[] { null, "0", "1", "2" }[random.nextInt(4)]);
-            p.set(new String[] { null, "0", "1", "2" }[random.nextInt(4)]);
-            p.set(new String[] { null, "0", "1", "2" }[random.nextInt(4)]);
+            p.set(new String[]{null, "0", "1", "2"}[random.nextInt(4)]);
+            p.set(new String[]{null, "0", "1", "2"}[random.nextInt(4)]);
+            p.set(new String[]{null, "0", "1", "2"}[random.nextInt(4)]);
             p.execute();
         }
         int len = getSize(1000, 3000);
@@ -233,7 +233,7 @@ public class TestFuzzOptimizations extends TestBase {
                     if (k > 0) {
                         x += ",";
                     }
-                    x += new String[] { "A", "B", "C" }[random.nextInt(3)];
+                    x += new String[]{"A", "B", "C"}[random.nextInt(3)];
                 }
                 db.execute(x + ")");
             }
@@ -243,8 +243,8 @@ public class TestFuzzOptimizations extends TestBase {
                     if (k > 0) {
                         x += ",";
                     }
-                    x += new String[] { "SUM(A)", "MAX(B)", "AVG(C)",
-                            "COUNT(B)" }[random.nextInt(4)];
+                    x += new String[]{"SUM(A)", "MAX(B)", "AVG(C)",
+                            "COUNT(B)"}[random.nextInt(4)];
                     x += " S" + k;
                 }
                 x += " FROM ";
@@ -254,7 +254,7 @@ public class TestFuzzOptimizations extends TestBase {
                     if (k > 0) {
                         group += ",";
                     }
-                    group += new String[] { "A", "B", "C" }[random.nextInt(3)];
+                    group += new String[]{"A", "B", "C"}[random.nextInt(3)];
                 }
                 group += " ORDER BY 1, 2, 3";
                 List<Map<String, Object>> a = db.query(x + "TEST" + group);

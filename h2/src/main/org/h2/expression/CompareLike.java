@@ -6,9 +6,6 @@
  */
 package org.h2.expression;
 
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
@@ -16,11 +13,10 @@ import org.h2.index.IndexCondition;
 import org.h2.message.DbException;
 import org.h2.table.ColumnResolver;
 import org.h2.table.TableFilter;
-import org.h2.value.CompareMode;
-import org.h2.value.Value;
-import org.h2.value.ValueBoolean;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueString;
+import org.h2.value.*;
+
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Pattern matching comparison expression: WHERE NAME LIKE ?
@@ -50,13 +46,13 @@ public class CompareLike extends Condition {
     private boolean invalidPattern;
 
     public CompareLike(Database db, Expression left, Expression right,
-            Expression escape, boolean regexp) {
+                       Expression escape, boolean regexp) {
         this(db.getCompareMode(), db.getSettings().defaultEscape, left, right,
                 escape, regexp);
     }
 
     public CompareLike(CompareMode compareMode, String defaultEscape,
-            Expression left, Expression right, Expression escape, boolean regexp) {
+                       Expression left, Expression right, Expression escape, boolean regexp) {
         this.compareMode = compareMode;
         this.defaultEscape = defaultEscape;
         this.regexp = regexp;
@@ -269,33 +265,33 @@ public class CompareLike extends Condition {
     }
 
     private boolean compareAt(String s, int pi, int si, int sLen,
-            char[] pattern, int[] types) {
+                              char[] pattern, int[] types) {
         for (; pi < patternLength; pi++) {
             switch (types[pi]) {
-            case MATCH:
-                if ((si >= sLen) || !compare(pattern, s, pi, si++)) {
-                    return false;
-                }
-                break;
-            case ONE:
-                if (si++ >= sLen) {
-                    return false;
-                }
-                break;
-            case ANY:
-                if (++pi >= patternLength) {
-                    return true;
-                }
-                while (si < sLen) {
-                    if (compare(pattern, s, pi, si) &&
-                            compareAt(s, pi, si, sLen, pattern, types)) {
+                case MATCH:
+                    if ((si >= sLen) || !compare(pattern, s, pi, si++)) {
+                        return false;
+                    }
+                    break;
+                case ONE:
+                    if (si++ >= sLen) {
+                        return false;
+                    }
+                    break;
+                case ANY:
+                    if (++pi >= patternLength) {
                         return true;
                     }
-                    si++;
-                }
-                return false;
-            default:
-                DbException.throwInternalError();
+                    while (si < sLen) {
+                        if (compare(pattern, s, pi, si) &&
+                                compareAt(s, pi, si, sLen, pattern, types)) {
+                            return true;
+                        }
+                        si++;
+                    }
+                    return false;
+                default:
+                    DbException.throwInternalError();
             }
         }
         return si == sLen;
@@ -305,8 +301,8 @@ public class CompareLike extends Condition {
      * Test if the value matches the pattern.
      *
      * @param testPattern the pattern
-     * @param value the value
-     * @param escapeChar the escape character
+     * @param value       the value
+     * @param escapeChar  the escape character
      * @return true if the value matches
      */
     public boolean test(String testPattern, String value, char escapeChar) {

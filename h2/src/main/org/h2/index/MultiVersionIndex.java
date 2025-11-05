@@ -6,8 +6,6 @@
  */
 package org.h2.index;
 
-import java.util.ArrayList;
-
 import org.h2.api.ErrorCode;
 import org.h2.engine.Database;
 import org.h2.engine.DbObject;
@@ -17,13 +15,11 @@ import org.h2.result.Row;
 import org.h2.result.SearchRow;
 import org.h2.result.SortOrder;
 import org.h2.schema.Schema;
-import org.h2.table.Column;
-import org.h2.table.IndexColumn;
-import org.h2.table.RegularTable;
-import org.h2.table.Table;
-import org.h2.table.TableFilter;
+import org.h2.table.*;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
+
+import java.util.ArrayList;
 
 /**
  * A multi-version index is a combination of a regular index,
@@ -143,7 +139,7 @@ public class MultiVersionIndex implements Index {
 
     @Override
     public double getCost(Session session, int[] masks, TableFilter filter,
-            SortOrder sortOrder) {
+                          SortOrder sortOrder) {
         return base.getCost(session, masks, filter, sortOrder);
     }
 
@@ -157,7 +153,7 @@ public class MultiVersionIndex implements Index {
      * within a different session.
      *
      * @param session the original session
-     * @param row the row (only the key is checked)
+     * @param row     the row (only the key is checked)
      * @return true if there is an uncommitted row
      */
     public boolean isUncommittedFromOtherSession(Session session, Row row) {

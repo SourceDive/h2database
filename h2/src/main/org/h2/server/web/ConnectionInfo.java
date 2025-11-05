@@ -57,7 +57,7 @@ public class ConnectionInfo implements Comparable<ConnectionInfo> {
     }
 
     String getString() {
-        return StringUtils.arrayCombine(new String[] { name, driver, url, user }, '|');
+        return StringUtils.arrayCombine(new String[]{name, driver, url, user}, '|');
     }
 
     @Override

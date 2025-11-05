@@ -6,11 +6,12 @@
  */
 package org.h2.test.jaqu;
 
-import java.util.Arrays;
-import java.util.List;
 import org.h2.jaqu.Table.JQColumn;
 import org.h2.jaqu.Table.JQIndex;
 import org.h2.jaqu.Table.JQTable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A table containing product data.
@@ -37,8 +38,8 @@ public class ProductMixedAnnotation {
     }
 
     protected ProductMixedAnnotation(int productId, String productName,
-            String category, double unitPrice, int unitsInStock,
-            String mappedField) {
+                                     String category, double unitPrice, int unitsInStock,
+                                     String mappedField) {
         this.productId = productId;
         this.productName = productName;
         this.category = category;
@@ -48,8 +49,8 @@ public class ProductMixedAnnotation {
     }
 
     private static ProductMixedAnnotation create(int productId,
-            String productName, String category, double unitPrice,
-            int unitsInStock, String mappedField) {
+                                                 String productName, String category, double unitPrice,
+                                                 int unitsInStock, String mappedField) {
         return new ProductMixedAnnotation(productId, productName, category,
                 unitPrice, unitsInStock, mappedField);
     }
@@ -66,7 +67,7 @@ public class ProductMixedAnnotation {
                 create(7, "Uncle Bob's Organic Dried Pears", "Produce", 30.0, 15, mappedField),
                 create(8, "Northwoods Cranberry Sauce", "Condiments", 40.0, 6, mappedField),
                 create(9, "Mishi Kobe Niku", "Meat/Poultry", 97.0, 29, mappedField),
-                create(10, "Ikura", "Seafood", 31.0, 31, mappedField), };
+                create(10, "Ikura", "Seafood", 31.0, 31, mappedField),};
         return Arrays.asList(list);
     }
 

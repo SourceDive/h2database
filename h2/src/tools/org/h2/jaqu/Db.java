@@ -6,19 +6,6 @@
  */
 package org.h2.jaqu;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import javax.sql.DataSource;
 import org.h2.jaqu.DbUpgrader.DefaultDbUpgrader;
 import org.h2.jaqu.SQLDialect.DefaultSQLDialect;
 import org.h2.jaqu.Table.JQDatabase;
@@ -27,6 +14,10 @@ import org.h2.jaqu.util.WeakIdentityHashMap;
 import org.h2.util.JdbcUtils;
 import org.h2.util.New;
 import org.h2.util.StringUtils;
+
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.*;
 
 /**
  * This class represents a connection to a database.
@@ -155,9 +146,9 @@ public class Db {
             if (model.version() > 0) {
                 DbVersion v = new DbVersion();
                 DbVersion dbVersion =
-                // (SCHEMA="" && TABLE="") == DATABASE
-                from(v).where(v.schema).is("").and(v.table).is("")
-                        .selectFirst();
+                        // (SCHEMA="" && TABLE="") == DATABASE
+                        from(v).where(v.schema).is("").and(v.table).is("")
+                                .selectFirst();
                 if (dbVersion == null) {
                     // database has no version registration, but model specifies
                     // version: insert DbVersion entry and return.

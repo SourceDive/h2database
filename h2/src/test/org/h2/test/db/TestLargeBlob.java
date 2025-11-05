@@ -6,12 +6,13 @@
  */
 package org.h2.test.db;
 
+import org.h2.test.TestBase;
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.h2.test.TestBase;
 
 /**
  * Test a BLOB larger than Integer.MAX_VALUE
@@ -45,11 +46,13 @@ public class TestLargeBlob extends TestBase {
         prep.setBinaryStream(1, new InputStream() {
             long remaining = testLength;
             int p;
-            byte[] oneByte = { 0 };
+            byte[] oneByte = {0};
+
             @Override
             public void close() {
                 // ignore
             }
+
             @Override
             public int read(byte[] buff, int off, int len) {
                 len = (int) Math.min(remaining, len);
@@ -59,6 +62,7 @@ public class TestLargeBlob extends TestBase {
                 }
                 return len == 0 ? -1 : len;
             }
+
             @Override
             public int read() {
                 return read(oneByte, 0, 1) < 0 ? -1 : oneByte[0];

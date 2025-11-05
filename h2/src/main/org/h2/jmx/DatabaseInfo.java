@@ -6,15 +6,6 @@
  */
 package org.h2.jmx;
 
-import java.lang.management.ManagementFactory;
-
-import java.sql.Timestamp;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.management.JMException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import org.h2.command.Command;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Constants;
@@ -23,6 +14,15 @@ import org.h2.engine.Session;
 import org.h2.store.PageStore;
 import org.h2.table.Table;
 import org.h2.util.New;
+
+import javax.management.JMException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
+import java.sql.Timestamp;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The MBean implementation.
@@ -34,7 +34,9 @@ public class DatabaseInfo implements DatabaseInfoMBean {
 
     private static final Map<String, ObjectName> MBEANS = New.hashMap();
 
-    /** Database. */
+    /**
+     * Database.
+     */
     private final Database database;
 
     private DatabaseInfo(Database database) {
@@ -66,10 +68,10 @@ public class DatabaseInfo implements DatabaseInfoMBean {
      * Registers an MBean for the database.
      *
      * @param connectionInfo connection info
-     * @param database database
+     * @param database       database
      */
     public static void registerMBean(ConnectionInfo connectionInfo,
-            Database database) throws JMException {
+                                     Database database) throws JMException {
         String path = connectionInfo.getName();
         if (!MBEANS.containsKey(path)) {
             MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
@@ -231,7 +233,7 @@ public class DatabaseInfo implements DatabaseInfoMBean {
         StringBuilder buff = new StringBuilder();
         for (Map.Entry<String, String> e :
                 new TreeMap<String, String>(
-                database.getSettings().getSettings()).entrySet()) {
+                        database.getSettings().getSettings()).entrySet()) {
             buff.append(e.getKey()).append(" = ").append(e.getValue()).append('\n');
         }
         return buff.toString();
@@ -256,7 +258,7 @@ public class DatabaseInfo implements DatabaseInfoMBean {
                 long commandStart = session.getCurrentCommandStart();
                 if (commandStart != 0) {
                     buff.append("started: ").append(
-                            new Timestamp(commandStart)).
+                                    new Timestamp(commandStart)).
                             append('\n');
                 }
             }

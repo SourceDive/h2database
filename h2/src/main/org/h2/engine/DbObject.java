@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import org.h2.table.Table;
 
 /**
+ * <p>数据库对象的统一抽象接口。</p>
+ * <p>看着类似java中Object的存在。</p>
  * A database object such as a table, an index, or a user.
  */
 public interface DbObject {

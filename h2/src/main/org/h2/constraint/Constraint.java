@@ -20,6 +20,7 @@ import org.h2.table.Column;
 import org.h2.table.Table;
 
 /**
+ * <p>约束</p>
  * The base class for constraint checking.
  */
 public abstract class Constraint extends SchemaObjectBase implements

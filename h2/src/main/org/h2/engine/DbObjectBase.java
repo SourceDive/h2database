@@ -18,7 +18,7 @@ public abstract class DbObjectBase implements DbObject {
     /**
      * The database.
      */
-    protected Database database;
+    protected Database database; // 所属数据库
 
     /**
      * The trace module.
@@ -30,10 +30,10 @@ public abstract class DbObjectBase implements DbObject {
      */
     protected String comment;
 
-    private int id;
-    private String objectName;
+    private int id; // 对象id
+    private String objectName; // 对象名称
     private long modificationId;
-    private boolean temporary;
+    private boolean temporary; // 是否为临时对象
 
     /**
      * Initialize some attributes of this object.

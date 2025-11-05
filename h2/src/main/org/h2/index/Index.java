@@ -17,6 +17,7 @@ import org.h2.table.Table;
 import org.h2.table.TableFilter;
 
 /**
+ * <p>视图</p>
  * An index. Indexes are used to speed up searching data.
  */
 public interface Index extends SchemaObject {

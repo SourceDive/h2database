@@ -24,6 +24,7 @@ import org.h2.util.StringUtils;
 import org.h2.util.Utils;
 
 /**
+ * <p>用户</p>
  * Represents a user object.
  */
 public class User extends RightOwner {
@@ -91,6 +92,7 @@ public class User extends RightOwner {
     }
 
     /**
+     * <p>检查用户权限。</p>
      * Checks that this user has the given rights for this database object.
      *
      * @param table the database object

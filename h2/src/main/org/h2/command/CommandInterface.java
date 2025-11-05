@@ -11,6 +11,7 @@ import org.h2.expression.ParameterInterface;
 import org.h2.result.ResultInterface;
 
 /**
+ * <p>代表一条sql语句。</p>
  * Represents a SQL statement.
  */
 public interface CommandInterface {
@@ -460,6 +461,7 @@ public interface CommandInterface {
     int getCommandType();
 
     /**
+     * <p>是否为查询语句。</p>
      * Check if this is a query.
      *
      * @return true if it is a query

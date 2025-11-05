@@ -33,6 +33,7 @@ import org.h2.value.ValueArray;
 import org.h2.value.ValueNull;
 
 /**
+ * <p>函数</p>
  * Represents a user-defined function, or alias.
  *
  * @author Thomas Mueller

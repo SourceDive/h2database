@@ -32,6 +32,7 @@ import org.h2.util.New;
 import org.h2.util.Utils;
 
 /**
+ * <p>模式</p>
  * A schema as created by the SQL statement
  * CREATE SCHEMA
  */

@@ -640,6 +640,7 @@ public class Session extends SessionWithState {
     }
 
     /**
+     * <p>设置保存点。</p>
      * Create a savepoint to allow rolling back to this state.
      *
      * @return the savepoint

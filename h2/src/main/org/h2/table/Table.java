@@ -41,6 +41,7 @@ import org.h2.value.Value;
 import org.h2.value.ValueNull;
 
 /**
+ * <p>表</p>
  * This is the base class for most tables.
  * A table contains a list of columns and a list of rows.
  */

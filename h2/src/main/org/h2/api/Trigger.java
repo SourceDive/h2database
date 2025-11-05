@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
+ * <p>触发器</p>
  * A class that implements this interface can be used as a trigger.
  */
 public interface Trigger {

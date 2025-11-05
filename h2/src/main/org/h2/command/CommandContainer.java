@@ -73,7 +73,7 @@ class CommandContainer extends Command {
     public int update() {
         recompileIfRequired();
         setProgress(DatabaseEventListener.STATE_STATEMENT_START);
-        start();
+        start(); // 计时开始
         session.setLastScopeIdentity(ValueNull.INSTANCE);
         prepared.checkParameters();
         int updateCount = prepared.update();

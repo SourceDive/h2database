@@ -11,6 +11,7 @@ import org.h2.message.Trace;
 import org.h2.table.Table;
 
 /**
+ * <p>角色</p>
  * Represents a role. Roles can be granted to users, and to other roles.
  */
 public class Role extends RightOwner {

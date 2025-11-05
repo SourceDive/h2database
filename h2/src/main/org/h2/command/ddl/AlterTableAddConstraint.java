@@ -99,6 +99,7 @@ public class AlterTableAddConstraint extends SchemaCommand {
             throw DbException.get(ErrorCode.CONSTRAINT_ALREADY_EXISTS_1,
                     constraintName);
         }
+        // 检查用户权限。
         session.getUser().checkRight(table, Right.ALL);
         db.lockMeta(session);
         table.lock(session, true, true);

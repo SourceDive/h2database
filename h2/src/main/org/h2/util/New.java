@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
+ * <p>工具类：创建泛型集合。</p>
  * This class contains static methods to construct commonly used generic objects
  * such as ArrayList.
  */

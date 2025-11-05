@@ -14,7 +14,7 @@ import org.h2.schema.Schema;
  */
 public abstract class SchemaCommand extends DefineCommand {
 
-    private final Schema schema;
+    private final Schema schema; // Schema 对象
 
     /**
      * Create a new command.

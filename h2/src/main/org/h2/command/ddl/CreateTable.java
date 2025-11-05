@@ -103,6 +103,7 @@ public class CreateTable extends SchemaCommand {
         if (!db.isPersistent()) {
             data.persistIndexes = false;
         }
+        // 表已存在，报错
         if (getSchema().findTableOrView(session, data.tableName) != null) {
             if (ifNotExists) {
                 return 0;
@@ -133,6 +134,7 @@ public class CreateTable extends SchemaCommand {
         if (!isSessionTemporary) {
             db.lockMeta(session);
         }
+        // 创建 Table
         Table table = getSchema().createTable(data);
         ArrayList<Sequence> sequences = New.arrayList();
         for (Column c : data.columns) {
@@ -156,6 +158,7 @@ public class CreateTable extends SchemaCommand {
             session.addLocalTempTable(table);
         } else {
             db.lockMeta(session);
+            // 将表添加到数据库。
             db.addSchemaObject(session, table);
         }
         try {

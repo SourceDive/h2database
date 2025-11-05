@@ -114,6 +114,7 @@ public class Constants {
     public static final int LOCK_MODE_READ_COMMITTED = 3;
 
     /**
+     * <p>表级锁</p>
      * The lock mode that means table level locking is used for reads and
      * writes.
      */

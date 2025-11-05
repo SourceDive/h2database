@@ -178,6 +178,7 @@ public abstract class Prepared {
     }
 
     /**
+     * <p>命令是否为查询</p>
      * Check if this object is a query.
      *
      * @return true if it is
@@ -194,6 +195,7 @@ public abstract class Prepared {
     }
 
     /**
+     * <p>执行语句。</p>
      * Execute the statement.
      *
      * @return the update count

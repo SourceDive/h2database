@@ -11,6 +11,8 @@ import org.h2.engine.Session;
 import org.h2.result.ResultInterface;
 
 /**
+ * <p>数据定义语言（DDL）命令。</p>
+ * <p>作用对象：数据库结构</p>
  * This class represents a non-transaction statement, for example a CREATE or
  * DROP.
  */

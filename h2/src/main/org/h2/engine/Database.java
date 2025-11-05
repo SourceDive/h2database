@@ -916,6 +916,7 @@ public class Database implements DataHandler {
     }
 
     /**
+     * <p>添加schema对象到数据库中。</p>
      * Add a schema object to the database.
      *
      * @param session the session
@@ -932,6 +933,7 @@ public class Database implements DataHandler {
     }
 
     /**
+     * <p>添加数据库对象到数据库中。</p>
      * Add an object to the database.
      *
      * @param session the session
@@ -1744,6 +1746,7 @@ public class Database implements DataHandler {
     }
 
     /**
+     * <p>数据库是基于持久化还是基于内存的</p>
      * Check if this database disk-based.
      *
      * @return true if it is disk-based, false it it is in-memory only.

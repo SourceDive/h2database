@@ -194,6 +194,7 @@ public interface DbObject {
     void setTemporary(boolean temporary);
 
     /**
+     * <p>设置备注。</p>
      * Change the comment of this object.
      *
      * @param comment the new comment, or null for no comment

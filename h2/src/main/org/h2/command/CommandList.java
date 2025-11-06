@@ -12,6 +12,7 @@ import org.h2.result.ResultInterface;
 import java.util.ArrayList;
 
 /**
+ * <p>批量执行sql语句。</p>
  * Represents a list of SQL statements.
  */
 class CommandList extends Command {

@@ -17,6 +17,8 @@ import java.util.ArrayList;
  */
 public interface CommandInterface {
 
+    // 这里有三类命令的枚举：ddl、dml、transaction
+
     /**
      * The type for unknown statement.
      */
@@ -372,7 +374,7 @@ public interface CommandInterface {
      */
     int UPDATE = 68;
 
-    // transaction commands
+    // transaction commands 事务命令
 
     /**
      * The type of a SET AUTOCOMMIT statement.
@@ -464,7 +466,7 @@ public interface CommandInterface {
     int getCommandType();
 
     /**
-     * <p>是否为查询语句。</p>
+     * <p>是否为查询命令。</p>
      * Check if this is a query.
      *
      * @return true if it is a query
@@ -479,7 +481,7 @@ public interface CommandInterface {
     ArrayList<? extends ParameterInterface> getParameters();
 
     /**
-     * <p>执行query语句。</p>
+     * <p>执行query命令。</p>
      * Execute the query.
      *
      * @param maxRows    the maximum number of rows returned

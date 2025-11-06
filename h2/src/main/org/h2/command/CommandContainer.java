@@ -16,6 +16,7 @@ import org.h2.value.ValueNull;
 import java.util.ArrayList;
 
 /**
+ * <p>Prepared语句的包装类。</p>
  * Represents a single SQL statements.
  * It wraps a prepared statement.
  */

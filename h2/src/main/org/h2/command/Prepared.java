@@ -69,6 +69,7 @@ public abstract class Prepared {
     }
 
     /**
+     * <p>是否为事务命令。</p>
      * Check if this command is transactional.
      * If it is not, then it forces the current transaction to commit.
      *

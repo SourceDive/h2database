@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * <p>支持客户端-服务器模式。</p>
+ * <p>需要经过网络传输。</p>
  * Represents the client-side part of a SQL statement.
  * This class is not used in embedded mode.
  */

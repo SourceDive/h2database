@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
+ * <p>支持嵌入式模式。</p>
+ * <p>直接在jvm中执行。</p>
  * Represents a SQL statement. This object is only used on the server side.
  */
 public abstract class Command implements CommandInterface {
@@ -55,6 +57,7 @@ public abstract class Command implements CommandInterface {
     }
 
     /**
+     * <p>是否为事务命令。</p>
      * Check if this command is transactional.
      * If it is not, then it forces the current transaction to commit.
      *
@@ -63,6 +66,7 @@ public abstract class Command implements CommandInterface {
     public abstract boolean isTransactional();
 
     /**
+     * <p>是否为查询命令。</p>
      * Check if this command is a query.
      *
      * @return true if it is

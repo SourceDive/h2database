@@ -399,10 +399,10 @@ public class JdbcConnection extends TraceObject implements Connection {
                 debugCode("setAutoCommit(" + autoCommit + ");");
             }
             checkClosed();
-            if (autoCommit && !session.getAutoCommit()) {
-                commit();
+            if (autoCommit && !session.getAutoCommit()) { // 检查
+                commit();                                 // 提交
             }
-            session.setAutoCommit(autoCommit);
+            session.setAutoCommit(autoCommit); // 把 conn 的职责转移到 session 上。
         } catch (Exception e) {
             throw logAndConvert(e);
         }
@@ -426,6 +426,7 @@ public class JdbcConnection extends TraceObject implements Connection {
     }
 
     /**
+     * <p>提交当前事务。</p>
      * Commits the current transaction. This call has only an effect if auto
      * commit is switched off.
      *
@@ -435,8 +436,10 @@ public class JdbcConnection extends TraceObject implements Connection {
     public synchronized void commit() throws SQLException {
         try {
             debugCodeCall("commit");
+
             checkClosedForWrite();
             try {
+                // 组装 sql commit 语句命令。
                 commit = prepareCommand("COMMIT", commit);
                 commit.executeUpdate();
             } finally {
@@ -457,8 +460,10 @@ public class JdbcConnection extends TraceObject implements Connection {
     public synchronized void rollback() throws SQLException {
         try {
             debugCodeCall("rollback");
+
             checkClosedForWrite();
             try {
+                // 执行 rollback 命令。
                 rollbackInternal();
             } finally {
                 afterWriting();
@@ -1153,6 +1158,9 @@ public class JdbcConnection extends TraceObject implements Connection {
         return session.prepareCommand(sql, fetchSize);
     }
 
+    /**
+     * 将给定的sql语句组装为命令。
+     */
     private CommandInterface prepareCommand(String sql, CommandInterface old) {
         return old == null ? session.prepareCommand(sql, Integer.MAX_VALUE) : old;
     }
@@ -1461,7 +1469,9 @@ public class JdbcConnection extends TraceObject implements Connection {
     }
 
     private void rollbackInternal() {
+        // 组装 rollback 命令
         rollback = prepareCommand("ROLLBACK", rollback);
+        // 执行。
         rollback.executeUpdate();
     }
 

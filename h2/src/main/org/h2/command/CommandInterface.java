@@ -455,6 +455,8 @@ public interface CommandInterface {
     int SHUTDOWN_DEFRAG = 84;
 
     /**
+     * <p>获取命令类型。</p>
+     * <p>就是上面这些定义的 int 类型值。</p>
      * Get command type.
      *
      * @return one of the constants above
@@ -477,6 +479,7 @@ public interface CommandInterface {
     ArrayList<? extends ParameterInterface> getParameters();
 
     /**
+     * <p>执行query语句。</p>
      * Execute the query.
      *
      * @param maxRows    the maximum number of rows returned
@@ -486,6 +489,7 @@ public interface CommandInterface {
     ResultInterface executeQuery(int maxRows, boolean scrollable);
 
     /**
+     * <p>执行update语句。</p>
      * Execute the statement
      *
      * @return the update count

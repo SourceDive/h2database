@@ -35,6 +35,7 @@ import org.h2.value.*;
 import java.util.*;
 
 /**
+ * <p>会话。</p>
  * A session represents an embedded database connection. When using the server
  * mode, this object resides on the server side and communicates with a
  * SessionRemote object on the client side.

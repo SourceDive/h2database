@@ -122,10 +122,10 @@ public class Database implements DataHandler {
     private final String cacheType;
     private final String accessModeData;
     private boolean referentialIntegrity = true;
-    private boolean multiVersion;
+    private boolean multiVersion; // 是否启用 MVCC(多版本并发控制)
     private DatabaseCloser closeOnExit;
     private Mode mode = Mode.getInstance(Mode.REGULAR);
-    private boolean multiThreaded;
+    private boolean multiThreaded; // 是否启动多线程访问
     private int maxOperationMemory =
             Constants.DEFAULT_MAX_OPERATION_MEMORY;
     private SmallLRUCache<String, String[]> lobFileListCache;

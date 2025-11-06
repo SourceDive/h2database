@@ -9,6 +9,7 @@ package org.h2.engine;
 import java.util.HashMap;
 
 /**
+ * <p>数据库级别的配置。</p>
  * This class contains various database-level settings. To override the
  * documented default value for a database, append the setting in the database
  * URL: "jdbc:h2:test;ALIAS_COLUMN_NAME=TRUE" when opening the first connection
